@@ -55,6 +55,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
   // Función helper para hacer peticiones autenticadas
   const authenticatedFetch = async (url, options = {}) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -64,7 +67,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       headers['authorization'] = `Bearer ${token}`;
     }
     
-    return fetch(url, {
+    return fetch(fullUrl, {
       ...options,
       headers
     });
@@ -346,13 +349,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const formData = new FormData();
       formData.append('image', file);
 
-      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
       const headers = {};
       if (token) {
         headers['authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/blog/upload-featured-image', {
+      const response = await fetch(`${baseUrl}/blog/upload-featured-image`, {
         method: 'POST',
         body: formData,
         headers: headers // Sin Content-Type para que el browser lo establezca correctamente
@@ -395,13 +398,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const formData = new FormData();
       formData.append('image', file);
 
-      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
       const headers = {};
       if (token) {
         headers['authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/blog/upload-featured-image', {
+      const response = await fetch(`${baseUrl}/blog/upload-featured-image`, {
         method: 'POST',
         body: formData,
         headers: headers // Sin Content-Type para que el browser lo establezca correctamente
