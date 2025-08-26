@@ -37,4 +37,37 @@ router.post('/force-sync-db', async (req, res) => {
   }
 });
 
+// Endpoint temporal para ejecutar seed en producción
+router.post('/seed-database', async (req, res) => {
+  try {
+    console.log('🌱 SEED: Iniciando población de base de datos...');
+    
+    // Verificar token de autorización
+    if (process.env.NODE_ENV === 'production' && !req.headers['x-seed-token']) {
+      return res.status(403).json({
+        success: false,
+        message: 'Token de autorización requerido para seed en producción'
+      });
+    }
+    
+    // Importar y ejecutar la función de seed
+    const { default: seedDatabase } = await import('../data/seedDatabase.js');
+    
+    await seedDatabase();
+    console.log('✅ Seed completado exitosamente');
+    
+    res.json({
+      success: true,
+      message: 'Base de datos poblada exitosamente con categorías, subcategorías y productos'
+    });
+    
+  } catch (error) {
+    console.error('❌ Error en seed:', error);
+    res.status(500).json({
+      success: false,
+      message: `Error poblando base de datos: ${error.message}`
+    });
+  }
+});
+
 export default router;
