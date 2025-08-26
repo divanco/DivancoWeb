@@ -19,7 +19,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
   const [formData, setFormData] = useState({
     title: '',
-    author: 'Administrador', // Agregar autor por defecto
     slug: '',
     excerpt: '',
     content: [],
@@ -159,7 +158,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     
     setFormData({
       title: postData.title || '',
-      author: postData.author || 'Administrador',
       slug: postData.slug || '',
       excerpt: postData.excerpt || '',
       content: postData.content || [],
@@ -205,7 +203,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
         
         setFormData({
           title: post.title || '',
-          author: post.author || 'Administrador',
           slug: post.slug || '',
           excerpt: post.excerpt || '',
           content: post.content || [],
@@ -694,20 +691,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
-                    Autor
-                  </label>
-                  <input
-                    type="text"
-                    id="author"
-                    name="author"
-                    value={formData.author}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
