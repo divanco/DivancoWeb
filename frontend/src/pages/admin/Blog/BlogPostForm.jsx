@@ -73,111 +73,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     });
   }, [token]);
 
-  // Nueva función para cargar post desde prop
-  const loadPostFromProp = useCallback((postData) => {
-    console.log('📝 [BlogPostForm] Cargando datos desde prop:', postData);
-    
-    setFormData({
-      title: postData.title || '',
-      author: postData.author || 'Administrador',
-      slug: postData.slug || '',
-      excerpt: postData.excerpt || '',
-      content: postData.content || [],
-      featuredImage: postData.featuredImage || '',
-      metaTitle: postData.metaTitle || '',
-      metaDescription: postData.metaDescription || '',
-      status: postData.status || 'draft',
-      projectId: postData.projectId || ''
-    });
-
-    // Convertir contenido del post al formato de Editor.js
-    const editorContent = convertToEditorFormat(postData.content);
-    console.log('🔄 [BlogPostForm] Contenido convertido para editor desde prop:', editorContent);
-    setEditorData(editorContent);
-  }, [convertToEditorFormat]);
-
-  const fetchProjects = useCallback(async () => {
-    try {
-      const response = await authenticatedFetch('/projects');
-      if (response.ok) {
-        const data = await response.json();
-        // Asegurar que data sea un array
-        setProjects(Array.isArray(data) ? data : []);
-      } else {
-        console.warn('No se pudieron cargar los proyectos');
-        setProjects([]);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setProjects([]); // Asegurar que projects sea siempre un array
-    }
-  }, [authenticatedFetch]);
-
-  const fetchBlogPost = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log('🔍 [BlogPostForm] Obteniendo post del backend, ID:', editingId);
-      
-      const response = await authenticatedFetch(`/blog/id/${editingId}`);
-      if (response.ok) {
-        const post = await response.json();
-        console.log('📝 [BlogPostForm] Post obtenido:', post);
-        
-        setFormData({
-          title: post.title || '',
-          author: post.author || 'Administrador',
-          slug: post.slug || '',
-          excerpt: post.excerpt || '',
-          content: post.content || [],
-          featuredImage: post.featuredImage || '',
-          metaTitle: post.metaTitle || '',
-          metaDescription: post.metaDescription || '',
-          status: post.status || 'draft',
-          projectId: post.projectId || '' // Cambiar category por projectId
-        });
-
-        // Convertir contenido del backend al formato de Editor.js
-        const editorContent = convertToEditorFormat(post.content);
-        console.log('🔄 [BlogPostForm] Contenido convertido para editor:', editorContent);
-        setEditorData(editorContent);
-      } else {
-        console.error('❌ [BlogPostForm] Error response:', response.status);
-        alert('Error al cargar el post');
-      }
-    } catch (error) {
-      console.error('❌ [BlogPostForm] Error fetching blog post:', error);
-      alert('Error al cargar el post');
-    } finally {
-      setLoading(false);
-    }
-  }, [authenticatedFetch, editingId]);
-
-  // Cargar proyectos (opcional)  
-  useEffect(() => {
-    // Solo intentar cargar proyectos, no es crítico si falla
-    fetchProjects().catch(console.error);
-  }, [fetchProjects]);
-
-  // Efecto separado para cargar datos del post al editar
-  useEffect(() => {
-    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
-    
-    if (isEditing) {
-      // Si tenemos la prop post, usarla directamente
-      if (post) {
-        console.log('📄 [BlogPostForm] Usando post de prop:', post);
-        loadPostFromProp(post);
-      }
-      // Si no tenemos prop post pero sí ID de URL, cargar desde API
-      else if (editingId) {
-        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
-        fetchBlogPost();
-      }
-    } else {
-      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
-    }
-  }, [isEditing, editingId, post, fetchBlogPost, loadPostFromProp]);
-
   // Convertir de formato backend a formato Editor.js
   const convertToEditorFormat = useCallback((backendContent) => {
     console.log('🔄 [BlogPostForm] Convirtiendo contenido backend:', backendContent);
@@ -257,6 +152,111 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     console.log('✅ [BlogPostForm] Contenido convertido:', result);
     return result;
   }, []);
+
+  // Nueva función para cargar post desde prop
+  const loadPostFromProp = useCallback((postData) => {
+    console.log('📝 [BlogPostForm] Cargando datos desde prop:', postData);
+    
+    setFormData({
+      title: postData.title || '',
+      author: postData.author || 'Administrador',
+      slug: postData.slug || '',
+      excerpt: postData.excerpt || '',
+      content: postData.content || [],
+      featuredImage: postData.featuredImage || '',
+      metaTitle: postData.metaTitle || '',
+      metaDescription: postData.metaDescription || '',
+      status: postData.status || 'draft',
+      projectId: postData.projectId || ''
+    });
+
+    // Convertir contenido del post al formato de Editor.js
+    const editorContent = convertToEditorFormat(postData.content);
+    console.log('🔄 [BlogPostForm] Contenido convertido para editor desde prop:', editorContent);
+    setEditorData(editorContent);
+  }, [convertToEditorFormat]);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      const response = await authenticatedFetch('/projects');
+      if (response.ok) {
+        const data = await response.json();
+        // Asegurar que data sea un array
+        setProjects(Array.isArray(data) ? data : []);
+      } else {
+        console.warn('No se pudieron cargar los proyectos');
+        setProjects([]);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setProjects([]); // Asegurar que projects sea siempre un array
+    }
+  }, [authenticatedFetch]);
+
+  const fetchBlogPost = useCallback(async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 [BlogPostForm] Obteniendo post del backend, ID:', editingId);
+      
+      const response = await authenticatedFetch(`/blog/id/${editingId}`);
+      if (response.ok) {
+        const post = await response.json();
+        console.log('📝 [BlogPostForm] Post obtenido:', post);
+        
+        setFormData({
+          title: post.title || '',
+          author: post.author || 'Administrador',
+          slug: post.slug || '',
+          excerpt: post.excerpt || '',
+          content: post.content || [],
+          featuredImage: post.featuredImage || '',
+          metaTitle: post.metaTitle || '',
+          metaDescription: post.metaDescription || '',
+          status: post.status || 'draft',
+          projectId: post.projectId || '' // Cambiar category por projectId
+        });
+
+        // Convertir contenido del backend al formato de Editor.js
+        const editorContent = convertToEditorFormat(post.content);
+        console.log('🔄 [BlogPostForm] Contenido convertido para editor:', editorContent);
+        setEditorData(editorContent);
+      } else {
+        console.error('❌ [BlogPostForm] Error response:', response.status);
+        alert('Error al cargar el post');
+      }
+    } catch (error) {
+      console.error('❌ [BlogPostForm] Error fetching blog post:', error);
+      alert('Error al cargar el post');
+    } finally {
+      setLoading(false);
+    }
+  }, [authenticatedFetch, editingId, convertToEditorFormat]);
+
+  // Cargar proyectos (opcional)  
+  useEffect(() => {
+    // Solo intentar cargar proyectos, no es crítico si falla
+    fetchProjects().catch(console.error);
+  }, [fetchProjects]);
+
+  // Efecto separado para cargar datos del post al editar
+  useEffect(() => {
+    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
+    
+    if (isEditing) {
+      // Si tenemos la prop post, usarla directamente
+      if (post) {
+        console.log('📄 [BlogPostForm] Usando post de prop:', post);
+        loadPostFromProp(post);
+      }
+      // Si no tenemos prop post pero sí ID de URL, cargar desde API
+      else if (editingId) {
+        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
+        fetchBlogPost();
+      }
+    } else {
+      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
+    }
+  }, [isEditing, editingId, post, fetchBlogPost, loadPostFromProp]);
 
   // Manejar cambios en Editor.js
   const handleEditorChange = useCallback((data) => {
