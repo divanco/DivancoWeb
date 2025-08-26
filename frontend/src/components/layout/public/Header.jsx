@@ -8,7 +8,7 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../../hooks";
-import logoCompleto from "../../../assets/images/DIVANCO HV3.PNG";
+import logoCompleto from "../../../assets/images/DIVANCOHV3.png";
 import { useGetRecentProjectsQuery } from "../../../features/projects/projectsApi";
 import { useGetRecentBlogPostsQuery } from "../../../features/blog/blogApi";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApi";
