@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FiSave, FiEye, FiArrowLeft } from 'react-icons/fi';
@@ -8,9 +8,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  // Determinar si estamos editando: puede ser por URL param o por prop post
-  const isEditing = Boolean(id) || Boolean(post?.id);
-  const editingId = id || post?.id;
+  // Memoizar valores para evitar re-renderizados
+  const isEditing = useMemo(() => Boolean(id) || Boolean(post?.id), [id, post?.id]);
+  const editingId = useMemo(() => id || post?.id, [id, post?.id]);
   
   console.log('🔍 [BlogPostForm] Inicializando - URL ID:', id, 'Post ID:', post?.id, 'isEditing:', isEditing, 'editingId:', editingId);
   
@@ -31,22 +31,22 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   });
 
   // Función para manejar el cierre/navegación según el contexto
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (onClose) {
       onClose(); // Si está en modo modal, usar la función de cierre
     } else {
       navigate('/admin/blog'); // Si está en página standalone, navegar
     }
-  };
+  }, [onClose, navigate]);
 
   // Función para manejar el éxito según el contexto
-  const handleSuccess = () => {
+  const handleSuccess = useCallback(() => {
     if (onSuccess) {
       onSuccess(); // Si está en modo modal, usar la función de éxito
     } else {
       navigate('/admin/blog'); // Si está en página standalone, navegar
     }
-  };
+  }, [onSuccess, navigate]);
   const [projects, setProjects] = useState([]); // Cambiar categories por projects
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -54,7 +54,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const [editorData, setEditorData] = useState({ blocks: [] });
 
   // Función helper para hacer peticiones autenticadas
-  const authenticatedFetch = async (url, options = {}) => {
+  const authenticatedFetch = useCallback(async (url, options = {}) => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
     const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
     
@@ -71,36 +71,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       ...options,
       headers
     });
-  };
-
-  // Cargar proyectos (opcional)
-  useEffect(() => {
-    // Solo intentar cargar proyectos, no es crítico si falla
-    fetchProjects().catch(console.error);
-  }, []);
-
-  // Efecto separado para cargar datos del post al editar
-  useEffect(() => {
-    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
-    
-    if (isEditing) {
-      // Si tenemos la prop post, usarla directamente
-      if (post) {
-        console.log('� [BlogPostForm] Usando post de prop:', post);
-        loadPostFromProp(post);
-      }
-      // Si no tenemos prop post pero sí ID de URL, cargar desde API
-      else if (editingId) {
-        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
-        fetchBlogPost();
-      }
-    } else {
-      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
-    }
-  }, [isEditing, editingId, post]);
+  }, [token]);
 
   // Nueva función para cargar post desde prop
-  const loadPostFromProp = (postData) => {
+  const loadPostFromProp = useCallback((postData) => {
     console.log('📝 [BlogPostForm] Cargando datos desde prop:', postData);
     
     setFormData({
@@ -120,9 +94,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     const editorContent = convertToEditorFormat(postData.content);
     console.log('🔄 [BlogPostForm] Contenido convertido para editor desde prop:', editorContent);
     setEditorData(editorContent);
-  };
+  }, [convertToEditorFormat]);
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const response = await authenticatedFetch('/projects');
       if (response.ok) {
@@ -137,9 +111,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       console.error('Error fetching projects:', error);
       setProjects([]); // Asegurar que projects sea siempre un array
     }
-  };
+  }, [authenticatedFetch]);
 
-  const fetchBlogPost = async () => {
+  const fetchBlogPost = useCallback(async () => {
     try {
       setLoading(true);
       console.log('🔍 [BlogPostForm] Obteniendo post del backend, ID:', editingId);
@@ -176,10 +150,36 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authenticatedFetch, editingId]);
+
+  // Cargar proyectos (opcional)  
+  useEffect(() => {
+    // Solo intentar cargar proyectos, no es crítico si falla
+    fetchProjects().catch(console.error);
+  }, [fetchProjects]);
+
+  // Efecto separado para cargar datos del post al editar
+  useEffect(() => {
+    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
+    
+    if (isEditing) {
+      // Si tenemos la prop post, usarla directamente
+      if (post) {
+        console.log('📄 [BlogPostForm] Usando post de prop:', post);
+        loadPostFromProp(post);
+      }
+      // Si no tenemos prop post pero sí ID de URL, cargar desde API
+      else if (editingId) {
+        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
+        fetchBlogPost();
+      }
+    } else {
+      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
+    }
+  }, [isEditing, editingId, post, fetchBlogPost, loadPostFromProp]);
 
   // Convertir de formato backend a formato Editor.js
-  const convertToEditorFormat = (backendContent) => {
+  const convertToEditorFormat = useCallback((backendContent) => {
     console.log('🔄 [BlogPostForm] Convirtiendo contenido backend:', backendContent);
     
     if (!backendContent || !Array.isArray(backendContent)) {
@@ -256,13 +256,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     const result = { blocks };
     console.log('✅ [BlogPostForm] Contenido convertido:', result);
     return result;
-  };
+  }, []);
 
   // Manejar cambios en Editor.js
-  const handleEditorChange = (data) => {
+  const handleEditorChange = useCallback((data) => {
     console.log('📝 Editor cambió:', data);
     setEditorData(data);
-  };
+  }, []);
 
   // Efecto para debuggear cambios en editorData
   useEffect(() => {
@@ -270,14 +270,14 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   }, [editorData]);
 
   // Función para limpiar HTML del texto
-  const stripHtml = (html) => {
+  const stripHtml = useCallback((html) => {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || '';
-  };
+  }, []);
 
   // Convertir contenido del Editor.js al formato del backend
-  const convertToBackendFormat = (editorData) => {
+  const convertToBackendFormat = useCallback((editorData) => {
     if (!editorData?.blocks) return [];
 
     return editorData.blocks.map(block => {
@@ -338,10 +338,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
           };
       }
     });
-  };
+  }, [stripHtml]);
 
   // Función para subir imagen destacada a Cloudinary
-  const handleFeaturedImageUpload = async (file) => {
+  const handleFeaturedImageUpload = useCallback(async (file) => {
     try {
       setLoading(true);
       console.log('📸 Subiendo imagen destacada a Cloudinary:', file.name);
@@ -388,10 +388,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   // Función para subir imágenes del contenido
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = useCallback(async (file) => {
     try {
       console.log('📸 Subiendo imagen del contenido:', file.name);
 
@@ -429,29 +429,29 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const url = URL.createObjectURL(file);
       return { url };
     }
-  };
+  }, [token]);
 
   // Generar slug automáticamente
-  const generateSlug = (title) => {
+  const generateSlug = useCallback((title) => {
     return title
       .toLowerCase()
       .replace(/[^a-z0-9 -]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
-  };
+  }, []);
 
   // Manejar cambios en inputs
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value,
       ...(name === 'title' && { slug: generateSlug(value) })
     }));
-  };
+  }, [generateSlug]);
 
   // Enviar formulario
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -548,10 +548,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, editorData, editorInstance, convertToBackendFormat, isEditing, editingId, authenticatedFetch, handleSuccess]);
 
   // Renderizar preview de bloques
-  const renderPreviewBlock = (block) => {
+  const renderPreviewBlock = useCallback((block) => {
     switch (block.type) {
       case 'text':
         return (
@@ -636,7 +636,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
           <p className="mb-4 text-gray-700">{block.value}</p>
         );
     }
-  };
+  }, []);
 
   if (loading) {
     return (
