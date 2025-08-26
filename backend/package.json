@@ -5,10 +5,14 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "npm run init-db && node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "jest",
-    "seed": "node src/data/seedDataStandalone.cjs"
+    "seed": "node src/data/seedDataStandalone.cjs",
+    "init-db": "node src/data/initDatabase.cjs",
+    "sync-production": "node src/data/syncProduction.cjs",
+    "build": "echo 'Build completed'",
+    "postbuild": "npm run init-db"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
