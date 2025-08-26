@@ -188,6 +188,18 @@ export const createBlogPost = async (req, res) => {
       publishedAt
     } = req.body;
 
+    console.log('🔍 [BACKEND] createBlogPost - datos recibidos:', {
+      title: title?.substring(0, 50),
+      author,
+      contentLength: Array.isArray(content) ? content.length : 'no array',
+      slug,
+      excerpt: excerpt?.substring(0, 50),
+      projectId,
+      tags,
+      status,
+      isFeatured
+    });
+
     // Validaciones básicas
     if (!title || title.trim().length < 5) {
       return res.status(400).json({
@@ -203,6 +215,7 @@ export const createBlogPost = async (req, res) => {
         message: 'El contenido es requerido y debe tener al menos un bloque.'
       });
     }
+    
     // Al menos un bloque de texto con más de 10 caracteres
     const hasValidTextBlock = content.some(
       block => block.type === 'text' && typeof block.value === 'string' && block.value.trim().length >= 10
@@ -214,6 +227,26 @@ export const createBlogPost = async (req, res) => {
       });
     }
 
+    // Generar slug si no se proporciona
+    let finalSlug = slug;
+    if (!finalSlug || finalSlug.trim().length === 0) {
+      finalSlug = title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      
+      // Asegurar que el slug sea único
+      const existingPost = await BlogPost.findOne({ where: { slug: finalSlug } });
+      if (existingPost) {
+        finalSlug = `${finalSlug}-${Date.now()}`;
+      }
+    }
+
+    console.log('🔍 [BACKEND] Slug generado:', finalSlug);
     
     // Verificar proyecto si se especifica
     if (projectId) {
@@ -228,7 +261,7 @@ export const createBlogPost = async (req, res) => {
 
     // Crear el post
     const postData = {
-      slug,
+      slug: finalSlug,
       title: title.trim(),
       author: author?.trim() || null,
       content, // array de bloques
@@ -239,6 +272,8 @@ export const createBlogPost = async (req, res) => {
       isFeatured: Boolean(isFeatured),
       publishedAt: status === 'published' ? (publishedAt ? new Date(publishedAt) : new Date()) : null
     };
+
+    console.log('🔍 [BACKEND] Creando post con datos:', postData);
 
     const post = await BlogPost.create(postData);
 
@@ -276,18 +311,29 @@ export const createBlogPost = async (req, res) => {
       data: post
     });
   } catch (error) {
-    console.error('Error creando post:', error);
+    console.error('❌ [BACKEND] Error creando post:', error);
+    console.error('❌ [BACKEND] Error name:', error.name);
+    console.error('❌ [BACKEND] Error message:', error.message);
+    console.error('❌ [BACKEND] Error stack:', error.stack);
     
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({
         success: false,
-        message: 'Ya existe un post con ese título'
+        message: 'Ya existe un post con ese título o slug'
+      });
+    }
+    
+    if (error.name === 'SequelizeValidationError') {
+      const validationErrors = error.errors.map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Error de validación: ' + validationErrors.join(', ')
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor'
+      message: 'Error interno del servidor: ' + error.message
     });
   }
 };
