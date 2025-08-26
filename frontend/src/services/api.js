@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // Base query con autenticación automática
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://divancoweb.onrender.com' || 'http://localhost:3001',
+  baseUrl: 'https://divancoweb.onrender.com' ,
   prepareHeaders: (headers, { getState, endpoint }) => {
     const token = getState().auth.token;
     if (token) {
