@@ -55,9 +55,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
   // Función helper para hacer peticiones autenticadas
   const authenticatedFetch = async (url, options = {}) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
-    
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -67,7 +64,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       headers['authorization'] = `Bearer ${token}`;
     }
     
-    return fetch(fullUrl, {
+    return fetch(url, {
       ...options,
       headers
     });
