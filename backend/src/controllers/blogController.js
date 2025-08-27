@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 export const getAllBlogPosts = async (req, res) => {
   try {
     const { 
-      status = 'published', // Por defecto solo posts publicados
+      status,
       project,
       tags,
       featured = false,
