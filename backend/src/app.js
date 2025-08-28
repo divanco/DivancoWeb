@@ -64,6 +64,9 @@ app.use((req, res, next) => {
 // ✅ Static files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads/')));
 
+// ✅ Servir archivos estáticos del frontend (ajusta la ruta si tu build está en otro lugar)
+app.use(express.static(path.join(process.cwd(), 'frontend', 'dist')));
+
 app.get('/', (req, res) => {
   res.send('Backend Divanco Running 🏗️');
 });
@@ -98,9 +101,25 @@ app.post('/upload', testUpload.single('file'), (req, res) => {
 });
 
 // ✅ RUTAS PRINCIPALES (después de middlewares básicos)
+
 app.use(routes);
 
-// 404 handler
+// SPA fallback: servir index.html para cualquier ruta que no sea archivo subido ni estático
+import fs from 'fs';
+const frontendDist = path.join(process.cwd(), 'frontend', 'dist');
+const indexHtml = path.join(frontendDist, 'index.html');
+
+app.get('*', (req, res, next) => {
+  // Si la ruta es para archivos subidos, no hacer fallback
+  if (req.path.startsWith('/uploads')) return next();
+  // Si la ruta es para un archivo estático existente, no hacer fallback
+  const filePath = path.join(frontendDist, req.path);
+  if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) return res.sendFile(filePath);
+  // Fallback: servir index.html
+  res.sendFile(indexHtml);
+});
+
+// 404 handler (solo si no existe ni como archivo ni como ruta)
 app.use('*', (req, res) => {
   res.status(404).json({ error: true, message: 'Route not found' });
 });
