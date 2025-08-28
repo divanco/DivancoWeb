@@ -108,8 +108,17 @@ app.use(routes);
 // SPA fallback: servir index.html para cualquier ruta que no sea archivo subido ni estático
 import fs from 'fs';
 
+
 const frontendDist = path.join(process.cwd(), 'dist');
 const indexHtml = path.join(frontendDist, 'index.html');
+console.log('🟢 [SERVER] frontendDist:', frontendDist);
+console.log('🟢 [SERVER] indexHtml:', indexHtml);
+import fs from 'fs';
+if (fs.existsSync(indexHtml)) {
+  console.log('✅ [SERVER] index.html encontrado');
+} else {
+  console.error('❌ [SERVER] index.html NO encontrado');
+}
 
 app.get('*', (req, res, next) => {
   // Si la ruta es para archivos subidos, no hacer fallback
