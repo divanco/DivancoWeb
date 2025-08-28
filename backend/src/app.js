@@ -64,8 +64,9 @@ app.use((req, res, next) => {
 // ✅ Static files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads/')));
 
-// ✅ Servir archivos estáticos del frontend (ajusta la ruta si tu build está en otro lugar)
-app.use(express.static(path.join(process.cwd(), 'frontend', 'dist')));
+
+// ✅ Servir archivos estáticos del frontend (ahora en backend/dist)
+app.use(express.static(path.join(process.cwd(), 'dist')));
 
 app.get('/', (req, res) => {
   res.send('Backend Divanco Running 🏗️');
@@ -106,7 +107,8 @@ app.use(routes);
 
 // SPA fallback: servir index.html para cualquier ruta que no sea archivo subido ni estático
 import fs from 'fs';
-const frontendDist = path.join(process.cwd(), 'frontend', 'dist');
+
+const frontendDist = path.join(process.cwd(), 'dist');
 const indexHtml = path.join(frontendDist, 'index.html');
 
 app.get('*', (req, res, next) => {
