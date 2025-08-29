@@ -33,10 +33,13 @@ app.use(morgan('dev'));
 app.use(cors({
   origin: [
     'https://divanco-web.vercel.app',
-    'http://localhost:5173'
+    'https://divancoweb.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000'
   ],
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with'],
   credentials: true
 }));
 
