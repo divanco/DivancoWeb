@@ -811,3 +811,41 @@ export const getRecentBlogPosts = async (req, res) => {
     });
   }
 };
+
+// ✅ NUEVO: Obtener proyectos disponibles para relacionar con blog posts
+export const getAvailableProjects = async (req, res) => {
+  try {
+    const { limit = 50, search } = req.query;
+
+    const whereClause = {
+      isActive: true,
+      isPublic: true
+    };
+
+    // Búsqueda opcional por título
+    if (search) {
+      whereClause.title = {
+        [Op.iLike]: `%${search}%`
+      };
+    }
+
+    const projects = await Project.findAll({
+      where: whereClause,
+      attributes: ['id', 'title', 'slug', 'year', 'location', 'projectType'],
+      order: [['year', 'DESC'], ['title', 'ASC']],
+      limit: parseInt(limit)
+    });
+
+    res.json({
+      success: true,
+      data: projects,
+      count: projects.length
+    });
+  } catch (error) {
+    console.error('Error obteniendo proyectos disponibles:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};

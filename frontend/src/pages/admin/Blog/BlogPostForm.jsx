@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FiSave, FiEye, FiArrowLeft } from 'react-icons/fi';
 import { EditorJSComponent } from '../../../components/ui';
+import { useGetAvailableProjectsQuery } from '../../../features/blog/blogApi';
 
 const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const navigate = useNavigate();
@@ -53,6 +54,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const [editorInstance, setEditorInstance] = useState(null);
   const [editorData, setEditorData] = useState({ blocks: [] });
 
+  // ✅ NUEVO: Usar hook para obtener proyectos disponibles
+  const { data: projectsData, isLoading: loadingProjects } = useGetAvailableProjectsQuery();
+
   // Función helper para hacer peticiones autenticadas
   const authenticatedFetch = async (url, options = {}) => {
     const headers = {
@@ -70,11 +74,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     });
   };
 
-  // Cargar proyectos (opcional)
-  useEffect(() => {
-    // Solo intentar cargar proyectos, no es crítico si falla
-    fetchProjects().catch(console.error);
-  }, []);
+  // ✅ ACTUALIZADO: Ya no necesitamos cargar proyectos manualmente
+  // useEffect(() => {
+  //   fetchProjects().catch(console.error);
+  // }, []);
 
   // Efecto separado para cargar datos del post al editar
   useEffect(() => {
@@ -119,22 +122,22 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     setEditorData(editorContent);
   };
 
-  const fetchProjects = async () => {
-    try {
-      const response = await authenticatedFetch('/projects');
-      if (response.ok) {
-        const data = await response.json();
-        // Asegurar que data sea un array
-        setProjects(Array.isArray(data) ? data : []);
-      } else {
-        console.warn('No se pudieron cargar los proyectos');
-        setProjects([]);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setProjects([]); // Asegurar que projects sea siempre un array
-    }
-  };
+  // ✅ ACTUALIZADO: Ya no necesitamos esta función, se maneja con React Query
+  // const fetchProjects = async () => {
+  //   try {
+  //     const response = await authenticatedFetch('/projects');
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setProjects(Array.isArray(data) ? data : []);
+  //     } else {
+  //       console.warn('No se pudieron cargar los proyectos');
+  //       setProjects([]);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching projects:', error);
+  //     setProjects([]);
+  //   }
+  // };
 
   const fetchBlogPost = async () => {
     try {
@@ -738,7 +741,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
                 <div>
                   <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Proyecto (opcional)
+                    Proyecto Relacionado (Opcional)
                   </label>
                   <select
                     id="projectId"
@@ -746,19 +749,30 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                     value={formData.projectId}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={loadingProjects}
                   >
-                    <option value="">Sin proyecto asociado</option>
-                    {Array.isArray(projects) && projects.map(project => (
+                    <option value="">Sin proyecto relacionado</option>
+                    {projectsData?.data?.map(project => (
                       <option key={project.id} value={project.id}>
-                        {project.title}
+                        {project.title} ({project.year}) - {project.location || 'Sin ubicación'}
                       </option>
                     ))}
                   </select>
-                  {!Array.isArray(projects) || projects.length === 0 ? (
-                    <p className="text-sm text-gray-500 mt-1">
-                      No hay proyectos disponibles. Los blogs pueden crearse sin asociar a un proyecto.
+                  {loadingProjects && (
+                    <p className="text-sm text-blue-500 mt-1">
+                      Cargando proyectos disponibles...
                     </p>
-                  ) : null}
+                  )}
+                  {!loadingProjects && (!projectsData?.data || projectsData.data.length === 0) && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      No hay proyectos disponibles. Los posts pueden crearse sin relacionar a un proyecto.
+                    </p>
+                  )}
+                  {!loadingProjects && projectsData?.data && projectsData.data.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {projectsData.data.length} proyecto{projectsData.data.length !== 1 ? 's' : ''} disponible{projectsData.data.length !== 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
 
                 <div>

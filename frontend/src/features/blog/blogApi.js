@@ -129,6 +129,21 @@ export const blogApi = baseApi.injectEndpoints({
         { type: 'BlogPost', id: id }
       ],
     }),
+
+    // ✅ NUEVO: Admin - Obtener proyectos disponibles para relacionar
+    getAvailableProjects: builder.query({
+      query: ({ search, limit = 50 } = {}) => {
+        const params = new URLSearchParams({
+          limit: limit.toString()
+        });
+        
+        if (search) params.append('search', search);
+        
+        return `/blog/available-projects?${params}`;
+      },
+      providesTags: ['Project'],
+      keepUnusedDataFor: 300, // 5 minutos de cache
+    }),
   }),
 });
 
@@ -146,4 +161,5 @@ export const {
   useDeleteBlogPostMutation,
   useDeleteBlogPostImageMutation,
   useDeleteBlogPostVideoMutation,
+  useGetAvailableProjectsQuery, // ✅ NUEVO HOOK
 } = blogApi;
