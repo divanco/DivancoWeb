@@ -111,7 +111,7 @@ const Header = () => {
   // Lógica para el fondo del header
   const getHeaderBackground = () => {
     if (!isHomepage) {
-      return "bg-gray-800/60 backdrop-blur-md shadow-lg border-b border-white/10 py-8";
+      return "bg-gray-800/50 backdrop-blur-md shadow-lg border-b border-white/10";
     } else {
       return scrolled
         ? "bg-gray-800/50 backdrop-blur-md shadow-lg border-b border-white/10"
@@ -168,7 +168,7 @@ const Header = () => {
           <>
             {/* Overlay oscuro detrás del menú */}
             <div
-              className="fixed inset-0 z-[1100] bg-black/80 backdrop-blur-sm transition-opacity animate-fade-in"
+              className="fixed inset-0 z-[1100] bg-black/90 backdrop-blur-sm transition-opacity animate-fade-in"
               onClick={() => setMobileMenuOpen(false)}
             />
             <MinimalMobileMenu
@@ -219,8 +219,12 @@ const MinimalMobileMenu = ({
 
   return (
     <div
-      className="fixed top-0 right-0 h-full w-4/5 max-w-xs px-6 pt-8 pb-8 space-y-4 backdrop-blur-lg shadow-2xl animate-fade-in border-l border-white/10"
-      style={{ backgroundColor: "rgba(0,0,0,0.98)", zIndex }}
+      className="fixed top-0 right-0 h-screen w-4/5 max-w-xs px-6 pt-8 pb-8 space-y-4 shadow-2xl animate-fade-in border-l border-white/10 overflow-y-auto"
+      style={{
+        backgroundColor: "#000000",
+        zIndex: zIndex || 1200,
+        minHeight: "100vh"
+      }}
     >
       {/* Botón X para cerrar menú */}
       <button
@@ -239,7 +243,7 @@ const MinimalMobileMenu = ({
               <button
                 className={`flex items-center w-full text-left text-base font-light tracking-widest uppercase py-3 px-2 rounded transition-all duration-200 group ${
                   openSubmenu === "showrooms"
-                    ? "text-naranjaDivanco bg-white/5"
+                    ? "text-naranjaDivanco bg-black/40"
                     : "text-white/80 hover:text-naranjaDivanco"
                 }`}
                 onClick={() =>
@@ -264,7 +268,7 @@ const MinimalMobileMenu = ({
                       <button
                         className={`flex items-center w-full text-left text-sm font-medium py-2 px-2 rounded transition-all duration-200 group ${
                           openCat === cat.slug
-                            ? "text-naranjaDivanco bg-white/5"
+                            ? "text-naranjaDivanco bg-black/40"
                             : "text-white/70 hover:text-naranjaDivanco"
                         }`}
                         onClick={() =>
@@ -306,7 +310,7 @@ const MinimalMobileMenu = ({
               <button
                 className={`flex items-center w-full text-left text-base font-light tracking-widest uppercase py-3 px-2 rounded transition-all duration-200 group ${
                   openSubmenu === "proyectos"
-                    ? "text-naranjaDivanco bg-white/5"
+                    ? "text-naranjaDivanco bg-black/40"
                     : "text-white/80 hover:text-naranjaDivanco"
                 }`}
                 onClick={() =>
@@ -354,7 +358,7 @@ const MinimalMobileMenu = ({
               <button
                 className={`flex items-center w-full text-left text-base font-light tracking-widest uppercase py-3 px-2 rounded transition-all duration-200 group ${
                   openSubmenu === "blog"
-                    ? "text-naranjaDivanco bg-white/5"
+                    ? "text-naranjaDivanco bg-black/40"
                     : "text-white/80 hover:text-naranjaDivanco"
                 }`}
                 onClick={() =>
@@ -399,7 +403,7 @@ const MinimalMobileMenu = ({
             <button
               className={`flex items-center w-full text-left text-base font-light tracking-widest uppercase py-3 px-2 rounded transition-all duration-200 group ${
                 openSubmenu === item.name.toLowerCase()
-                  ? "text-naranjaDivanco bg-white/5"
+                  ? "text-naranjaDivanco bg-black/40"
                   : "text-white/80 hover:text-naranjaDivanco"
               }`}
               onClick={() =>

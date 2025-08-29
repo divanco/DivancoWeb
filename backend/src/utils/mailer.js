@@ -2,19 +2,26 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Debug: verificar variables de entorno
+console.log('🔧 [MAILER] Configuración SMTP:');
+console.log('   MAIL_HOST:', process.env.MAIL_HOST);
+console.log('   MAIL_PORT:', process.env.MAIL_PORT);
+console.log('   MAIL_USER:', process.env.MAIL_USER);
+console.log('   MAIL_PASS:', process.env.MAIL_PASS ? '***configurado***' : 'NO CONFIGURADO');
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
   secure: false,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
   },
 });
 
 export async function sendMail({ to, subject, text, html, from }) {
   return transporter.sendMail({
-    from: from || process.env.SMTP_USER,
+    from: from || process.env.MAIL_USER,
     to,
     subject,
     text,

@@ -13,7 +13,8 @@ import {
   deleteBlogPostImage,
   deleteBlogPostVideo,
   getFeaturedBlogPosts,
-  getRecentBlogPosts
+  getRecentBlogPosts,
+  getAvailableProjects
 } from '../controllers/blogController.js';
 import { authenticateToken, requireRole } from '../middlewares/auth.js';
 
@@ -69,6 +70,9 @@ const uploadVideo = multer({
 router.get('/', getAllBlogPosts);
 router.get('/featured', getFeaturedBlogPosts);
 router.get('/recent', getRecentBlogPosts);
+
+// ✅ NUEVA: Ruta para obtener proyectos disponibles (protegida para admin)
+router.get('/available-projects', authenticateToken, requireRole(['admin']), getAvailableProjects);
 
 // Ruta protegida para obtener por ID (para edición)
 router.get('/id/:id', authenticateToken, requireRole(['admin']), getBlogPostById);

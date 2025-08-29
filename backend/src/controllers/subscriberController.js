@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 // Crear nueva suscripción
 export const subscribe = async (req, res) => {
   try {
-    const { email, name } = req.body;
+    const { email } = req.body;
 
     // Validación básica
     if (!email || !email.trim()) {
@@ -40,10 +40,7 @@ export const subscribe = async (req, res) => {
       } else {
         // Reactivar suscripción
         await subscriber.update({
-          isActive: true,
-          name: name?.trim() || subscriber.name,
-          unsubscribeToken: null,
-          resubscribedAt: new Date()
+          isActive: true
         });
 
         // Enviar email de bienvenida
@@ -57,8 +54,7 @@ export const subscribe = async (req, res) => {
           success: true,
           message: 'Suscripción reactivada exitosamente',
           data: {
-            email: subscriber.email,
-            name: subscriber.name
+            email: subscriber.email
           }
         });
       }
@@ -67,7 +63,6 @@ export const subscribe = async (req, res) => {
     // Crear nueva suscripción
     subscriber = await Subscriber.create({
       email: cleanEmail,
-      name: name?.trim() || null,
       isActive: true,
       subscribedAt: new Date()
     });
@@ -83,8 +78,7 @@ export const subscribe = async (req, res) => {
       success: true,
       message: 'Suscripción creada exitosamente',
       data: {
-        email: subscriber.email,
-        name: subscriber.name
+        email: subscriber.email
       }
     });
   } catch (error) {
@@ -96,26 +90,24 @@ export const subscribe = async (req, res) => {
   }
 };
 
-// Cancelar suscripción por token
+// Cancelar suscripción por ID
 export const unsubscribe = async (req, res) => {
   try {
-    const { token } = req.params;
+    const { token } = req.params; // Mantenemos el nombre 'token' para compatibilidad con frontend
 
     if (!token) {
       return res.status(400).json({
         success: false,
-        message: 'Token de cancelación requerido'
+        message: 'ID de suscriptor requerido'
       });
     }
 
-    const subscriber = await Subscriber.findOne({
-      where: { unsubscribeToken: token }
-    });
+    const subscriber = await Subscriber.findByPk(token);
 
     if (!subscriber) {
       return res.status(404).json({
         success: false,
-        message: 'Token de cancelación inválido o expirado'
+        message: 'Suscriptor no encontrado'
       });
     }
 
@@ -145,7 +137,7 @@ export const unsubscribe = async (req, res) => {
   }
 };
 
-// Generar token de cancelación
+// Generar enlace de cancelación
 export const generateUnsubscribeToken = async (req, res) => {
   try {
     const { email } = req.body;
@@ -171,18 +163,15 @@ export const generateUnsubscribeToken = async (req, res) => {
       });
     }
 
-    // El token se genera automáticamente en el modelo
-    await subscriber.save();
-
     res.json({
       success: true,
-      message: 'Token de cancelación generado',
+      message: 'Enlace de cancelación generado',
       data: {
-        unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe/${subscriber.unsubscribeToken}`
+        unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe/${subscriber.id}`
       }
     });
   } catch (error) {
-    console.error('Error generando token:', error);
+    console.error('Error generando enlace:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -250,17 +239,14 @@ export const getAllSubscribers = async (req, res) => {
     }
 
     if (search) {
-      whereClause[Op.or] = [
-        { email: { [Op.iLike]: `%${search}%` } },
-        { name: { [Op.iLike]: `%${search}%` } }
-      ];
+      whereClause.email = { [Op.iLike]: `%${search}%` };
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     const { count, rows: subscribers } = await Subscriber.findAndCountAll({
       where: whereClause,
-      attributes: ['id', 'email', 'name', 'isActive', 'subscribedAt', 'unsubscribedAt'],
+      attributes: ['id', 'email', 'isActive', 'subscribedAt', 'unsubscribedAt'],
       order: [['subscribedAt', 'DESC']],
       limit: parseInt(limit),
       offset: offset
@@ -290,16 +276,15 @@ export const exportActiveSubscribers = async (req, res) => {
   try {
     const subscribers = await Subscriber.findAll({
       where: { isActive: true },
-      attributes: ['email', 'name', 'subscribedAt'],
+      attributes: ['email', 'subscribedAt'],
       order: [['subscribedAt', 'DESC']]
     });
 
     // Formato CSV
-    const csvHeader = 'Email,Nombre,Fecha de Suscripción\n';
+    const csvHeader = 'Email,Fecha de Suscripción\n';
     const csvContent = subscribers.map(subscriber => {
-      const name = subscriber.name || '';
       const date = subscriber.subscribedAt.toISOString().split('T')[0];
-      return `${subscriber.email},"${name}",${date}`;
+      return `${subscriber.email},${date}`;
     }).join('\n');
 
     const csv = csvHeader + csvContent;
