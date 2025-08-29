@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FiSave, FiEye, FiArrowLeft } from 'react-icons/fi';
 import { EditorJSComponent } from '../../../components/ui';
+import { useGetAvailableProjectsQuery } from '../../../features/blog/blogApi';
 
 const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  // Memoizar valores para evitar re-renderizados
-  const isEditing = useMemo(() => Boolean(id) || Boolean(post?.id), [id, post?.id]);
-  const editingId = useMemo(() => id || post?.id, [id, post?.id]);
+  // Determinar si estamos editando: puede ser por URL param o por prop post
+  const isEditing = Boolean(id) || Boolean(post?.id);
+  const editingId = id || post?.id;
   
   console.log('🔍 [BlogPostForm] Inicializando - URL ID:', id, 'Post ID:', post?.id, 'isEditing:', isEditing, 'editingId:', editingId);
   
@@ -31,33 +32,33 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   });
 
   // Función para manejar el cierre/navegación según el contexto
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     if (onClose) {
       onClose(); // Si está en modo modal, usar la función de cierre
     } else {
       navigate('/admin/blog'); // Si está en página standalone, navegar
     }
-  }, [onClose, navigate]);
+  };
 
   // Función para manejar el éxito según el contexto
-  const handleSuccess = useCallback(() => {
+  const handleSuccess = () => {
     if (onSuccess) {
       onSuccess(); // Si está en modo modal, usar la función de éxito
     } else {
       navigate('/admin/blog'); // Si está en página standalone, navegar
     }
-  }, [onSuccess, navigate]);
+  };
   const [projects, setProjects] = useState([]); // Cambiar categories por projects
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [editorInstance, setEditorInstance] = useState(null);
   const [editorData, setEditorData] = useState({ blocks: [] });
 
+  // ✅ NUEVO: Usar hook para obtener proyectos disponibles
+  const { data: projectsData, isLoading: loadingProjects } = useGetAvailableProjectsQuery();
+
   // Función helper para hacer peticiones autenticadas
-  const authenticatedFetch = useCallback(async (url, options = {}) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
-    
+  const authenticatedFetch = async (url, options = {}) => {
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -67,14 +68,118 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       headers['authorization'] = `Bearer ${token}`;
     }
     
-    return fetch(fullUrl, {
+    return fetch(url, {
       ...options,
       headers
     });
-  }, [token]);
+  };
+
+  // ✅ ACTUALIZADO: Ya no necesitamos cargar proyectos manualmente
+  // useEffect(() => {
+  //   fetchProjects().catch(console.error);
+  // }, []);
+
+  // Efecto separado para cargar datos del post al editar
+  useEffect(() => {
+    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
+    
+    if (isEditing) {
+      // Si tenemos la prop post, usarla directamente
+      if (post) {
+        console.log('� [BlogPostForm] Usando post de prop:', post);
+        loadPostFromProp(post);
+      }
+      // Si no tenemos prop post pero sí ID de URL, cargar desde API
+      else if (editingId) {
+        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
+        fetchBlogPost();
+      }
+    } else {
+      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
+    }
+  }, [isEditing, editingId, post]);
+
+  // Nueva función para cargar post desde prop
+  const loadPostFromProp = (postData) => {
+    console.log('📝 [BlogPostForm] Cargando datos desde prop:', postData);
+    
+    setFormData({
+      title: postData.title || '',
+      author: postData.author || 'Administrador',
+      slug: postData.slug || '',
+      excerpt: postData.excerpt || '',
+      content: postData.content || [],
+      featuredImage: postData.featuredImage || '',
+      metaTitle: postData.metaTitle || '',
+      metaDescription: postData.metaDescription || '',
+      status: postData.status || 'draft',
+      projectId: postData.projectId || ''
+    });
+
+    // Convertir contenido del post al formato de Editor.js
+    const editorContent = convertToEditorFormat(postData.content);
+    console.log('🔄 [BlogPostForm] Contenido convertido para editor desde prop:', editorContent);
+    setEditorData(editorContent);
+  };
+
+  // ✅ ACTUALIZADO: Ya no necesitamos esta función, se maneja con React Query
+  // const fetchProjects = async () => {
+  //   try {
+  //     const response = await authenticatedFetch('/projects');
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setProjects(Array.isArray(data) ? data : []);
+  //     } else {
+  //       console.warn('No se pudieron cargar los proyectos');
+  //       setProjects([]);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching projects:', error);
+  //     setProjects([]);
+  //   }
+  // };
+
+  const fetchBlogPost = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 [BlogPostForm] Obteniendo post del backend, ID:', editingId);
+      
+      const response = await authenticatedFetch(`/blog/id/${editingId}`);
+      if (response.ok) {
+        const post = await response.json();
+        console.log('📝 [BlogPostForm] Post obtenido:', post);
+        
+        setFormData({
+          title: post.title || '',
+          author: post.author || 'Administrador',
+          slug: post.slug || '',
+          excerpt: post.excerpt || '',
+          content: post.content || [],
+          featuredImage: post.featuredImage || '',
+          metaTitle: post.metaTitle || '',
+          metaDescription: post.metaDescription || '',
+          status: post.status || 'draft',
+          projectId: post.projectId || '' // Cambiar category por projectId
+        });
+
+        // Convertir contenido del backend al formato de Editor.js
+        const editorContent = convertToEditorFormat(post.content);
+        console.log('🔄 [BlogPostForm] Contenido convertido para editor:', editorContent);
+        setEditorData(editorContent);
+      } else {
+        console.error('❌ [BlogPostForm] Error response:', response.status);
+        alert('Error al cargar el post');
+      }
+    } catch (error) {
+      console.error('❌ [BlogPostForm] Error fetching blog post:', error);
+      alert('Error al cargar el post');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Convertir de formato backend a formato Editor.js
-  const convertToEditorFormat = useCallback((backendContent) => {
+  const convertToEditorFormat = (backendContent) => {
     console.log('🔄 [BlogPostForm] Convirtiendo contenido backend:', backendContent);
     
     if (!backendContent || !Array.isArray(backendContent)) {
@@ -151,118 +256,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     const result = { blocks };
     console.log('✅ [BlogPostForm] Contenido convertido:', result);
     return result;
-  }, []);
-
-  // Nueva función para cargar post desde prop
-  const loadPostFromProp = useCallback((postData) => {
-    console.log('📝 [BlogPostForm] Cargando datos desde prop:', postData);
-    
-    setFormData({
-      title: postData.title || '',
-      author: postData.author || 'Administrador',
-      slug: postData.slug || '',
-      excerpt: postData.excerpt || '',
-      content: postData.content || [],
-      featuredImage: postData.featuredImage || '',
-      metaTitle: postData.metaTitle || '',
-      metaDescription: postData.metaDescription || '',
-      status: postData.status || 'draft',
-      projectId: postData.projectId || ''
-    });
-
-    // Convertir contenido del post al formato de Editor.js
-    const editorContent = convertToEditorFormat(postData.content);
-    console.log('🔄 [BlogPostForm] Contenido convertido para editor desde prop:', editorContent);
-    setEditorData(editorContent);
-  }, [convertToEditorFormat]);
-
-  const fetchProjects = useCallback(async () => {
-    try {
-      const response = await authenticatedFetch('/projects');
-      if (response.ok) {
-        const data = await response.json();
-        // Asegurar que data sea un array
-        setProjects(Array.isArray(data) ? data : []);
-      } else {
-        console.warn('No se pudieron cargar los proyectos');
-        setProjects([]);
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      setProjects([]); // Asegurar que projects sea siempre un array
-    }
-  }, [authenticatedFetch]);
-
-  const fetchBlogPost = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log('🔍 [BlogPostForm] Obteniendo post del backend, ID:', editingId);
-      
-      const response = await authenticatedFetch(`/blog/id/${editingId}`);
-      if (response.ok) {
-        const post = await response.json();
-        console.log('📝 [BlogPostForm] Post obtenido:', post);
-        
-        setFormData({
-          title: post.title || '',
-          author: post.author || 'Administrador',
-          slug: post.slug || '',
-          excerpt: post.excerpt || '',
-          content: post.content || [],
-          featuredImage: post.featuredImage || '',
-          metaTitle: post.metaTitle || '',
-          metaDescription: post.metaDescription || '',
-          status: post.status || 'draft',
-          projectId: post.projectId || '' // Cambiar category por projectId
-        });
-
-        // Convertir contenido del backend al formato de Editor.js
-        const editorContent = convertToEditorFormat(post.content);
-        console.log('🔄 [BlogPostForm] Contenido convertido para editor:', editorContent);
-        setEditorData(editorContent);
-      } else {
-        console.error('❌ [BlogPostForm] Error response:', response.status);
-        alert('Error al cargar el post');
-      }
-    } catch (error) {
-      console.error('❌ [BlogPostForm] Error fetching blog post:', error);
-      alert('Error al cargar el post');
-    } finally {
-      setLoading(false);
-    }
-  }, [authenticatedFetch, editingId, convertToEditorFormat]);
-
-  // Cargar proyectos (opcional)  
-  useEffect(() => {
-    // Solo intentar cargar proyectos, no es crítico si falla
-    fetchProjects().catch(console.error);
-  }, [fetchProjects]);
-
-  // Efecto separado para cargar datos del post al editar
-  useEffect(() => {
-    console.log('🔄 [BlogPostForm] useEffect disparado - isEditing:', isEditing, 'editingId:', editingId, 'post prop:', post);
-    
-    if (isEditing) {
-      // Si tenemos la prop post, usarla directamente
-      if (post) {
-        console.log('📄 [BlogPostForm] Usando post de prop:', post);
-        loadPostFromProp(post);
-      }
-      // Si no tenemos prop post pero sí ID de URL, cargar desde API
-      else if (editingId) {
-        console.log('📖 [BlogPostForm] Cargando post desde API, ID:', editingId);
-        fetchBlogPost();
-      }
-    } else {
-      console.log('⚠️ [BlogPostForm] Modo creación - no se carga post');
-    }
-  }, [isEditing, editingId, post, fetchBlogPost, loadPostFromProp]);
+  };
 
   // Manejar cambios en Editor.js
-  const handleEditorChange = useCallback((data) => {
+  const handleEditorChange = (data) => {
     console.log('📝 Editor cambió:', data);
     setEditorData(data);
-  }, []);
+  };
 
   // Efecto para debuggear cambios en editorData
   useEffect(() => {
@@ -270,14 +270,14 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   }, [editorData]);
 
   // Función para limpiar HTML del texto
-  const stripHtml = useCallback((html) => {
+  const stripHtml = (html) => {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || '';
-  }, []);
+  };
 
   // Convertir contenido del Editor.js al formato del backend
-  const convertToBackendFormat = useCallback((editorData) => {
+  const convertToBackendFormat = (editorData) => {
     if (!editorData?.blocks) return [];
 
     return editorData.blocks.map(block => {
@@ -338,10 +338,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
           };
       }
     });
-  }, [stripHtml]);
+  };
 
   // Función para subir imagen destacada a Cloudinary
-  const handleFeaturedImageUpload = useCallback(async (file) => {
+  const handleFeaturedImageUpload = async (file) => {
     try {
       setLoading(true);
       console.log('📸 Subiendo imagen destacada a Cloudinary:', file.name);
@@ -349,13 +349,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const formData = new FormData();
       formData.append('image', file);
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
       const headers = {};
       if (token) {
         headers['authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${baseUrl}/blog/upload-featured-image`, {
+      const response = await fetch('/blog/upload-featured-image', {
         method: 'POST',
         body: formData,
         headers: headers // Sin Content-Type para que el browser lo establezca correctamente
@@ -388,23 +388,23 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  };
 
   // Función para subir imágenes del contenido
-  const handleImageUpload = useCallback(async (file) => {
+  const handleImageUpload = async (file) => {
     try {
       console.log('📸 Subiendo imagen del contenido:', file.name);
 
       const formData = new FormData();
       formData.append('image', file);
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
       const headers = {};
       if (token) {
         headers['authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${baseUrl}/blog/upload-featured-image`, {
+      const response = await fetch('/blog/upload-featured-image', {
         method: 'POST',
         body: formData,
         headers: headers // Sin Content-Type para que el browser lo establezca correctamente
@@ -429,29 +429,29 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const url = URL.createObjectURL(file);
       return { url };
     }
-  }, [token]);
+  };
 
   // Generar slug automáticamente
-  const generateSlug = useCallback((title) => {
+  const generateSlug = (title) => {
     return title
       .toLowerCase()
       .replace(/[^a-z0-9 -]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
-  }, []);
+  };
 
   // Manejar cambios en inputs
-  const handleInputChange = useCallback((e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value,
       ...(name === 'title' && { slug: generateSlug(value) })
     }));
-  }, [generateSlug]);
+  };
 
   // Enviar formulario
-  const handleSubmit = useCallback(async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -548,10 +548,10 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  }, [formData, editorData, editorInstance, convertToBackendFormat, isEditing, editingId, authenticatedFetch, handleSuccess]);
+  };
 
   // Renderizar preview de bloques
-  const renderPreviewBlock = useCallback((block) => {
+  const renderPreviewBlock = (block) => {
     switch (block.type) {
       case 'text':
         return (
@@ -636,7 +636,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
           <p className="mb-4 text-gray-700">{block.value}</p>
         );
     }
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -741,7 +741,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
                 <div>
                   <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Proyecto (opcional)
+                    Proyecto Relacionado (Opcional)
                   </label>
                   <select
                     id="projectId"
@@ -749,19 +749,30 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                     value={formData.projectId}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={loadingProjects}
                   >
-                    <option value="">Sin proyecto asociado</option>
-                    {Array.isArray(projects) && projects.map(project => (
+                    <option value="">Sin proyecto relacionado</option>
+                    {projectsData?.data?.map(project => (
                       <option key={project.id} value={project.id}>
-                        {project.title}
+                        {project.title} ({project.year}) - {project.location || 'Sin ubicación'}
                       </option>
                     ))}
                   </select>
-                  {!Array.isArray(projects) || projects.length === 0 ? (
-                    <p className="text-sm text-gray-500 mt-1">
-                      No hay proyectos disponibles. Los blogs pueden crearse sin asociar a un proyecto.
+                  {loadingProjects && (
+                    <p className="text-sm text-blue-500 mt-1">
+                      Cargando proyectos disponibles...
                     </p>
-                  ) : null}
+                  )}
+                  {!loadingProjects && (!projectsData?.data || projectsData.data.length === 0) && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      No hay proyectos disponibles. Los posts pueden crearse sin relacionar a un proyecto.
+                    </p>
+                  )}
+                  {!loadingProjects && projectsData?.data && projectsData.data.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {projectsData.data.length} proyecto{projectsData.data.length !== 1 ? 's' : ''} disponible{projectsData.data.length !== 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
 
                 <div>

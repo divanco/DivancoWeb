@@ -13,8 +13,8 @@ import { authenticateToken, requireRole } from '../middlewares/auth.js';
 const router = express.Router();
 
 // Rutas públicas
-router.post('/subscribe', subscribe);
-router.get('/unsubscribe/:token', unsubscribe);
+router.post('/', subscribe); // POST /subscribers
+router.delete('/unsubscribe/:token', unsubscribe); // DELETE /subscribers/unsubscribe/:token
 router.post('/unsubscribe-link', generateUnsubscribeToken);
 
 // Rutas protegidas (solo para administradores)

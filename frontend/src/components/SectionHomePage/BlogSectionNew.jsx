@@ -3,8 +3,8 @@ import { useGetFeaturedBlogPostsQuery, useGetRecentBlogPostsQuery } from '../../
 import { scrollToSection } from '../../utils/simpleScroll';
 
 const BlogSection = () => {
-  const { data: featuredResponse, isLoading: featuredLoading, error: featuredError } = useGetFeaturedBlogPostsQuery(3);
-  const { data: recentResponse, isLoading: recentLoading, error: recentError } = useGetRecentBlogPostsQuery(3);
+  const { data: featuredResponse, isLoading: featuredLoading, error: featuredError } = useGetFeaturedBlogPostsQuery(1);
+  const { data: recentResponse, isLoading: recentLoading, error: recentError } = useGetRecentBlogPostsQuery(1);
   
   // Usar posts destacados si existen, si no usar posts recientes
   const featuredPosts = featuredResponse?.data || [];
@@ -104,7 +104,7 @@ const BlogSection = () => {
             <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4">
               News
               <span className="block text-sm font-normal text-gray-500 mt-2 tracking-wider uppercase">
-                — MIRA LAS NOVEDADES
+                — ÚLTIMA NOVEDAD
               </span>
             </h2>
           </div>
@@ -128,7 +128,7 @@ const BlogSection = () => {
 
         {/* Blog Posts */}
         <div className="space-y-12 lg:space-y-16">
-          {blogPosts.map((post, index) => (
+          {blogPosts.slice(0, 1).map((post, index) => (
             <article key={post.id} className="group">
               
               {/* ✅ MOBILE: Layout vertical (columnas) */}
