@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { 
   MapPinIcon, 
   PhoneIcon, 
-  EnvelopeIcon,
-  BuildingOfficeIcon
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
 
 import Newsletter from './Newsletter'; 
@@ -19,7 +18,11 @@ const Footer = () => {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-4">
-              <BuildingOfficeIcon className="h-8 w-8 text-primary-400" />
+              <img 
+                src="/images/logoblanco.png" 
+                alt="Divanco Logo" 
+                className="h-16 w-auto"
+              />
               <span className="ml-2 text-xl font-bold">Divanco</span>
             </div>
             <p className="text-gray-300 mb-6 max-w-md">
@@ -129,7 +132,7 @@ const Footer = () => {
                   className="h-6 w-auto group-hover:scale-105 transition-transform"
                 />
                 <span className="text-gray-300 text-sm font-medium group-hover:text-white transition-colors">
-                  Code Developers
+                  Code Desarrolladores Web
                 </span>
               </div>
             </div>
