@@ -23,6 +23,7 @@ import BlogPostPage from "../pages/public/BlogPostPage";
 import AboutPage from "../pages/public/AboutPage";
 import ContactPage from "../pages/public/ContactPage";
 import SearchPage from "../pages/public/SearchPage";
+import EdicionesPage from "../components/layout/public/EdicionesPage";
 
 // 🔐 Auth Pages
 import LoginPage from "../pages/auth/LoginPage";
@@ -79,6 +80,10 @@ export const router = createBrowserRouter(
         {
           path: "proyectos/:slug",
           element: <ProjectDetailPage />,
+        },
+        {
+          path: "ediciones",
+          element: <EdicionesPage />,
         },
         {
           path: "blog",

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGetProjectsByYearQuery } from '../../../features/projects/projectsApi';
 import { scrollToSection } from '../../../utils/simpleScroll';
 
 function EdicionesPage() {
   const [currentImage, setCurrentImage] = useState(0);
   const currentYear = 2025; // Cambiar esto para mostrar diferentes años
+  const navigate = useNavigate();
 
   // ✅ Obtener proyectos del año actual desde la API
   const { data: projectsData, isLoading, error } = useGetProjectsByYearQuery(currentYear);
@@ -74,19 +75,53 @@ function EdicionesPage() {
               index === currentImage ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%23f5f5f5'/%3E%3Ctext x='600' y='400' text-anchor='middle' fill='%23999' font-size='32' font-family='Arial'%3EEdiciones 2025%3C/text%3E%3C/svg%3E";
-              }}
-            />
+            {/* Hacer la imagen clickeable si tiene proyecto */}
+            {image.project ? (
+              <div 
+                className="absolute inset-0 cursor-pointer group z-20"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('🖱️ Click en imagen:', image.project.title);
+                  console.log('🔗 Slug del proyecto:', image.project.slug);
+                  console.log('🌐 Navegando a:', `/proyectos/${image.project.slug}`);
+                  navigate(`/proyectos/${image.project.slug}`);
+                }}
+                style={{ pointerEvents: 'auto' }}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%23f5f5f5'/%3E%3Ctext x='600' y='400' text-anchor='middle' fill='%23999' font-size='32' font-family='Arial'%3EEdiciones 2025%3C/text%3E%3C/svg%3E";
+                  }}
+                />
+                {/* Indicador visual de que es clickeable */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
+                    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%23f5f5f5'/%3E%3Ctext x='600' y='400' text-anchor='middle' fill='%23999' font-size='32' font-family='Arial'%3EEdiciones 2025%3C/text%3E%3C/svg%3E";
+                }}
+              />
+            )}
           </div>
         ))}
         
         {/* Overlay sutil */}
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
       </div>
 
       {/* Contenido principal */}
@@ -173,21 +208,28 @@ function EdicionesPage() {
           </div>
 
           {/* Call to action sutil */}
-          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30">
             {images[currentImage]?.project ? (
-              <Link 
-                to={`/proyectos/${images[currentImage].project.slug}`}
-                className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group"
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('🔘 Click en botón Ver detalles');
+                  console.log('🔗 Navegando a:', `/proyectos/${images[currentImage].project.slug}`);
+                  navigate(`/proyectos/${images[currentImage].project.slug}`);
+                }}
+                className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group cursor-pointer bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/50"
+                style={{ pointerEvents: 'auto' }}
               >
                 Ver detalles
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </Link>
+              </button>
             ) : (
               <Link 
                 to="/proyectos"
-                className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group"
+                className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/50"
               >
                 Ver todos los proyectos
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
