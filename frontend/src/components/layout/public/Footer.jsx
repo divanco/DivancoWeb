@@ -18,17 +18,16 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1 lg:col-span-2">
-            <div className="flex items-center mb-4">
-              <img 
-                src="/images/logoblanco.png" 
-                alt="Divanco Logo" 
-                className="h-16 w-auto"
-              />
-              <span className="ml-2 text-xl font-bold">Divanco</span>
-            </div>
-            <p className="text-gray-300 mb-6 max-w-md">
-              {t('footer.companyDescription')}
-            </p>
+  <div className="flex items-center mb-2">
+    <img 
+      src="/images/DIVANCOHV3.png" 
+      alt="Divanco Logo" 
+      className="h-28 w-auto"
+    />
+  </div>
+  <p className="text-gray-300 mb-6 max-w-md">
+    {t('footer.companyDescription')}
+  </p>
             
             {/* Contact Info */}
             <div className="space-y-3">

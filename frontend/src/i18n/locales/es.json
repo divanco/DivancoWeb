@@ -122,7 +122,7 @@
     }
   },
   "newsletter": {
-    "title": "Newsletter",
+    "title": "Noticias",
     "description": "Recibe las últimas noticias sobre nuestros proyectos y novedades del blog",
     "emailPlaceholder": "tu-email@ejemplo.com",
     "subscribe": "SUSCRIBETE",
