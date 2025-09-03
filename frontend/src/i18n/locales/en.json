@@ -134,5 +134,32 @@
       "successDefault": "Subscription successful! Check your email to confirm.",
       "errorDefault": "Error subscribing. Please try again."
     }
+  },
+  "aboutPage": {
+    "title": "About Us - Divanco Architecture",
+    "metaDescription": "At Divanco Construction, we don't just build, we design the future of architecture. Every space we create is a manifestation of exclusivity, innovation and harmony with the environment.",
+    "sectionTitle": "ABOUT US",
+    "heroTitle": "We design the",
+    "heroTitleHighlight": "future",
+    "heroTitleEnd": "of architecture",
+    "heroDescription": "At Divanco Construction, we don't just build, we design the future of architecture. Every space we create is a manifestation of exclusivity, innovation and harmony with the environment.",
+    "quote": "We become the bridge between our clients' vision and the materialization of spaces that inspire, transform and transcend.",
+    "philosophyTitle": "Our Philosophy",
+    "philosophyText1": "Our architectural footprint doesn't follow trends, it sets them, redefining lifestyle and the way the world is inhabited.",
+    "philosophyText2": "Each project is unique, each space tells a story, and each design establishes a new standard of excellence in contemporary architecture.",
+    "values": {
+      "innovation": {
+        "title": "Innovation",
+        "description": "We implement cutting-edge technologies and methodologies in every project."
+      },
+      "exclusivity": {
+        "title": "Exclusivity",
+        "description": "Each space is unique and reflects the personality of those who inhabit it."
+      },
+      "harmony": {
+        "title": "Harmony",
+        "description": "We design in perfect harmony with the environment and nature."
+      }
+    }
   }
 }

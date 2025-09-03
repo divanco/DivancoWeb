@@ -39,11 +39,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <PhoneIcon className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-300">+57 320 8021225</span>
+                <span className="text-gray-300">+57 310 5706816</span>
               </div>
               <div className="flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-300">info@divanco.com</span>
+                <span className="text-gray-300">info@grupodivanco.com</span>
               </div>
             </div>
           </div>

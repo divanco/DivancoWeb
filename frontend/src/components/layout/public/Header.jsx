@@ -36,7 +36,7 @@ const Header = () => {
   // Navegación completa
   const navigation = [
     { name: t('navigation.showrooms'), href: "/showrooms" },
-    { name: t('navigation.nosotros'), href: "/about" },
+    { name: t('navigation.nosotros'), href: "/nosotros" },
     { name: t('navigation.projects'), href: "/proyectos" },
     { name: t('navigation.editions'), href: "/ediciones" },
     { name: t('navigation.noticias'), href: "/blog" },

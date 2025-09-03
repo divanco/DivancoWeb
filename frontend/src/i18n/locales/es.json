@@ -134,5 +134,32 @@
       "successDefault": "¡Suscripción exitosa! Revisa tu email para confirmar.",
       "errorDefault": "Error al suscribirse. Intenta nuevamente."
     }
+  },
+  "aboutPage": {
+    "title": "Nosotros - Divanco Arquitectura",
+    "metaDescription": "En Divanco Constructora, no solo edificamos, diseñamos el futuro de la arquitectura. Cada espacio que creamos es una manifestación de exclusividad, innovación y armonía con el entorno.",
+    "sectionTitle": "NOSOTROS",
+    "heroTitle": "Diseñamos el",
+    "heroTitleHighlight": "futuro",
+    "heroTitleEnd": "de la arquitectura",
+    "heroDescription": "En Divanco Constructora, no solo edificamos, diseñamos el futuro de la arquitectura. Cada espacio que creamos es una manifestación de exclusividad, innovación y armonía con el entorno.",
+    "quote": "Nos convertimos en el puente entre la visión de nuestros clientes y la materialización de espacios que inspiran, transforman y trascienden.",
+    "philosophyTitle": "Nuestra Filosofía",
+    "philosophyText1": "Nuestra huella arquitectónica no sigue tendencias, las impone, redefiniendo el estilo de vida y la manera en que se habita el mundo.",
+    "philosophyText2": "Cada proyecto es único, cada espacio cuenta una historia, y cada diseño establece un nuevo estándar de excelencia en la arquitectura contemporánea.",
+    "values": {
+      "innovation": {
+        "title": "Innovación",
+        "description": "Implementamos tecnologías y metodologías de vanguardia en cada proyecto."
+      },
+      "exclusivity": {
+        "title": "Exclusividad",
+        "description": "Cada espacio es único y refleja la personalidad de quienes lo habitan."
+      },
+      "harmony": {
+        "title": "Armonía",
+        "description": "Diseñamos en perfecta sintonía con el entorno y la naturaleza."
+      }
+    }
   }
 }
