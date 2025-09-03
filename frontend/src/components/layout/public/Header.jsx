@@ -218,6 +218,7 @@ const MinimalMobileMenu = ({
   user,
   zIndex = 50,
 }) => {
+  const { t } = useTranslation();
   const { data: categoriesData } = useGetCategoriesQuery({
     limit: 50,
     page: 1,
@@ -246,7 +247,7 @@ const MinimalMobileMenu = ({
       <button
         className="absolute top-4 right-4 text-white/80 hover:text-naranjaDivanco transition-all z-50 p-2 rounded-full bg-black/30 backdrop-blur-md"
         style={{ fontSize: 28, lineHeight: 1 }}
-        aria-label="Cerrar menú"
+        aria-label={t('menu.closeMenu')}
         onClick={() => setMobileMenuOpen(false)}
       >
         <XMarkIcon className="h-8 w-8" />
@@ -311,7 +312,7 @@ const MinimalMobileMenu = ({
                   {(!categoriesData?.data ||
                     categoriesData.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay categorías
+                      {t('menu.noCategories')}
                     </span>
                   )}
                 </div>
@@ -359,7 +360,7 @@ const MinimalMobileMenu = ({
                   {(!recentProjects?.data ||
                     recentProjects.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay proyectos recientes
+                      {t('menu.noRecentProjects')}
                     </span>
                   )}
                 </div>
@@ -405,7 +406,7 @@ const MinimalMobileMenu = ({
                   {(!recentBlogPosts?.data ||
                     recentBlogPosts.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay posts recientes
+                      {t('menu.noRecentPosts')}
                     </span>
                   )}
                 </div>
@@ -446,7 +447,7 @@ const MinimalMobileMenu = ({
                   className="block text-sm text-white/70 hover:text-naranjaDivanco py-2 px-2 rounded transition-all duration-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Ir a {item.name}
+                  {t('menu.goTo')} {item.name}
                 </Link>
               </div>
             )}
@@ -460,7 +461,7 @@ const MinimalMobileMenu = ({
         onClick={() => setMobileMenuOpen(false)}
       >
         <MagnifyingGlassIcon className="h-5 w-5" />
-        <span>Buscar</span>
+        <span>{t('menu.search')}</span>
       </Link>
       {isAuthenticated && (
         <div>
@@ -479,7 +480,7 @@ const MinimalMobileMenu = ({
             }}
             className="block w-full text-left text-base font-light uppercase tracking-widest text-white/80 hover:text-red-400 py-3 px-2 rounded transition-all duration-200"
           >
-            Cerrar sesión
+            {t('menu.logout')}
           </button>
         </div>
       )}
@@ -488,6 +489,7 @@ const MinimalMobileMenu = ({
 };
 
 function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
+  const { t } = useTranslation();
   const { data: subcatData } = useGetSubcategoriesByCategoryQuery({
     categorySlug,
     limit: 20,
@@ -509,7 +511,7 @@ function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
         className="block text-xs text-white/60 hover:text-naranjaDivanco py-1 px-2 rounded transition-all duration-200 font-medium"
         onClick={() => setMobileMenuOpen(false)}
       >
-        Ver todos los productos de {category?.name}
+        {t('common.seeAll')} {category?.name}
       </Link>
       
       {/* Subcategorías */}

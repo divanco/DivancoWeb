@@ -37,7 +37,10 @@
     "goTo": "Ir a",
     "noRecentProjects": "No hay proyectos recientes",
     "noRecentPosts": "No hay posts recientes",
-    "noCategories": "No hay categorías"
+    "noCategories": "No hay categorías",
+    "search": "Buscar",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión"
   },
   "pages": {
     "blog": {
