@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useGetSliderProjectsQuery } from '../../features/projects/projectsApi';
 import { scrollToSection } from '../../utils/simpleScroll';
+import { useTranslation } from '../../hooks';
 
 const ProjectSection = ({ limit = 6 }) => {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useGetSliderProjectsQuery(limit);
   const projects = data?.data || [];
 
@@ -175,7 +177,7 @@ const ProjectSection = ({ limit = 6 }) => {
                           isMobile ? 'text-xs' : 'text-sm'
                         }`}
                       >
-                        Ver más
+                        {t('common.viewMore')}
                         <svg className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -266,7 +268,7 @@ const ProjectSection = ({ limit = 6 }) => {
         <button 
           onClick={() => scrollToSection('#blog-section')}
           className="absolute bottom-6 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform duration-300 z-20"
-          aria-label="Ver blog"
+          aria-label="Ver más proyectos"
         >
           <div className="w-px h-6 bg-gray-300 mx-auto mb-2"></div>
           <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors duration-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">

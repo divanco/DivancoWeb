@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetProjectsByYearQuery } from '../../../features/projects/projectsApi';
 import { scrollToSection } from '../../../utils/simpleScroll';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 function EdicionesPage() {
+  const { t } = useTranslation();
   const [currentImage, setCurrentImage] = useState(0);
   const currentYear = 2025; // Cambiar esto para mostrar diferentes años
   const navigate = useNavigate();
@@ -221,7 +223,7 @@ function EdicionesPage() {
                 className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group cursor-pointer bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/50"
                 style={{ pointerEvents: 'auto' }}
               >
-                Ver detalles
+                {t('common.viewMore')}
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetBlogPostsQuery, useGetFeaturedBlogPostsQuery } from '../../features/blog';
 import { Helmet } from 'react-helmet-async';
+import { useTranslatedBlogPosts, useTranslation } from '../../hooks';
 
 const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +30,10 @@ const BlogPage = () => {
     data: featuredPosts, 
     isLoading: featuredLoading 
   } = useGetFeaturedBlogPostsQuery(3);
+
+  const { posts: translatedPosts, isTranslating: postsTranslating } = useTranslatedBlogPosts(postsResponse?.data);
+  const { posts: translatedFeaturedPosts, isTranslating: featuredTranslating } = useTranslatedBlogPosts(featuredPosts?.data);
+  const { t } = useTranslation();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -85,8 +90,8 @@ const BlogPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>Blog - Divanco</title>
-        <meta name="description" content="Descubre las últimas novedades, tendencias y proyectos en nuestro blog de arquitectura y diseño." />
+        <title>{t('pages.blog.title')} - Divanco</title>
+        <meta name="description" content={t('pages.blog.description')} />
       </Helmet>
 
       {/* Hero Section con Posts Destacados */}
@@ -95,9 +100,9 @@ const BlogPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-16">
               <h1 className="text-4xl lg:text-6xl font-light text-gray-900 mb-4">
-                Blog
+                {t('pages.blog.title')}
                 <span className="block text-sm font-normal text-gray-500 mt-2 tracking-wider uppercase">
-                  — NOVEDADES Y TENDENCIAS
+                  — {t('pages.blog.subtitle')}
                 </span>
               </h1>
             </div>
@@ -124,7 +129,7 @@ const BlogPage = () => {
                       </div>
                       <div className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 group/link">
                         <span className="border-b border-gray-300 group-hover/link:border-gray-900 transition-colors duration-200">
-                          Leer más
+                          {t('pages.blog.readMore')}
                         </span>
                         <svg className="ml-2 w-4 h-4 transform group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -139,7 +144,10 @@ const BlogPage = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Y2EzYWYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNHB4Ij5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+';
+                              e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f3f4f6"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="14px">${t('pages.blog.imageAlt')}</text>
+</svg>`)}`;
                             }
                           }}
                         />
@@ -166,7 +174,7 @@ const BlogPage = () => {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Todos
+              {t('pages.blog.filters.all')}
             </button>
             <button
               onClick={() => setFilters({ ...filters, featured: true })}
@@ -176,14 +184,14 @@ const BlogPage = () => {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Destacados
+              {t('pages.blog.filters.featured')}
             </button>
           </div>
 
           {/* Grid de Posts */}
           {postsError ? (
             <div className="text-center py-16">
-              <p className="text-gray-500">Error cargando los posts del blog</p>
+              <p className="text-gray-500">{t('pages.blog.errors.loading')}</p>
             </div>
           ) : (
             <>
@@ -199,7 +207,10 @@ const BlogPage = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Y2EzYWYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNHB4Ij5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+';
+                              e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f3f4f6"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="14px">${t('pages.blog.imageAlt')}</text>
+</svg>`)}`;
                             }
                           }}
                         />
@@ -225,7 +236,7 @@ const BlogPage = () => {
                         <div className="pt-2">
                           <span className="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 group/link">
                             <span className="border-b border-gray-300 group-hover/link:border-gray-900 transition-colors duration-200">
-                              Leer más
+                              {t('pages.blog.readMore')}
                             </span>
                             <svg className="ml-1 w-3 h-3 transform group-hover/link:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -248,7 +259,7 @@ const BlogPage = () => {
                       disabled={currentPage === 1}
                       className="px-4 py-2 text-sm border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors duration-200"
                     >
-                      Anterior
+                      {t('pages.blog.pagination.previous')}
                     </button>
 
                     {/* Números de página */}
@@ -272,7 +283,7 @@ const BlogPage = () => {
                       disabled={currentPage === postsResponse.pagination.total_pages}
                       className="px-4 py-2 text-sm border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors duration-200"
                     >
-                      Siguiente
+                      {t('pages.blog.pagination.next')}
                     </button>
                   </div>
                 </div>

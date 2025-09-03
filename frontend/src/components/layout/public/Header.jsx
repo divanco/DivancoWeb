@@ -8,11 +8,13 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../../hooks";
+import { useTranslation } from "../../../hooks/useTranslation";
 import logoCompleto from "../../../assets/images/DIVANCOHV3.png";
 import { useGetRecentProjectsQuery } from "../../../features/projects/projectsApi";
 import { useGetRecentBlogPostsQuery } from "../../../features/blog/blogApi";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApi";
 import { useGetSubcategoriesByCategoryQuery } from "../../../features/subcategories/subcategoriesApi";
+import LanguageSwitcher from "../../LanguageSwitcher";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,14 +31,15 @@ const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+   const { t } = useTranslation(); 
 
   // Navegación completa
   const navigation = [
-    { name: "Showrooms", href: "/showrooms" },
-    { name: "About", href: "/about" },
-    { name: "Proyectos", href: "/proyectos" },
-    { name: "Ediciones", href: "/ediciones" },
-    { name: "Blog", href: "/blog" },
+    { name: t('navigation.showrooms'), href: "/showrooms" },
+    { name: t('navigation.nosotros'), href: "/about" },
+    { name: t('navigation.projects'), href: "/proyectos" },
+    { name: t('navigation.editions'), href: "/ediciones" },
+    { name: t('navigation.noticias'), href: "/blog" },
   ];
 
   const isActive = (href) => {
@@ -125,15 +128,27 @@ const Header = () => {
   }, [location.pathname]);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${getHeaderBackground()}`}
-    >
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div
-          className={`flex items-center justify-between transition-all duration-500 ${
-            isHomepage ? "h-16 py-4" : "h-14 py-3"
-          }`}
-        >
+
+    <>
+      {/* Barra superior con language switcher - Estilo Minotti */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-end items-center py-2">
+            <LanguageSwitcher className="text-xs" />
+          </div>
+        </div>
+      </div>
+
+      {/* Header principal */}
+      <header
+        className={`fixed top-10 left-0 right-0 z-40 transition-all duration-500 ${getHeaderBackground()}`}
+      >
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div
+            className={`flex items-center justify-between transition-all duration-500 ${
+              isHomepage ? "h-16 py-4" : "h-14 py-3"
+            }`}
+          >
           {/* Logo Completo - Siempre visible */}
           <div className="flex items-center">
             <Link
@@ -187,6 +202,7 @@ const Header = () => {
 
 
     </header>
+    </>
   );
 };
 

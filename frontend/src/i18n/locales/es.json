@@ -1,0 +1,135 @@
+{
+  "navigation": {
+    "showrooms": "Showrooms",
+    "nosotros": "Nosotros",
+    "projects": "Proyectos",
+    "editions": "Ediciones",
+    "noticias": "Noticias",
+    "buscar": "Buscar"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "profile": "Perfil"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "retry": "Reintentar",
+    "viewMore": "Ver más",
+    "close": "Cerrar",
+    "seeAll": "Ver todos los productos de",
+    "readMore": "Leer más",
+    "translating": "Traduciendo contenido...",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
+  },
+  "search": {
+    "placeholder": "Buscar proyectos, productos, categorías...",
+    "noResults": "Sin resultados",
+    "suggestions": "Sugerencias",
+    "results": "Resultados"
+  },
+  "menu": {
+    "closeMenu": "Cerrar menú",
+    "goTo": "Ir a",
+    "noRecentProjects": "No hay proyectos recientes",
+    "noRecentPosts": "No hay posts recientes",
+    "noCategories": "No hay categorías"
+  },
+  "pages": {
+    "blog": {
+      "title": "Noticias",
+      "subtitle": "NOVEDADES Y TENDENCIAS",
+      "description": "Descubre las últimas novedades, tendencias y proyectos en nuestro blog de arquitectura y diseño.",
+      "readMore": "Leer más",
+      "filters": {
+        "all": "Todos",
+        "featured": "Destacados"
+      },
+      "pagination": {
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
+      "errors": {
+        "loading": "Error cargando los posts del blog"
+      },
+      "imageAlt": "Imagen no disponible"
+    }
+  },
+  "sloganPage": {
+    "design": "Diseño",
+    "vanguard": "Vanguardia",
+    "construction": "Construcción",
+    "seeProjects": "Ver proyectos"
+  },
+  "blogSection": {
+    "noticias": "Noticias",
+    "miraLasNovedades": "MIRA LAS NOVEDADES",
+    "verTodasLasNovedades": "Ver todas las novedades",
+    "verGaleria": "Ver galería",
+    "explorarTodoBlog": "Explorar todo el blog",
+    "noImagenes": "No hay imágenes para mostrar."
+  },
+  "showroom": {
+    "title": "Nuestro Salón de Ventas",
+    "description": "Descubre nuestras categorías de productos y encuentra todo lo que necesitas para tu proyecto",
+    "categoria": "Explora nuestros productos",
+    "destacados": "Producto Destacado",
+    "verTodo": "Ver todos los productos de la tienda"
+  },
+  "projectDetail": {
+    "galeria": "Galería del Proyecto",
+    "informacion": "Información del Proyecto",
+    "etiquetas": "Etiquetas",
+    "cronologia": "Cronología",
+    "año": "Año",
+    "ubicacion": "Ubicación",
+    "cliente": "Cliente",
+    "etapa": "ETAPA",
+    "area": "Área",
+    "inicio": "Inicio",
+    "finalizacion": "Finalización",
+    "verTourVirtual": "Ver Tour Virtual",
+    "tourVirtual": "Tour Virtual 360°",
+    "tourVirtualSubtitle": "Explora el proyecto en una experiencia inmersiva",
+    "cargandoTour": "Cargando tour virtual...",
+    "sinImagen": "Sin imagen",
+    "deslizaContenido": "Desliza para ver más contenido",
+    "enlaceCopiado": "¡Enlace copiado al portapapeles!",
+    "cargandoProyecto": "Cargando proyecto..."
+  },
+  "footer": {
+    "companyDescription": "Estudio de arquitectura especializado en diseño contemporáneo y showroom de materiales de construcción de alta calidad.",
+    "links": "Enlaces",
+    "showroom": "Showroom",
+    "projects": "Proyectos",
+    "blog": "Blog",
+    "about": "Nosotros",
+    "contact": "Contacto",
+    "ourLocation": "Nuestra Ubicación",
+    "followUs": "Síguenos:",
+    "developedBy": "Desarrollado por:",
+    "allRightsReserved": "Todos los derechos reservados.",
+    "mapPopup": {
+      "title": "Divanco Arquitectura",
+      "viewInGoogleMaps": "Ver en Google Maps →"
+    }
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "description": "Recibe las últimas noticias sobre nuestros proyectos y novedades del blog",
+    "emailPlaceholder": "tu-email@ejemplo.com",
+    "subscribe": "SUSCRIBETE",
+    "subscribing": "SUSCRIBIENDO...",
+    "subscribed": "¡SUSCRITO!",
+    "messages": {
+      "enterEmail": "Por favor ingresa tu email",
+      "validEmail": "Por favor ingresa un email válido",
+      "successDefault": "¡Suscripción exitosa! Revisa tu email para confirmar.",
+      "errorDefault": "Error al suscribirse. Intenta nuevamente."
+    }
+  }
+}
