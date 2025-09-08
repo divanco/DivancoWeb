@@ -57,41 +57,59 @@ export async function sendWelcomeEmail(subscriber) {
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Bienvenido a Divanco</title>
+        <title>Bienvenido a la Comunidad Divanco</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-          .btn { display: inline-block; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; }
-          .unsubscribe { margin-top: 20px; font-size: 12px; color: #666; }
+          body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8fafc; }
+          .container { max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+          .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 40px 20px; text-align: center; }
+          .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+          .content { padding: 40px 30px; }
+          .content h2 { color: #1e3a8a; margin-bottom: 20px; font-size: 24px; }
+          .content p { margin-bottom: 16px; color: #4b5563; }
+          .highlights { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #3b82f6; }
+          .highlights ul { margin: 10px 0; padding-left: 20px; }
+          .highlights li { margin-bottom: 8px; color: #374151; }
+          .btn { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s; }
+          .btn:hover { transform: translateY(-2px); }
+          .footer { padding: 30px; text-align: center; background: #f8fafc; border-top: 1px solid #e5e7eb; }
+          .footer p { margin: 5px 0; color: #6b7280; }
+          .unsubscribe { margin-top: 20px; font-size: 12px; color: #9ca3af; }
+          .unsubscribe a { color: #6b7280; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>¡Bienvenido a Divanco!</h1>
+            <h1>Bienvenido a la Comunidad Divanco ✨</h1>
           </div>
           <div class="content">
-            <h2>Hola${subscriber.name ? ` ${subscriber.name}` : ''}!</h2>
-            <p>Gracias por suscribirte a nuestro newsletter. Estamos emocionados de tenerte en nuestra comunidad.</p>
-            <p>Recibirás notificaciones sobre:</p>
-            <ul>
-              <li>📝 Nuevos artículos en nuestro blog</li>
-              <li>🏗️ Proyectos arquitectónicos destacados</li>
-              <li>🔧 Materiales y tendencias en construcción</li>
-              <li>📅 Eventos y novedades del estudio</li>
-            </ul>
-            <p>¡Esperamos que disfrutes del contenido!</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.FRONTEND_URL}" class="btn">Visitar nuestro sitio web</a>
+            <h2>¡Hola${subscriber.name ? ` ${subscriber.name}` : ''}!</h2>
+            <p>Gracias por unirte a nuestra comunidad. Ahora tienes acceso exclusivo a contenido especializado en arquitectura, diseño y construcción.</p>
+            
+            <div class="highlights">
+              <p><strong>Como miembro de nuestra comunidad, recibirás:</strong></p>
+              <ul>
+                <li>🏗️ Artículos exclusivos sobre tendencias arquitectónicas</li>
+                <li>📐 Análisis detallados de nuestros proyectos</li>
+                <li>🔧 Consejos profesionales sobre materiales y técnicas</li>
+                <li>� Insights del mercado inmobiliario y construcción</li>
+                <li>🎯 Invitaciones a eventos y workshops especializados</li>
+              </ul>
             </div>
+            
+            <p>Estamos comprometidos a compartir conocimiento valioso que impulse tu crecimiento profesional en el mundo de la arquitectura y el diseño.</p>
+            
+            <div style="text-align: center; margin: 35px 0;">
+              <a href="${process.env.FRONTEND_URL}" class="btn">Explorar Contenido Exclusivo</a>
+            </div>
+            
+            <p>¡Bienvenido a bordo! 🚀</p>
           </div>
           <div class="footer">
-            <p>Divanco - Estudio de Arquitectura</p>
+            <p><strong>Divanco</strong> - Estudio de Arquitectura</p>
+            <p>Creando espacios que inspiran</p>
             <div class="unsubscribe">
-              <p>Si no deseas recibir más emails, puedes <a href="${unsubscribeUrl}">cancelar tu suscripción</a></p>
+              <p>Si no deseas recibir más emails, puedes <a href="${unsubscribeUrl}">cancelar tu suscripción aquí</a></p>
             </div>
           </div>
         </div>
@@ -101,7 +119,7 @@ export async function sendWelcomeEmail(subscriber) {
 
     return sendMail({
       to: subscriber.email,
-      subject: '¡Bienvenido al Newsletter de Divanco!',
+      subject: 'Bienvenido a la Comunidad Divanco ✨',
       html
     });
   } catch (error) {
@@ -137,46 +155,64 @@ export async function sendBlogNotification(subscribers, blogPost) {
           <html>
           <head>
             <meta charset="utf-8">
-            <title>Nuevo artículo en Divanco</title>
+            <title>Nueva actualización de Divanco</title>
             <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
-              .content { padding: 20px; background: #f9f9f9; }
-              .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-              .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; margin: 15px 0; }
-              .post-preview { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-              .post-title { color: #2c3e50; margin-bottom: 10px; }
-              .post-excerpt { color: #666; line-height: 1.5; }
-              .unsubscribe { margin-top: 20px; font-size: 12px; color: #666; }
+              body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8fafc; }
+              .container { max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+              .header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 40px 20px; text-align: center; }
+              .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+              .content { padding: 40px 30px; }
+              .content h2 { color: #059669; margin-bottom: 20px; font-size: 24px; }
+              .content p { margin-bottom: 16px; color: #4b5563; }
+              .btn { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: 600; transition: transform 0.2s; }
+              .btn:hover { transform: translateY(-2px); }
+              .post-preview { background: #f0fdf4; padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #10b981; }
+              .post-title { color: #065f46; margin-bottom: 15px; font-size: 22px; font-weight: 600; }
+              .post-excerpt { color: #374151; line-height: 1.6; margin-bottom: 15px; }
+              .post-meta { color: #6b7280; font-size: 14px; }
+              .post-meta strong { color: #374151; }
+              .footer { padding: 30px; text-align: center; background: #f8fafc; border-top: 1px solid #e5e7eb; }
+              .footer p { margin: 5px 0; color: #6b7280; }
+              .unsubscribe { margin-top: 20px; font-size: 12px; color: #9ca3af; }
+              .unsubscribe a { color: #6b7280; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h1>📝 Nuevo Artículo Publicado</h1>
+                <h1>Nueva actualización de Divanco 🏗️</h1>
               </div>
               <div class="content">
-                <h2>Hola${subscriber.name ? ` ${subscriber.name}` : ''}!</h2>
-                <p>Tenemos un nuevo artículo en nuestro blog que creemos que te interesará:</p>
+                <h2>¡Hola${subscriber.name ? ` ${subscriber.name}` : ''}!</h2>
+                <p>Tenemos contenido fresco que seguramente te va a interesar. Hemos publicado un nuevo artículo con insights y conocimientos especializados para profesionales como tú.</p>
                 
                 <div class="post-preview">
                   <h3 class="post-title">${blogPost.title}</h3>
                   ${blogPost.excerpt ? `<p class="post-excerpt">${blogPost.excerpt}</p>` : ''}
-                  ${blogPost.author ? `<p><strong>Por:</strong> ${blogPost.author.name}</p>` : ''}
-                  <p><strong>Publicado:</strong> ${new Date(blogPost.publishedAt).toLocaleDateString('es-ES')}</p>
+                  <div class="post-meta">
+                    ${blogPost.author ? `<p><strong>Autor:</strong> ${blogPost.author.name}</p>` : ''}
+                    <p><strong>Fecha de publicación:</strong> ${new Date(blogPost.publishedAt).toLocaleDateString('es-ES', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</p>
+                  </div>
                 </div>
                 
                 <div style="text-align: center;">
-                  <a href="${postUrl}" class="btn">Leer Artículo Completo</a>
+                  <a href="${postUrl}" class="btn">Leer Artículo Completo →</a>
                 </div>
                 
-                <p>¡Esperamos que disfrutes de la lectura!</p>
+                <p>Este contenido ha sido cuidadosamente desarrollado para aportar valor a tu práctica profesional. ¡No te lo pierdas!</p>
+                
+                <p>Saludos cordiales,<br>
+                <strong>El equipo de Divanco</strong></p>
               </div>
               <div class="footer">
-                <p>Divanco - Estudio de Arquitectura</p>
+                <p><strong>Divanco</strong> - Estudio de Arquitectura</p>
+                <p>Creando espacios que inspiran</p>
                 <div class="unsubscribe">
-                  <p>Si no deseas recibir más emails, puedes <a href="${unsubscribeUrl}">cancelar tu suscripción</a></p>
+                  <p>Si no deseas recibir más emails, puedes <a href="${unsubscribeUrl}">cancelar tu suscripción aquí</a></p>
                 </div>
               </div>
             </div>
@@ -186,7 +222,7 @@ export async function sendBlogNotification(subscribers, blogPost) {
 
         return sendMail({
           to: subscriber.email,
-          subject: `📝 Nuevo artículo: ${blogPost.title}`,
+          subject: `Nueva actualización de Divanco 🏗️ - ${blogPost.title}`,
           html
         });
       });

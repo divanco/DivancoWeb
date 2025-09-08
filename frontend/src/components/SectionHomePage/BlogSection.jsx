@@ -3,11 +3,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
+import { useTranslation } from '../../hooks/useTranslation';
 
 import { Link } from 'react-router-dom';
 import { useGetFeaturedBlogPostsQuery } from '../../features/blog';
 
 const BlogSection = () => {
+  const { t } = useTranslation();
   const { data: blogResponse, isLoading, error } = useGetFeaturedBlogPostsQuery(3);
 
   const blogPosts = blogResponse?.data || [];
@@ -87,7 +89,7 @@ const BlogSection = () => {
                 </Swiper>
               </>
             ) : (
-              <div className="w-full h-80 flex items-center justify-center text-gray-400">No hay imágenes para mostrar.</div>
+              <div className="w-full h-80 flex items-center justify-center text-gray-400">{t('blogSection.noImagenes')}</div>
             )}
           </div>
         </div>
@@ -99,9 +101,9 @@ const BlogSection = () => {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 lg:mb-16">
           <div>
             <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4">
-              News
+              {t('blogSection.noticias')}
               <span className="block text-sm font-normal text-gray-500 mt-2 tracking-wider uppercase">
-                — MIRA LAS NOVEDADES
+                — {t('blogSection.miraLasNovedades')}
               </span>
             </h2>
           </div>
@@ -110,11 +112,11 @@ const BlogSection = () => {
               to="/blog"
               className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 group"
             >
-              Ver todas las novedades
-              <svg 
-                className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" 
-                fill="none" 
-                stroke="currentColor" 
+              {t('blogSection.verTodasLasNovedades')}
+              <svg
+                className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -167,7 +169,7 @@ const BlogSection = () => {
                       className="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 group/link"
                     >
                       <span className="border-b border-gray-300 group-hover/link:border-gray-900 transition-colors duration-200">
-                        Leer más
+                        {t('common.readMore')}
                       </span>
                       <svg className="ml-1 w-3 h-3 transform group-hover/link:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -203,7 +205,7 @@ const BlogSection = () => {
                       className="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 group/link"
                     >
                       <span className="border-b border-gray-300 group-hover/link:border-gray-900 transition-colors duration-200">
-                        Leer más
+                        {t('common.readMore')}
                       </span>
                       <svg className="ml-1 w-3 h-3 transform group-hover/link:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -236,7 +238,7 @@ const BlogSection = () => {
                         setModalOpen(true);
                       }}
                     >
-                      Ver galería
+                      {t('blogSection.verGaleria')}
                     </button>
                   )}
                 </div>

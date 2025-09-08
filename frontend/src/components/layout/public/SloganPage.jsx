@@ -1,7 +1,11 @@
 import React from 'react';
 import { scrollToSection } from '../../../utils/simpleScroll';
+import { useTranslation } from '../../../hooks/useTranslation';
+
 
 function SloganPage() {
+ const { t } = useTranslation();
+
  return (
   <section id="slogan-section" className="relative min-h-[50vh] bg-white flex items-center justify-center overflow-hidden py-8 pb-24">
     {/* Container principal */}
@@ -32,7 +36,7 @@ function SloganPage() {
           {/* Diseño */}
           <div className="flex items-center">
             <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              Diseño
+              {t('sloganPage.design')}
             </p>
           </div>
           
@@ -44,7 +48,7 @@ function SloganPage() {
           {/* Vanguardia */}
           <div className="flex items-center">
             <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              Vanguardia
+              {t('sloganPage.vanguard')}
             </p>
           </div>
           
@@ -56,7 +60,7 @@ function SloganPage() {
           {/* Construcción */}
           <div className="flex items-center">
             <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              Construcción
+              {t('sloganPage.construction')}
             </p>
           </div>
         </div>
@@ -80,7 +84,7 @@ function SloganPage() {
     <button 
       onClick={() => scrollToSection('#projects-section')}
       className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform duration-300"
-      aria-label="Ver proyectos"
+      aria-label={t('sloganPage.seeProjects')}
     >
       <div className="w-px h-6 md:h-8 bg-gray-300 mx-auto mb-2"></div>
       <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors duration-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">

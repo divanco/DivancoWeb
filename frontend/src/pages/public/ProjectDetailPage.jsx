@@ -6,9 +6,11 @@ import ProjectNavigation from '../../components/ui/ProjectNavigation';
 import ImageLightbox from '../../components/ui/ImageLightbox';
 import { ScrollProgress, ProjectBreadcrumbs, FloatingActions } from '../../components/ui/ProjectExtras';
 import ProjectSEO from '../../components/ui/ProjectSEO';
+import { useTranslation } from '../../hooks';
 
 // Imagen principal limpia
-const ProjectHero = ({ project, mainImage }) => (
+const ProjectHero = ({ project, mainImage, t }) => (
+
   <div className="relative h-[60vh] w-full overflow-hidden">
     {mainImage ? (
       <img
@@ -18,14 +20,14 @@ const ProjectHero = ({ project, mainImage }) => (
       />
     ) : (
       <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
-        <span className="text-gray-400 text-xl font-alt">Sin imagen</span>
+        <span className="text-gray-400 text-xl font-alt">{t('projectDetail.sinImagen')}</span>
       </div>
     )}
   </div>
 );
 
 // ✅ NUEVO: Información del proyecto en dos columnas
-const ProjectInfo = ({ project }) => (
+const ProjectInfo = ({ project, t }) => (
    <div className="max-w-7xl mx-auto mt-8 relative z-10 px-6 md:px-8">
     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
@@ -73,7 +75,7 @@ const ProjectInfo = ({ project }) => (
                     <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
-                    <span className="tracking-wider uppercase">Desliza para ver más contenido</span>
+                    <span className="tracking-wider uppercase">{t('projectDetail.deslizaContenido')}</span>
                   </div>
                 </div>
               </div>
@@ -83,7 +85,7 @@ const ProjectInfo = ({ project }) => (
             {project.tags && project.tags.length > 0 && (
               <div className="pt-6 border-t border-gray-100">
                 <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-3">
-                  — Etiquetas
+                  — {t('projectDetail.etiquetas')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {project.tags.map((tag, index) => (
@@ -105,14 +107,14 @@ const ProjectInfo = ({ project }) => (
           <div className="space-y-8">
             <div>
               <h3 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-6 border-b border-gray-200 pb-2">
-                — Información del Proyecto
+                — {t('projectDetail.informacion')}
               </h3>
               <div className="space-y-5">
                 
                 {project.year && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Año
+                      {t('projectDetail.año')}
                     </dt>
                     <dd className="text-2xl font-light text-gray-900">
                       {project.year}
@@ -123,7 +125,7 @@ const ProjectInfo = ({ project }) => (
                 {project.location && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Ubicación
+                      {t('projectDetail.ubicacion')}
                     </dt>
                     <dd className="text-lg font-light text-gray-900 leading-relaxed">
                       {project.location}
@@ -134,7 +136,7 @@ const ProjectInfo = ({ project }) => (
                 {project.client && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Cliente
+                      {t('projectDetail.cliente')}
                     </dt>
                     <dd className="text-lg font-light text-gray-900">
                       {project.client}
@@ -145,7 +147,7 @@ const ProjectInfo = ({ project }) => (
                 {project.projectType && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      ETAPA
+                      {t('projectDetail.etapa')}
                     </dt>
                     <dd className="text-lg font-light text-gray-900">
                       {project.projectType}
@@ -158,7 +160,7 @@ const ProjectInfo = ({ project }) => (
                 {project.area && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Área
+                      {t('projectDetail.area')}
                     </dt>
                     <dd className="text-lg font-light text-gray-900">
                       {project.area}
@@ -173,13 +175,13 @@ const ProjectInfo = ({ project }) => (
             {(project.startDate || project.endDate) && (
               <div>
                 <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-4 border-b border-gray-200 pb-2">
-                  — Cronología
+                  — {t('projectDetail.cronologia')}
                 </h4>
                 <div className="space-y-4">
                   {project.startDate && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                        Inicio
+                        {t('projectDetail.inicio')}
                       </dt>
                       <dd className="text-base font-light text-gray-900">
                         {new Date(project.startDate).toLocaleDateString('es-ES', {
@@ -192,7 +194,7 @@ const ProjectInfo = ({ project }) => (
                   {project.endDate && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                        Finalización
+                        {t('projectDetail.finalizacion')}
                       </dt>
                       <dd className="text-base font-light text-gray-900">
                         {new Date(project.endDate).toLocaleDateString('es-ES', {
@@ -216,7 +218,7 @@ const ProjectInfo = ({ project }) => (
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 002 2v8a2 2 0 002 2z" />
                   </svg>
-                  Ver Tour Virtual
+                  {t('projectDetail.verTourVirtual')}
                 </a>
               </div>
             )}
@@ -229,7 +231,7 @@ const ProjectInfo = ({ project }) => (
     <div className="flex flex-col items-center mt-16 mb-8">
       <div className="text-center space-y-4">
         <h3 className="text-xs font-medium text-gray-500 tracking-wider uppercase">
-          — Galería del Proyecto
+          — {t('projectDetail.galeria')}
         </h3>
         <div className="flex items-center justify-center space-x-2">
           <div className="w-2 h-2 bg-naranjaDivanco rounded-full animate-pulse"></div>
@@ -311,16 +313,16 @@ const VirtualTour = ({ kuulaUrl }) => {
       <div className="max-w-7xl mx-auto px-8 md:px-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-light mb-4 text-white">
-            Tour Virtual 360°
+            {t('projectDetail.tourVirtual')}
             <span className="block text-sm font-normal text-gray-300 mt-3 tracking-wider uppercase">
-              — Explora el proyecto en una experiencia inmersiva
+              — {t('projectDetail.tourVirtualSubtitle')}
             </span>
           </h2>
         </div>
         <div className="relative aspect-video bg-gray-800 rounded-none overflow-hidden shadow-2xl ring-1 ring-white/10">
           <iframe
             src={kuulaUrl}
-            title="Tour Virtual 360°"
+            title={t('projectDetail.tourVirtual')}
             className="w-full h-full"
             allowFullScreen
             frameBorder="0"
@@ -329,7 +331,7 @@ const VirtualTour = ({ kuulaUrl }) => {
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
             <div className="text-white space-y-4 text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-white mx-auto"></div>
-              <p className="text-gray-300 font-light tracking-wider uppercase text-sm">Cargando tour virtual...</p>
+              <p className="text-gray-300 font-light tracking-wider uppercase text-sm">{t('projectDetail.cargandoTour')}</p>
             </div>
           </div>
         </div>
@@ -339,6 +341,7 @@ const VirtualTour = ({ kuulaUrl }) => {
 };
 
 const ProjectDetailPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams();
   const { data: projectResponse, error, isLoading } = useGetProjectBySlugQuery(slug);
   const project = projectResponse?.data;
@@ -396,7 +399,7 @@ const ProjectDetailPage = () => {
             <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-4 border-naranjaDivanco/20 mx-auto"></div>
           </div>
           <div className="space-y-2">
-            <p className="text-gray-600 font-alt font-medium">Cargando proyecto...</p>
+            <p className="text-gray-600 font-alt font-medium">{t('projectDetail.cargandoProyecto')}</p>
             <div className="flex space-x-1 justify-center">
               <div className="w-2 h-2 bg-naranjaDivanco rounded-full animate-bounce"></div>
               <div className="w-2 h-2 bg-naranjaDivanco rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -424,9 +427,9 @@ const ProjectDetailPage = () => {
       {/* Breadcrumbs */}
       <ProjectBreadcrumbs project={project} />
       {/* Hero Section */}
-      <ProjectHero project={project} mainImage={mainImage} />
+      <ProjectHero project={project} mainImage={mainImage} t={t} />
       {/* ✅ NUEVA: Información del proyecto en dos columnas */}
-      <ProjectInfo project={project} />
+      <ProjectInfo project={project} t={t} />
       {/* Galería agrupada */}
       <ProjectGallery mediaFiles={project.media} galleryImages={galleryImages} onImageClick={handleImageClick} />
       {/* Virtual Tour */}
@@ -444,7 +447,7 @@ const ProjectDetailPage = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span className="font-alt font-medium">¡Enlace copiado al portapapeles!</span>
+            <span className="font-alt font-medium">{t('projectDetail.enlaceCopiado')}</span>
           </div>
         </div>
       )}

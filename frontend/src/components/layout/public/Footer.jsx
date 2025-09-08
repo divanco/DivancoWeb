@@ -6,29 +6,28 @@ import {
 } from '@heroicons/react/24/outline';
 
 import Newsletter from './Newsletter'; 
+import MapLocation from '../../ui/MapLocation';
+import { useTranslation } from '../../../hooks';
 
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
-  return (
+  const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();  return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center mb-4">
-              <img 
-                src="/images/logoblanco.png" 
-                alt="Divanco Logo" 
-                className="h-16 w-auto"
-              />
-              <span className="ml-2 text-xl font-bold">Divanco</span>
-            </div>
-            <p className="text-gray-300 mb-6 max-w-md">
-              Estudio de arquitectura especializado en diseño contemporáneo y 
-              showroom de materiales de construcción de alta calidad.
-            </p>
+          <div className="col-span-1 lg:col-span-2">
+  <div className="flex items-center mb-2">
+    <img 
+      src="/images/DIVANCOHV3.png" 
+      alt="Divanco Logo" 
+      className="h-28 w-auto"
+    />
+  </div>
+  <p className="text-gray-300 mb-6 max-w-md">
+    {t('footer.companyDescription')}
+  </p>
             
             {/* Contact Info */}
             <div className="space-y-3">
@@ -40,37 +39,37 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <PhoneIcon className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-300">+57 320 8021225</span>
+                <span className="text-gray-300">+57 310 5706816</span>
               </div>
               <div className="flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-300">info@divanco.com</span>
+                <span className="text-gray-300">info@grupodivanco.com</span>
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Enlaces</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.links')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/showroom" className="text-gray-300 hover:text-white transition-colors">
-                  Showroom
+                  {t('footer.showroom')}
                 </Link>
               </li>
               <li>
                 <Link to="/proyectos" className="text-gray-300 hover:text-white transition-colors">
-                  Proyectos
+                  {t('footer.projects')}
                 </Link>
               </li>
               <li>
                 <Link to="/blog" className="text-gray-300 hover:text-white transition-colors">
-                  Blog
+                  {t('footer.blog')}
                 </Link>
               </li>
               <li>
                 <Link to="/nosotros" className="text-gray-300 hover:text-white transition-colors">
-                  Nosotros
+                  {t('footer.about')}
                 </Link>
               </li>
               <li>
@@ -80,13 +79,21 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
-                  Contacto
+                  {t('footer.contact')}
                 </a>
               </li>
             </ul>
           </div>
 
           <Newsletter />
+        </div>
+
+        {/* Map Section */}
+        <div className="mt-12 mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-center">{t('footer.ourLocation')}</h3>
+          <div className="max-w-4xl mx-auto">
+            <MapLocation />
+          </div>
         </div>
 
         {/* Bottom */}
@@ -96,7 +103,7 @@ const Footer = () => {
             
             {/* Social Media */}
             <div className="flex items-center space-x-6">
-              <span className="text-gray-400 text-sm">Síguenos:</span>
+              <span className="text-gray-400 text-sm">{t('footer.followUs')}</span>
               <a 
                 href="https://instagram.com/divancoconstructora" 
                 target="_blank" 
@@ -124,7 +131,7 @@ const Footer = () => {
 
             {/* Code Developers Credit */}
             <div className="flex items-center space-x-3">
-              <span className="text-gray-400 text-sm">Desarrollado por:</span>
+              <span className="text-gray-400 text-sm">{t('footer.developedBy')}</span>
               <div className="flex items-center space-x-2 group">
                 <img 
                   src="/images/logoCode.PNG" 
@@ -141,7 +148,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-gray-400 text-sm">
-              © {currentYear} Divanco Arquitectura. Todos los derechos reservados.
+              © {currentYear} Divanco Arquitectura. {t('footer.allRightsReserved')}
             </p>
           </div>
         </div>

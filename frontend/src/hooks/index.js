@@ -6,3 +6,6 @@ export { useApp } from './useApp';
 
 // Feature-specific hooks
 export { useSearch } from './useSearch';
+export { useTranslation } from './useTranslation';
+export { useTranslatedBlogPost } from './useTranslatedBlogPost';
+export { useTranslatedBlogPosts } from './useTranslatedBlogPosts';

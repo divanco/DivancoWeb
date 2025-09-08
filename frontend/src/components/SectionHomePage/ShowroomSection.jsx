@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApi';
 import { scrollToSection } from '../../utils/simpleScroll';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ShowroomSection = () => {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useGetCategoriesQuery({ 
     includeSubcategories: false, 
     activeOnly: true,
@@ -77,10 +79,10 @@ const ShowroomSection = () => {
       {/* Título de la sección */}
       <div className="max-w-6xl mx-auto px-4 mb-12">
         <h2 className="text-3xl md:text-4xl font-light text-center text-gray-900 tracking-wide">
-          Nuestro Showroom
+          {t('showroom.title')}
         </h2>
         <p className="text-center text-gray-600 mt-4 max-w-2xl mx-auto">
-          Descubre nuestras categorías de productos y encuentra todo lo que necesitas para tu proyecto
+          {t('showroom.description')}
         </p>
       </div>
 
@@ -182,7 +184,7 @@ const ShowroomSection = () => {
                       <div className={`inline-flex items-center text-white font-light uppercase tracking-wider hover:opacity-70 transition-all duration-300 group-hover:translate-x-1 ${
                         isMobile ? 'text-xs' : 'text-sm'
                       }`}>
-                        Explorar categoría
+                        {t('showroom.categoria')}
                         <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -193,7 +195,7 @@ const ShowroomSection = () => {
                   {/* Indicador de categoría activa */}
                   {!isMobile && isActive && (
                     <div className="absolute top-4 left-4 bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      Destacada
+                      {t('showroom.destacados')}
                     </div>
                   )}
                 </Link>
@@ -275,7 +277,7 @@ const ShowroomSection = () => {
           to="/showroom"
           className="inline-flex items-center bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition-all duration-300 font-medium"
         >
-          Ver todo el showroom
+          {t('showroom.verTodo')}
           <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>

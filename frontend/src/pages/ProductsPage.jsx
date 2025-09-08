@@ -69,7 +69,7 @@ const ProductsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm pt-20 md:pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
@@ -148,27 +148,7 @@ const ProductsPage = () => {
         />
       </div>
 
-      {/* CTA Section */}
-      {!isLoading && products.length > 0 && (
-        <div className="bg-gray-900 text-white py-16 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              ¿No encuentras lo que buscas?
-            </h2>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              Nuestro equipo de expertos está aquí para ayudarte a encontrar la solución perfecta para tus necesidades.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-gray-900 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-                Contactar asesor
-              </button>
-              <button className="border border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-gray-900 transition-colors">
-                Ver catálogo completo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     
     </div>
   );
 };

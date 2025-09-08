@@ -8,6 +8,7 @@ import projectRoutes from './projectRoutes.js';
 import blogRoutes from './blogRoutes.js';
 import subscriberRoutes from './subscriberRoutes.js';
 import searchRoutes from './searchRoutes.js';
+import syncRoutes from './syncRoutes.js';
 
 const router = express.Router();
 
@@ -34,6 +35,9 @@ router.use('/subscribers', subscriberRoutes);
 // Rutas de búsqueda
 router.use('/search', searchRoutes);
 
+// Rutas de sincronización (temporal)
+router.use('/sync', syncRoutes);
+
 // Ruta de información del API
 router.get('/', (req, res) => {
   res.json({
@@ -49,7 +53,8 @@ router.get('/', (req, res) => {
       projects: '/projects',
       blog: '/blog',
       subscribers: '/subscribers',
-      search: '/search'
+      search: '/search',
+      sync: '/sync (temporal)'
     }
   });
 });

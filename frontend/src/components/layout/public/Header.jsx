@@ -8,11 +8,13 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../../hooks";
+import { useTranslation } from "../../../hooks/useTranslation";
 import logoCompleto from "../../../assets/images/DIVANCOHV3.png";
 import { useGetRecentProjectsQuery } from "../../../features/projects/projectsApi";
 import { useGetRecentBlogPostsQuery } from "../../../features/blog/blogApi";
 import { useGetCategoriesQuery } from "../../../features/categories/categoriesApi";
 import { useGetSubcategoriesByCategoryQuery } from "../../../features/subcategories/subcategoriesApi";
+import LanguageSwitcher from "../../LanguageSwitcher";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,14 +31,15 @@ const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+   const { t } = useTranslation(); 
 
   // Navegación completa
   const navigation = [
-    { name: "Showrooms", href: "/showrooms" },
-    { name: "About", href: "/about" },
-    { name: "Proyectos", href: "/proyectos" },
-    { name: "Ediciones", href: "/ediciones" },
-    { name: "Blog", href: "/blog" },
+    { name: t('navigation.showrooms'), href: "/showrooms" },
+    { name: t('navigation.nosotros'), href: "/nosotros" },
+    { name: t('navigation.projects'), href: "/proyectos" },
+    { name: t('navigation.editions'), href: "/ediciones" },
+    { name: t('navigation.noticias'), href: "/blog" },
   ];
 
   const isActive = (href) => {
@@ -125,15 +128,27 @@ const Header = () => {
   }, [location.pathname]);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${getHeaderBackground()}`}
-    >
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div
-          className={`flex items-center justify-between transition-all duration-500 ${
-            isHomepage ? "h-16 py-4" : "h-14 py-3"
-          }`}
-        >
+
+    <>
+      {/* Barra superior con language switcher - Estilo Minotti */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-end items-center py-2">
+            <LanguageSwitcher className="text-xs" />
+          </div>
+        </div>
+      </div>
+
+      {/* Header principal */}
+      <header
+        className={`fixed top-10 left-0 right-0 z-40 transition-all duration-500 ${getHeaderBackground()}`}
+      >
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div
+            className={`flex items-center justify-between transition-all duration-500 ${
+              isHomepage ? "h-16 py-4" : "h-14 py-3"
+            }`}
+          >
           {/* Logo Completo - Siempre visible */}
           <div className="flex items-center">
             <Link
@@ -187,6 +202,7 @@ const Header = () => {
 
 
     </header>
+    </>
   );
 };
 
@@ -202,6 +218,7 @@ const MinimalMobileMenu = ({
   user,
   zIndex = 50,
 }) => {
+  const { t } = useTranslation();
   const { data: categoriesData } = useGetCategoriesQuery({
     limit: 50,
     page: 1,
@@ -230,7 +247,7 @@ const MinimalMobileMenu = ({
       <button
         className="absolute top-4 right-4 text-white/80 hover:text-naranjaDivanco transition-all z-50 p-2 rounded-full bg-black/30 backdrop-blur-md"
         style={{ fontSize: 28, lineHeight: 1 }}
-        aria-label="Cerrar menú"
+        aria-label={t('menu.closeMenu')}
         onClick={() => setMobileMenuOpen(false)}
       >
         <XMarkIcon className="h-8 w-8" />
@@ -295,7 +312,7 @@ const MinimalMobileMenu = ({
                   {(!categoriesData?.data ||
                     categoriesData.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay categorías
+                      {t('menu.noCategories')}
                     </span>
                   )}
                 </div>
@@ -343,7 +360,7 @@ const MinimalMobileMenu = ({
                   {(!recentProjects?.data ||
                     recentProjects.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay proyectos recientes
+                      {t('menu.noRecentProjects')}
                     </span>
                   )}
                 </div>
@@ -389,7 +406,7 @@ const MinimalMobileMenu = ({
                   {(!recentBlogPosts?.data ||
                     recentBlogPosts.data.length === 0) && (
                     <span className="block text-xs text-white/40">
-                      No hay posts recientes
+                      {t('menu.noRecentPosts')}
                     </span>
                   )}
                 </div>
@@ -430,7 +447,7 @@ const MinimalMobileMenu = ({
                   className="block text-sm text-white/70 hover:text-naranjaDivanco py-2 px-2 rounded transition-all duration-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Ir a {item.name}
+                  {t('menu.goTo')} {item.name}
                 </Link>
               </div>
             )}
@@ -444,7 +461,7 @@ const MinimalMobileMenu = ({
         onClick={() => setMobileMenuOpen(false)}
       >
         <MagnifyingGlassIcon className="h-5 w-5" />
-        <span>Buscar</span>
+        <span>{t('menu.search')}</span>
       </Link>
       {isAuthenticated && (
         <div>
@@ -463,7 +480,7 @@ const MinimalMobileMenu = ({
             }}
             className="block w-full text-left text-base font-light uppercase tracking-widest text-white/80 hover:text-red-400 py-3 px-2 rounded transition-all duration-200"
           >
-            Cerrar sesión
+            {t('menu.logout')}
           </button>
         </div>
       )}
@@ -472,6 +489,7 @@ const MinimalMobileMenu = ({
 };
 
 function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
+  const { t } = useTranslation();
   const { data: subcatData } = useGetSubcategoriesByCategoryQuery({
     categorySlug,
     limit: 20,
@@ -493,7 +511,7 @@ function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
         className="block text-xs text-white/60 hover:text-naranjaDivanco py-1 px-2 rounded transition-all duration-200 font-medium"
         onClick={() => setMobileMenuOpen(false)}
       >
-        Ver todos los productos de {category?.name}
+        {t('common.seeAll')} {category?.name}
       </Link>
       
       {/* Subcategorías */}

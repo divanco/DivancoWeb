@@ -36,7 +36,7 @@ const ProjectsPage = () => {
     if (!isAutoPlaying) return;
     
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % projects.length);
+      setCurrentSlide((prev) => (prev + 2) % projects.length);
     }, 5000);
 
     return () => clearInterval(interval);

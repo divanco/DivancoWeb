@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useSubscribeMutation } from '../../../features/subscriber/subscriberApi';
+import { useTranslation } from '../../../hooks';
 
 const Newsletter = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
@@ -12,7 +14,7 @@ const Newsletter = () => {
     e.preventDefault();
     
     if (!email.trim()) {
-      setMessage('Por favor ingresa tu email');
+      setMessage(t('newsletter.messages.enterEmail'));
       setShowSuccess(false);
       return;
     }
@@ -20,7 +22,7 @@ const Newsletter = () => {
     // Validación básica de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setMessage('Por favor ingresa un email válido');
+      setMessage(t('newsletter.messages.validEmail'));
       setShowSuccess(false);
       return;
     }
@@ -31,7 +33,7 @@ const Newsletter = () => {
       const result = await subscribe(email.trim()).unwrap();
       
       if (result.success) {
-        setMessage(result.message || '¡Suscripción exitosa! Revisa tu email para confirmar.');
+        setMessage(result.message || t('newsletter.messages.successDefault'));
         setShowSuccess(true);
         setEmail('');
         
@@ -41,12 +43,12 @@ const Newsletter = () => {
           setShowSuccess(false);
         }, 5000);
       } else {
-        setMessage(result.message || 'Error al suscribirse. Intenta nuevamente.');
+        setMessage(result.message || t('newsletter.messages.errorDefault'));
         setShowSuccess(false);
       }
     } catch (error) {
       console.error('Error en suscripción:', error);
-      const errorMessage = error?.data?.message || 'Error al suscribirse. Intenta nuevamente.';
+      const errorMessage = error?.data?.message || t('newsletter.messages.errorDefault');
       setMessage(errorMessage);
       setShowSuccess(false);
     }
@@ -54,9 +56,9 @@ const Newsletter = () => {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('newsletter.title')}</h3>
       <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-        Recibe las últimas noticias sobre nuestros proyectos y novedades del blog
+        {t('newsletter.description')}
       </p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,7 +67,7 @@ const Newsletter = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu-email@ejemplo.com"
+            placeholder={t('newsletter.emailPlaceholder')}
             className="
               w-full px-0 py-3 
               bg-transparent 
@@ -94,7 +96,7 @@ const Newsletter = () => {
             }
           `}
         >
-          {isSubmitting ? 'SUSCRIBIENDO...' : showSuccess ? '¡SUSCRITO!' : 'SUSCRIBETE'}
+          {isSubmitting ? t('newsletter.subscribing') : showSuccess ? t('newsletter.subscribed') : t('newsletter.subscribe')}
         </button>
         
         {message && (
