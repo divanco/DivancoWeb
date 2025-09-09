@@ -27,7 +27,7 @@ const sequelize = process.env.DB_DEPLOY
 
 async function forceSync() {
   try {
-    console.log('🔄 FORCE: Recreando base de datos completamente...');
+    console.log('🔄 FORCE SYNC: Recreando base de datos completamente...');
     console.log('⚠️ ADVERTENCIA: Esto eliminará todos los datos existentes');
     
     await sequelize.authenticate();
@@ -37,8 +37,11 @@ async function forceSync() {
     await sequelize.sync({ force: true });
     console.log('✅ Base de datos recreada con force: true');
     
+    console.log('🧹 No se cargarán datos de ejemplo');
+    console.log('👤 No se crearán usuarios predeterminados');
+    
     await sequelize.close();
-    console.log('✅ Recreación completada - todas las tablas están actualizadas');
+    console.log('✅ Recreación completada - todas las tablas están vacías');
     
   } catch (error) {
     console.error('❌ Error:', error);

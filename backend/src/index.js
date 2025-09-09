@@ -5,6 +5,7 @@ import app from './app.js';
 
 const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
+const isProduction = env === 'production' || !!process.env.DB_DEPLOY;
 
 // Función para inicializar la aplicación
 async function initializeApp() {
@@ -12,10 +13,10 @@ async function initializeApp() {
     
     
     // Sincronizar modelos en orden correcto
-    // ✅ CAMBIO: No usar force en desarrollo para preservar datos
-    // Solo usar force si está explícitamente definido en variable de entorno
-    const force = process.env.FORCE_SYNC === 'true';
-    await syncAllModels(force);
+    // Siempre usar force: true en producción
+    console.log(`⚠️ Entorno detectado: ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
+    console.log('⚠️ RECREANDO TODAS LAS TABLAS - MODO FORCE: true');
+    await syncAllModels(true);
     
     // Iniciar servidor
     app.listen(PORT, () => {
