@@ -19,13 +19,13 @@ function EdicionesPage() {
   
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    console.log('EdicionesPage - isLoading:', isLoading);
-    console.log('EdicionesPage - hasData:', projects.length > 0);
-    
-    // Solo marcar como cargado cuando no está cargando Y tenemos datos o al menos hay imágenes por defecto
-    const isLoaded = !isLoading;
-    setSectionLoaded('ediciones', isLoaded);
-  }, [isLoading, setSectionLoaded, projects.length]);
+    // Importante: EdicionesPage siempre se marca como cargado cuando los datos están listos
+    // porque incluso sin proyectos tiene imágenes por defecto
+    if (!isLoading) {
+      console.log('EdicionesPage - Marcando como cargado');
+      setSectionLoaded('ediciones', true); // true = cargado (ya no está cargando)
+    }
+  }, [isLoading, setSectionLoaded]);
   
   // ✅ Procesar proyectos para crear el slideshow
   const projects = projectsData?.data?.projects || [];

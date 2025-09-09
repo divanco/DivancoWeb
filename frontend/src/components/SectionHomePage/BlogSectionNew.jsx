@@ -23,13 +23,12 @@ const BlogSection = () => {
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    console.log('BlogSection - isLoading:', isLoading);
-    console.log('BlogSection - hasData:', featuredPosts.length > 0 || recentPosts.length > 0);
-    
-    // Solo marcar como cargado cuando no está cargando Y tenemos datos
-    const isLoaded = !isLoading && (featuredPosts.length > 0 || recentPosts.length > 0);
-    setSectionLoaded('blog', isLoaded);
-  }, [isLoading, setSectionLoaded, featuredPosts.length, recentPosts.length]);
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
+    if (!isLoading && (featuredPosts.length > 0 || recentPosts.length > 0)) {
+      console.log('BlogSection - Marcando como cargado');
+      setSectionLoaded('blog', true); // true = cargado (ya no está cargando)
+    }
+  }, [isLoading, featuredPosts, recentPosts, setSectionLoaded]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

@@ -21,13 +21,12 @@ const ShowroomSection = () => {
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    console.log('ShowroomSection - isLoading:', isLoading);
-    console.log('ShowroomSection - hasData:', categories.length > 0);
-    
-    // Solo marcar como cargado cuando no está cargando Y tenemos datos
-    const isLoaded = !isLoading && categories.length > 0;
-    setSectionLoaded('showroom', isLoaded);
-  }, [isLoading, setSectionLoaded, categories.length]);
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
+    if (!isLoading && categories.length > 0) {
+      console.log('ShowroomSection - Marcando como cargado');
+      setSectionLoaded('showroom', true); // true = cargado (ya no está cargando)
+    }
+  }, [isLoading, categories, setSectionLoaded]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);

@@ -16,13 +16,12 @@ const ProjectSection = ({ limit = 6 }) => {
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    console.log('ProjectSection - isLoading:', isLoading);
-    console.log('ProjectSection - hasData:', projects.length > 0);
-    
-    // Solo marcar como cargado cuando no está cargando Y tenemos datos
-    const isLoaded = !isLoading && projects.length > 0;
-    setSectionLoaded('projects', isLoaded);
-  }, [isLoading, setSectionLoaded, projects.length]);
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
+    if (!isLoading && projects.length > 0) {
+      console.log('ProjectSection - Marcando como cargado');
+      setSectionLoaded('projects', true); // true = cargado (ya no está cargando)
+    }
+  }, [isLoading, projects, setSectionLoaded]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);

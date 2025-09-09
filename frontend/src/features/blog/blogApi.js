@@ -16,18 +16,30 @@ export const blogApi = baseApi.injectEndpoints({
         return `/blog?${params}`;
       },
       providesTags: ['BlogPost'],
+      transformResponse: (response) => {
+        console.log('getBlogPosts response:', response);
+        return response;
+      }
     }),
 
     // Posts destacados para homepage
     getFeaturedBlogPosts: builder.query({
       query: (limit = 3) => `/blog/featured?limit=${limit}`,
       providesTags: ['BlogPost'],
+      transformResponse: (response) => {
+        console.log('getFeaturedBlogPosts response:', response);
+        return response;
+      }
     }),
 
     // Posts recientes
     getRecentBlogPosts: builder.query({
       query: (limit = 5) => `/blog/recent?limit=${limit}`,
       providesTags: ['BlogPost'],
+      transformResponse: (response) => {
+        console.log('getRecentBlogPosts response:', response);
+        return response;
+      }
     }),
 
     // Obtener post por slug

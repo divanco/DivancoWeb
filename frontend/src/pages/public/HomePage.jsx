@@ -5,12 +5,26 @@ import ShowroomSection from '../../components/SectionHomePage/ShowroomSection';
 import BlogSectionNew from '../../components/SectionHomePage/BlogSectionNew';
 import { SectionLoader } from '../../components/common/DivancoLoader';
 import { HomeLoadingProvider, useHomeLoading } from '../../contexts/HomeLoadingContext';
+import { useEffect } from 'react';
 
 // Componente contenedor que utiliza el contexto
 const HomePageContent = () => {
-  const { loadingStates } = useHomeLoading();
+  const { loadingStates, setSectionLoaded } = useHomeLoading();
   
   console.log('HomePage - loadingStates:', loadingStates);
+  
+  // Temporizador de seguridad - desactiva todos los loaders después de 5 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.log('⏱️ Temporizador de seguridad activado - Forzando carga de todas las secciones');
+      setSectionLoaded('projects', true);
+      setSectionLoaded('blog', true);
+      setSectionLoaded('showroom', true);
+      setSectionLoaded('ediciones', true);
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, [setSectionLoaded]);
   
   return (
     <div>

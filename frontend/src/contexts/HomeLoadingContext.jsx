@@ -18,14 +18,18 @@ export const HomeLoadingProvider = ({ children }) => {
   // loaded = false significa "está cargando"
   const setSectionLoaded = (section, loaded) => {
     console.log(`Setting section ${section} loaded:`, loaded);
-    setLoadingStates(prev => {
-      const newState = {
-        ...prev,
-        [section]: !loaded  // Si loaded=true, entonces loadingStates[section]=false (no está cargando)
-      };
-      console.log('New loading states:', newState);
-      return newState;
-    });
+    
+    // Forzamos el valor directamente para garantizar el cambio
+    if (loaded) {
+      setLoadingStates(prev => {
+        // Si ya está marcado como cargado (false), no hacer nada
+        if (prev[section] === false) return prev;
+        
+        const newState = { ...prev, [section]: false };
+        console.log('New loading states:', newState);
+        return newState;
+      });
+    }
   };
 
   // Valores a compartir
