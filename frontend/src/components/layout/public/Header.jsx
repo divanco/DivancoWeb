@@ -133,7 +133,7 @@ const Header = () => {
       {/* Barra superior con language switcher - Estilo Minotti */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-end items-center py-2">
+          <div className="flex justify-end items-center py-4">
             <LanguageSwitcher className="text-xs" />
           </div>
         </div>
@@ -141,7 +141,7 @@ const Header = () => {
 
       {/* Header principal */}
       <header
-        className={`fixed top-10 left-0 right-0 z-40 transition-all duration-500 ${getHeaderBackground()}`}
+        className={`fixed top-14 left-0 right-0 z-40 transition-all duration-500 ${getHeaderBackground()}`}
       >
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div
