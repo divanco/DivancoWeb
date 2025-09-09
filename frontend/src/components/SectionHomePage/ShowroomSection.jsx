@@ -28,7 +28,16 @@ const ShowroomSection = () => {
     }
   }, [isLoading, categories, setSectionLoaded]);
 
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // Ajustar slide inicial basado en la cantidad de categorías disponibles
+  useEffect(() => {
+    if (categories.length > 0) {
+      // Si solo hay una categoría o menos de 3, comenzar desde el índice 0
+      // Si hay 2 o más, comenzar desde el índice 1 (segunda imagen)
+      setCurrentSlide(categories.length >= 3 ? 1 : 0);
+    }
+  }, [categories.length]);
+
+  const [currentSlide, setCurrentSlide] = useState(1); // Comenzar desde la segunda imagen (índice 1)
   const [isMobile, setIsMobile] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
