@@ -306,7 +306,7 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
 };
 
 // Tour virtual
-const VirtualTour = ({ kuulaUrl }) => {
+const VirtualTour = ({ kuulaUrl, t }) => {
   if (!kuulaUrl) return null;
   return (
     <div id="virtual-tour" className="bg-gray-900 py-16 md:py-24">
@@ -433,7 +433,7 @@ const ProjectDetailPage = () => {
       {/* Galería agrupada */}
       <ProjectGallery mediaFiles={project.media} galleryImages={galleryImages} onImageClick={handleImageClick} />
       {/* Virtual Tour */}
-      <VirtualTour kuulaUrl={project.kuulaUrl} />
+      <VirtualTour kuulaUrl={project.kuulaUrl} t={t} />
       {/* Related Projects */}
       <RelatedProjects currentProject={project} />
       {/* Navigation */}
