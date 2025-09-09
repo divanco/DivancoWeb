@@ -235,11 +235,15 @@ const CategoryForm = ({ category, onClose, onSave }) => {
   });
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(
-    category?.featuredImage?.thumbnail?.url || 
-    category?.featuredImage?.desktop?.url || 
-    null
-  );
+  const [imagePreview, setImagePreview] = useState(() => {
+    // Only set image preview from category data if category exists
+    if (category?.featuredImage) {
+      return category.featuredImage.thumbnail?.url || 
+             category.featuredImage.desktop?.url || 
+             null;
+    }
+    return null;
+  });
 
   console.log('[CategoryManagement] Imagen preview inicial:', imagePreview);
   console.log('[CategoryManagement] Datos de categoría recibidos:', category);
@@ -299,22 +303,43 @@ const CategoryForm = ({ category, onClose, onSave }) => {
     }
 
     try {
+      // Clean form data to prevent console logs from being submitted
+      const cleanForm = {
+        ...form,
+        // Clean and limit text fields to prevent validation errors
+        description: form.description?.substring(0, 1990) || '',
+        content: form.content?.substring(0, 4990) || ''
+      };
+      
+      console.log('🔵 [CategoryForm] Enviando datos de categoría:', cleanForm);
       let savedCategory;
       
       if (category) {
+        console.log('🔵 [CategoryForm] Actualizando categoría existente ID:', category.id);
         savedCategory = await updateCategory({ id: category.id, ...form }).unwrap();
       } else {
+        console.log('🔵 [CategoryForm] Creando nueva categoría');
         savedCategory = await createCategory(form).unwrap();
       }
 
+      console.log('✅ [CategoryForm] Categoría guardada exitosamente:', savedCategory);
+
       // Upload image if selected
       if (imageFile && savedCategory) {
+        console.log('🔵 [CategoryForm] Subiendo imagen para categoría ID:', savedCategory.id || category?.id);
         const formData = new FormData();
         formData.append('image', imageFile);
-        await uploadImage({ 
-          id: savedCategory.id || category.id, 
-          formData 
-        }).unwrap();
+        
+        try {
+          const imageResult = await uploadImage({ 
+            id: savedCategory.id || category?.id, 
+            formData 
+          }).unwrap();
+          console.log('✅ [CategoryForm] Imagen subida exitosamente:', imageResult);
+        } catch (imageError) {
+          console.error('🔴 [CategoryForm] Error al subir imagen:', imageError);
+          // Continue despite image upload error
+        }
       }
 
       onSave();

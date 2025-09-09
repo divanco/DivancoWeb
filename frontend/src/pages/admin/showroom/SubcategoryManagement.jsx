@@ -405,11 +405,15 @@ const SubcategoryForm = ({ category, subcategory, onClose, onSave }) => {
   });
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(
-    subcategory?.featuredImage?.desktop?.url || 
-    subcategory?.featuredImage?.thumbnail?.url || 
-    null
-  );
+  const [imagePreview, setImagePreview] = useState(() => {
+    // Only set image preview from subcategory data if subcategory exists
+    if (subcategory?.featuredImage) {
+      return subcategory.featuredImage.desktop?.url || 
+             subcategory.featuredImage.thumbnail?.url || 
+             null;
+    }
+    return null;
+  });
 
   const [createSubcategory, { isLoading: isCreating }] = useCreateSubcategoryMutation();
   const [updateSubcategory, { isLoading: isUpdating }] = useUpdateSubcategoryMutation();
@@ -466,54 +470,83 @@ const SubcategoryForm = ({ category, subcategory, onClose, onSave }) => {
     }
 
     try {
+      // Clean form data to prevent console logs from being submitted
+      const cleanForm = {
+        ...form,
+        // Clean and limit content field to prevent validation errors
+        description: form.description?.substring(0, 990) || '',
+        content: form.content?.substring(0, 2990) || ''
+      };
+      
+      console.log('🔵 [SubcategoryForm] Enviando datos de subcategoría:', {
+        ...cleanForm, 
+        categoryId: category.id
+      });
+      
       let savedSubcategory;
-      const payload = { ...form, categoryId: category.id };
+      const payload = { ...cleanForm, categoryId: category.id };
       
       if (subcategory) {
+        console.log('🔵 [SubcategoryForm] Actualizando subcategoría existente ID:', subcategory.id);
         savedSubcategory = await updateSubcategory({ id: subcategory.id, ...payload }).unwrap();
       } else {
+        console.log('🔵 [SubcategoryForm] Creando nueva subcategoría');
         savedSubcategory = await createSubcategory(payload).unwrap();
       }
 
+      console.log('✅ [SubcategoryForm] Subcategoría guardada exitosamente:', savedSubcategory);
+
       // Upload image if selected
       if (imageFile && savedSubcategory) {
+        console.log('🔵 [SubcategoryForm] Preparando subida de imagen');
         const formData = new FormData();
         formData.append('image', imageFile);
         
         // Obtener el slug de la subcategoría (puede venir de la respuesta o usar el existente)
         const targetSlug = savedSubcategory.data?.slug || savedSubcategory.slug || subcategory?.slug || form.slug;
+        console.log('🔵 [SubcategoryForm] Subiendo imagen para slug:', targetSlug);
         
-        await uploadImage({ 
-          slug: targetSlug, 
-          formData 
-        }).unwrap();
-        
-        // Refrescar la lista de subcategorías para mostrar la imagen
-        if (onRefresh) {
-          await onRefresh();
+        try {
+          const imageResult = await uploadImage({ 
+            slug: targetSlug, 
+            formData 
+          }).unwrap();
+          console.log('✅ [SubcategoryForm] Imagen subida exitosamente:', imageResult);
+        } catch (imageError) {
+          console.error('🔴 [SubcategoryForm] Error al subir imagen:', imageError);
+          // Continue despite image upload error
         }
       }
-
-      // Cerrar el formulario y resetear
-      setShowForm(false);
-      setEditingSubcategory(null);
-      setForm({
-        name: '',
-        slug: '',
-        description: '',
-        content: '',
-        brand: '',
-        model: '',
-        sku: '',
-        specifications: {},
-        order: 0,
-        isFeatured: false,
-        isNew: false
-      });
-      setImageFile(null);
-      setImagePreview(null);
+      
+      // Refrescar los datos y cerrar el formulario
+      if (onSave) {
+        onSave();
+      }
+      
+      // Resetear el formulario si es una nueva subcategoría
+      if (!subcategory) {
+        setForm({
+          name: '',
+          slug: '',
+          description: '',
+          content: '',
+          order: 0,
+          isShowInHome: false
+        });
+        setImageFile(null);
+        setImagePreview(null);
+      }
     } catch (err) {
-      setError(err?.data?.message || 'Error al guardar la subcategoría');
+      console.error('🔴 [SubcategoryForm] Error al guardar:', err);
+      
+      // Handle validation errors from backend
+      if (err?.data?.errors && Array.isArray(err.data.errors)) {
+        setError(`Error de validación: ${err.data.errors.join(', ')}`);
+      } else if (err?.data?.message) {
+        setError(err.data.message);
+      } else {
+        setError('Error al guardar la subcategoría. Por favor intenta de nuevo.');
+      }
     }
   };
 

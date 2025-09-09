@@ -132,7 +132,8 @@ export const createSubcategory = async (req, res) => {
       specifications,
       order = 0,
       isFeatured = false,
-      isNew = false
+      isNew = false,
+      slug: customSlug
     } = req.body;
 
     // Validaciones básicas
@@ -159,18 +160,29 @@ export const createSubcategory = async (req, res) => {
       });
     }
 
+    // Validar longitudes de campos
+    if (content && content.length > 3000) {
+      console.warn('Content field exceeds maximum length, truncating');
+      content = content.substring(0, 3000);
+    }
+    
+    if (description && description.length > 1000) {
+      console.warn('Description field exceeds maximum length, truncating');
+      description = description.substring(0, 1000);
+    }
+
     // Crear la subcategoría
     const subcategoryData = {
       name: name.trim(),
-      slug: generateSlug(name.trim()),
-      description: description?.trim(),
-      content: content?.trim(),
+      slug: customSlug?.trim() || generateSlug(name.trim()),
+      description: description?.trim() || '',
+      content: content?.trim() || '',
       categoryId,
-      brand: brand?.trim(),
-      model: model?.trim(),
-      sku: sku?.trim(),
+      brand: brand?.trim() || '',
+      model: model?.trim() || '',
+      sku: sku?.trim() || '',
       specifications: specifications || {},
-      order: parseInt(order),
+      order: parseInt(order) || 0,
       isFeatured: Boolean(isFeatured),
       isNew: Boolean(isNew)
     };
@@ -198,6 +210,16 @@ export const createSubcategory = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Ya existe una subcategoría con ese nombre en esta categoría'
+      });
+    }
+    
+    if (error.name === 'SequelizeValidationError') {
+      // Extract the specific validation error message
+      const validationErrors = error.errors.map(err => `${err.path}: ${err.message}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Error de validación',
+        errors: validationErrors
       });
     }
 

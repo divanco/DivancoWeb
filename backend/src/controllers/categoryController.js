@@ -100,52 +100,91 @@ export const getCategoryBySlug = async (req, res) => {
 // Crear nueva categoría
 export const createCategory = async (req, res) => {
   try {
+    console.log('📦 [CategoryController] Datos recibidos para crear categoría:', req.body);
+    
     const {
       name,
       description,
       content,
       order = 0,
-      isShowInHome = false
+      isShowInHome = false,
+      slug
     } = req.body;
 
     // Validaciones básicas
     if (!name || name.trim().length < 2) {
+      console.error('❌ [CategoryController] Error validación: nombre requerido');
       return res.status(400).json({
         success: false,
         message: 'El nombre es requerido y debe tener al menos 2 caracteres'
       });
     }
 
+    if (!slug || slug.trim().length < 2) {
+      console.error('❌ [CategoryController] Error validación: slug requerido');
+      return res.status(400).json({
+        success: false,
+        message: 'El slug es requerido y debe tener al menos 2 caracteres'
+      });
+    }
+    
+    // Validar longitudes de campos
+    let descriptionValue = description?.trim() || '';
+    let contentValue = content?.trim() || '';
+    
+    if (descriptionValue.length > 2000) {
+      console.warn('Description field exceeds maximum length, truncating');
+      descriptionValue = descriptionValue.substring(0, 2000);
+    }
+    
+    if (contentValue.length > 5000) {
+      console.warn('Content field exceeds maximum length, truncating');
+      contentValue = contentValue.substring(0, 5000);
+    }
+
     // Crear la categoría
     const categoryData = {
-  name: name.trim(),
-  description: description?.trim(),
-  content: content?.trim(),
-  order: parseInt(order),
-  isShowInHome: Boolean(isShowInHome),
-  slug: req.body.slug?.trim(), // <-- AGREGAR ESTA LÍNEA
-};
+      name: name.trim(),
+      description: descriptionValue,
+      content: contentValue,
+      order: parseInt(order) || 0,
+      isShowInHome: Boolean(isShowInHome),
+      slug: slug.trim()
+    };
 
+    console.log('📦 [CategoryController] Datos preparados para la base de datos:', categoryData);
     const category = await Category.create(categoryData);
+    console.log('✅ [CategoryController] Categoría creada exitosamente:', category.id);
 
     res.status(201).json({
       success: true,
       message: 'Categoría creada exitosamente',
+      id: category.id,
       data: category
     });
   } catch (error) {
-    console.error('Error creando categoría:', error);
+    console.error('❌ Error creando categoría:', error);
     
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({
         success: false,
-        message: 'Ya existe una categoría con ese nombre'
+        message: 'Ya existe una categoría con ese nombre o slug'
+      });
+    }
+    
+    if (error.name === 'SequelizeValidationError') {
+      // Extract the specific validation error message
+      const validationErrors = error.errors.map(err => `${err.path}: ${err.message}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Error de validación',
+        errors: validationErrors
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor'
+      message: 'Error interno del servidor: ' + error.message
     });
   }
 };
@@ -185,17 +224,21 @@ export const updateCategory = async (req, res) => {
 export const uploadCategoryImage = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('📸 [CategoryController] Solicitud para subir imagen, categoría ID:', id);
     
     if (!req.file) {
+      console.error('❌ [CategoryController] Error: No se proporcionó ningún archivo');
       return res.status(400).json({
         success: false,
         message: 'No se proporcionó ningún archivo'
       });
     }
 
+    console.log('📸 [CategoryController] Archivo recibido:', req.file.path);
     const category = await Category.findByPk(id);
     
     if (!category) {
+      console.error('❌ [CategoryController] Error: Categoría no encontrada con ID:', id);
       return res.status(404).json({
         success: false,
         message: 'Categoría no encontrada'
@@ -204,15 +247,18 @@ export const uploadCategoryImage = async (req, res) => {
 
     // Eliminar imagen anterior si existe
     if (category.featuredImage) {
+      console.log('📸 [CategoryController] Eliminando imagen anterior para categoría ID:', id);
       try {
         await deleteResponsiveImages(category.featuredImage);
       } catch (deleteError) {
-        console.warn('Error eliminando imagen anterior:', deleteError);
+        console.warn('⚠️ [CategoryController] Error eliminando imagen anterior:', deleteError);
       }
     }
 
     // Subir nueva imagen
+    console.log('📸 [CategoryController] Subiendo nueva imagen para categoría:', category.slug);
     const images = await uploadResponsiveImage(req.file.path, `categories/${category.slug}`);
+    console.log('✅ [CategoryController] Imagen subida exitosamente:', images);
 
     // Actualizar categoría con nueva imagen
     await category.update({ featuredImage: images });
@@ -226,10 +272,10 @@ export const uploadCategoryImage = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error subiendo imagen:', error);
+    console.error('❌ [CategoryController] Error subiendo imagen:', error);
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor'
+      message: 'Error interno del servidor: ' + error.message
     });
   }
 };

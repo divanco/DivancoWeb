@@ -160,43 +160,49 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
       return;
     }
 
-    // Convert specifications and dimensions arrays to objects
-    const specificationsObj = specifications.reduce((acc, spec) => {
-      if (spec.key.trim() && spec.value.trim()) {
-        acc[spec.key.trim()] = spec.value.trim();
-      }
-      return acc;
-    }, {});
-
-    const dimensionsObj = dimensions.reduce((acc, dim) => {
-      if (dim.key.trim() && dim.value.trim()) {
-        acc[dim.key.trim()] = dim.value.trim();
-      }
-      return acc;
-    }, {});
-
-    const payload = {
-      ...form,
-      subcategoryId: subcategory.id,
-      specifications: specificationsObj,
-      dimensions: dimensionsObj,
-      price: form.price ? parseFloat(form.price) : null,
-      salePrice: form.salePrice ? parseFloat(form.salePrice) : null
-    };
-
     try {
+      // Convert specifications and dimensions arrays to objects
+      const specificationsObj = specifications.reduce((acc, spec) => {
+        if (spec.key.trim() && spec.value.trim()) {
+          acc[spec.key.trim()] = spec.value.trim();
+        }
+        return acc;
+      }, {});
+
+      const dimensionsObj = dimensions.reduce((acc, dim) => {
+        if (dim.key.trim() && dim.value.trim()) {
+          acc[dim.key.trim()] = dim.value.trim();
+        }
+        return acc;
+      }, {});
+
+      const payload = {
+        ...form,
+        subcategoryId: subcategory.id,
+        specifications: specificationsObj,
+        dimensions: dimensionsObj,
+        price: form.price ? parseFloat(form.price) : null,
+        salePrice: form.salePrice ? parseFloat(form.salePrice) : null
+      };
+
+      console.log('🔵 [ProductForm] Enviando datos:', payload);
       let result;
       
       if (product) {
+        console.log('🔵 [ProductForm] Actualizando producto existente ID:', product.id);
         result = await updateProduct(product.id, payload);
       } else {
+        console.log('🔵 [ProductForm] Creando nuevo producto');
         result = await createProduct(payload);
       }
 
       if (!result.success) {
+        console.error('🔴 [ProductForm] Error al guardar:', result.error);
         setError(result.error);
         return;
       }
+
+      console.log('✅ [ProductForm] Producto guardado exitosamente:', result.data);
 
       // Upload images if selected
       const productId = result.data?.product?.id || product?.id;

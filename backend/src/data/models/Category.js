@@ -17,9 +17,9 @@ Category.init({
     }
   },
   description: {
-    type: DataTypes.TEXT(1000),
+    type: DataTypes.TEXT(2000),
     validate: {
-      len: [0, 1000]
+      len: [0, 2000]
     }
   },
   slug: {
@@ -30,9 +30,9 @@ Category.init({
   },
   // Contenido completo de la categoría
   content: {
-    type: DataTypes.TEXT(3000),
+    type: DataTypes.TEXT(5000),
     validate: {
-      len: [0, 3000]
+      len: [0, 5000]
     }
   },
   // Imágenes responsivas
