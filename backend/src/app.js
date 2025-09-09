@@ -33,6 +33,7 @@ app.use(morgan('dev'));
 app.use(cors({
   origin: [
     'https://divanco-web.vercel.app',
+    'https://divanco-8y4f6l47s-divancos-projects.vercel.app',
     'https://divancoweb.onrender.com',
     'http://localhost:5173',
     'http://localhost:5174',
