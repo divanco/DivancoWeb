@@ -1,5 +1,6 @@
-// Script independiente para cargar datos usando conexión directa
+// Script independiente para crear usuarios predeterminados
 const { Sequelize, DataTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 // Configurar conexión a base de datos
@@ -26,32 +27,42 @@ const sequelize = process.env.DB_DEPLOY
       }
     );
 
-// Definir modelos directamente
-const Category = sequelize.define('Category', {
+// Definir solo el modelo de usuario
+const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true,
-    autoIncrement: true
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true,
   },
-  description: {
-    type: DataTypes.TEXT
-  },
-  slug: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: DataTypes.ENUM('admin', 'user', 'editor', 'author'),
+    defaultValue: 'user',
+    allowNull: false,
   },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
-  },
-  order: {
-    type: DataTypes.INTEGER,
-    defaultValue: 1
   }
 });
 
@@ -155,10 +166,7 @@ const Product = sequelize.define('Product', {
 });
 
 // Establecer relaciones
-Category.hasMany(Subcategory, { foreignKey: 'categoryId' });
-Subcategory.belongsTo(Category, { foreignKey: 'categoryId' });
-Subcategory.hasMany(Product, { foreignKey: 'subcategoryId' });
-Product.belongsTo(Subcategory, { foreignKey: 'subcategoryId' });
+// Ninguna relación es necesaria ya que solo tenemos el modelo User
 
 // Datos a cargar
 const seedData = {
@@ -318,98 +326,68 @@ const seedData = {
 };
 
 // Función para generar slug
-function generateSlug(name) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-}
-
+// No necesitamos crear slugs para los usuarios
 async function seedDatabase() {
   try {
-    console.log('🌱 Iniciando carga de datos de desarrollo...');
+    console.log('🌱 Iniciando carga de usuarios predeterminados...');
     
     // Conectar a la base de datos
     await sequelize.authenticate();
     console.log('🔗 Conexión a la base de datos establecida');
     
-    // Verificar si ya hay datos
-    const existingCategories = await Category.count();
-    if (existingCategories > 0) {
-      console.log('📊 La base de datos ya contiene datos. Saltando seeding...');
-      await sequelize.close();
-      process.exit(0);
+    // Verificar si ya hay usuarios
+    const existingUsers = await User.count();
+    if (existingUsers > 0) {
+      console.log('� Ya existen usuarios en la base de datos.');
+      console.log('🔄 Verificando usuarios predeterminados...');
+    } else {
+      console.log('🧹 No hay usuarios, creando usuarios predeterminados...');
     }
     
-    console.log('🧹 Base de datos vacía, procediendo con el seeding...');
+    // Crear usuario admin predeterminado
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     
-    for (const categoryData of seedData.categories) {
-      console.log(`📁 Creando categoría: ${categoryData.name}`);
-      
-      // Crear categoría
-      const category = await Category.create({
-        name: categoryData.name,
-        description: categoryData.description,
-        slug: generateSlug(categoryData.name),
-        isActive: categoryData.isActive,
-        order: 1
+    // Verificar si el usuario admin ya existe
+    const adminExists = await User.findOne({ where: { email: 'admin@divanco.co' } });
+    
+    if (!adminExists) {
+      console.log('� Creando usuario administrador predeterminado...');
+      await User.create({
+        name: 'Admin',
+        email: 'admin@divanco.co',
+        username: 'admin',
+        password: hashedPassword,
+        role: 'admin'
       });
-      
-      // Crear subcategorías
-      for (let i = 0; i < categoryData.subcategories.length; i++) {
-        const subcategoryData = categoryData.subcategories[i];
-        console.log(`  📂 Creando subcategoría: ${subcategoryData.name}`);
-        
-        const subcategory = await Subcategory.create({
-          name: subcategoryData.name,
-          description: subcategoryData.description,
-          slug: generateSlug(subcategoryData.name),
-          categoryId: category.id,
-          isActive: true,
-          order: i + 1
-        });
-        
-        // Crear productos para esta subcategoría
-        const products = seedData.products[subcategoryData.name];
-        if (products) {
-          for (let j = 0; j < products.length; j++) {
-            const productData = products[j];
-            console.log(`    📦 Creando producto: ${productData.name}`);
-            
-            await Product.create({
-              name: productData.name,
-              description: productData.description,
-              slug: generateSlug(productData.name),
-              price: productData.price,
-              currency: 'COP',
-              stock: productData.stock,
-              subcategoryId: subcategory.id,
-              isActive: true,
-              isFeatured: j < 2, // Los primeros 2 productos son destacados
-              order: j + 1,
-              specifications: {},
-              images: []
-            });
-          }
-        }
-      }
+      console.log('✅ Usuario admin creado exitosamente');
+    } else {
+      console.log('✅ Usuario admin ya existe, omitiendo creación');
     }
     
-    console.log('✅ Datos de desarrollo cargados exitosamente!');
-    console.log(`📊 Resumen:`);
-    console.log(`   - ${seedData.categories.length} categorías`);
-    console.log(`   - ${seedData.categories.length * 3} subcategorías`);
+    // Crear usuario editor predeterminado
+    const editorExists = await User.findOne({ where: { email: 'editor@divanco.co' } });
     
-    // Contar productos totales
-    let totalProducts = 0;
-    Object.values(seedData.products).forEach(productArray => {
-      totalProducts += productArray.length;
-    });
-    console.log(`   - ${totalProducts} productos`);
+    if (!editorExists) {
+      console.log('� Creando usuario editor predeterminado...');
+      await User.create({
+        name: 'Editor',
+        email: 'editor@divanco.co',
+        username: 'editor',
+        password: hashedPassword,
+        role: 'editor'
+      });
+      console.log('✅ Usuario editor creado exitosamente');
+    } else {
+      console.log('✅ Usuario editor ya existe, omitiendo creación');
+    }
+    
+    console.log('✅ Usuarios predeterminados verificados/creados exitosamente!');
+    console.log('📊 Resumen:');
+    console.log('   - 2 usuarios (admin y editor)');
+    console.log('   - 0 categorías (carga omitida)');
+    console.log('   - 0 subcategorías (carga omitida)');
+    console.log('   - 0 productos (carga omitida)');
     
     await sequelize.close();
     process.exit(0);

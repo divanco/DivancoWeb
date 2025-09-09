@@ -1,6 +1,7 @@
 import { Project, BlogPost, User, MediaFile } from '../data/models/index.js';
 import { uploadResponsiveImage, uploadOptimizedVideo, deleteResponsiveImages, uploadDocument } from '../config/cloudinary.js';
 import { Op } from 'sequelize';
+import sequelize from '../data/config/sequelize.js';
 
 // Obtener todos los proyectos
 export const getAllProjects = async (req, res) => {
@@ -1089,7 +1090,25 @@ export const getSliderProjects = async (req, res) => {
     console.log('🎠 Obteniendo proyectos para slider...');
     const { limit = 5 } = req.query;
 
+    // Determinar qué atributos seleccionar (omitir shortDescription si no existe)
+    let attributes;
+    try {
+      // Verificar si la columna shortDescription existe
+      await sequelize.query('SELECT shortDescription FROM "Projects" LIMIT 1');
+      attributes = undefined; // Si no da error, incluir todos los atributos
+      console.log('✅ Campo shortDescription existe en BD');
+    } catch (err) {
+      // Si da error, excluir shortDescription
+      console.log('⚠️ Campo shortDescription NO existe en BD - omitiendo');
+      attributes = { 
+        exclude: ['shortDescription']
+      };
+    }
+
+    // Versión más robusta para evitar problemas con la condición required: true
+    // Primero obtenemos proyectos que deberían estar en el slider
     const projects = await Project.findAll({
+      attributes,
       where: { 
         isActive: true,
         isPublic: true, 
@@ -1100,33 +1119,68 @@ export const getSliderProjects = async (req, res) => {
         as: 'media',
         where: { 
           isActive: true,
-          [Op.or]: [
-            { isSliderImage: true },  // Prioridad 1: Imagen específica del slider
-            { isMain: true }          // Prioridad 2: Imagen principal
-          ]
         },
-        required: true, // Solo proyectos que tengan al menos una imagen
-        order: [['isSliderImage', 'DESC'], ['isMain', 'DESC'], ['order', 'ASC']]
+        required: false, // Permitimos proyectos sin imágenes para ser más flexibles
       }],
       order: [['order', 'ASC'], ['updatedAt', 'DESC']],
-      limit: parseInt(limit)
+      limit: parseInt(limit) * 2 // Obtenemos más por si algunos son filtrados
     });
 
     // ✅ Procesar para que cada proyecto tenga solo UNA imagen del slider
-    const processedProjects = projects.map(project => {
-      const projectData = project.toJSON();
-      
-      // Buscar imagen del slider específica, sino usar la principal
-      const sliderImage = projectData.media.find(img => img.isSliderImage) || 
-                         projectData.media.find(img => img.isMain) ||
-                         projectData.media[0];
-      
-      return {
-        ...projectData,
-        sliderImage, // Imagen específica para el slider
-        media: [sliderImage] // Solo la imagen del slider
-      };
-    });
+    // Versión extremadamente defensiva para entornos de producción
+    const processedProjects = projects
+      .filter(project => {
+        // Solo incluir proyectos que tengan medios válidos
+        return project && project.media && Array.isArray(project.media) && project.media.length > 0;
+      })
+      .map(project => {
+        try {
+          // Intentar usar toJSON() pero manejar caso donde no es función
+          let projectData;
+          try {
+            projectData = typeof project.toJSON === 'function' ? project.toJSON() : project;
+          } catch (e) {
+            console.error('Error al convertir proyecto a JSON:', e);
+            projectData = JSON.parse(JSON.stringify(project));
+          }
+          
+          // Verificación defensiva de estructura
+          if (!projectData || typeof projectData !== 'object') {
+            console.error('Formato de proyecto inválido:', projectData);
+            return null;
+          }
+          
+          // Buscar imagen del slider específica con manejo defensivo
+          let sliderImage = null;
+          
+          if (projectData.media && Array.isArray(projectData.media) && projectData.media.length > 0) {
+            // Filtrar cualquier elemento null o undefined primero
+            const validMedia = projectData.media.filter(m => m);
+            
+            if (validMedia.length > 0) {
+              // Buscar en orden de prioridad
+              sliderImage = validMedia.find(img => img && img.isSliderImage === true) || 
+                           validMedia.find(img => img && img.isMain === true) ||
+                           validMedia[0];
+            }
+          }
+          
+          // Si no hay imagen válida, usar un objeto con propiedades mínimas
+          if (!sliderImage) {
+            sliderImage = { id: null, urls: {}, isSliderImage: false, isMain: false };
+          }
+          
+          return {
+            ...projectData,
+            sliderImage, // Imagen específica para el slider
+            media: sliderImage ? [sliderImage] : [] // Solo la imagen del slider
+          };
+        } catch (err) {
+          console.error('Error procesando proyecto para slider:', err, project.id);
+          return null;
+        }
+      })
+      .filter(Boolean); // Eliminar los nulos que pudieron quedar por errores
 
     console.log(`✅ Encontrados ${processedProjects.length} proyectos para slider`);
 
@@ -1140,9 +1194,17 @@ export const getSliderProjects = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error obteniendo proyectos del slider:', error);
+    console.error('Stack:', error.stack); // Agregar stack para mejor depuración
+    
+    // Devolver mensaje de error más detallado en desarrollo
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Error interno del servidor' 
+      : error.message;
+      
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor'
+      message: errorMessage,
+      error: process.env.NODE_ENV !== 'production' ? error.toString() : undefined
     });
   }
 };
