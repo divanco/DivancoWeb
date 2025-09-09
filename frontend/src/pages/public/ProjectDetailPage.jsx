@@ -208,15 +208,23 @@ const ProjectInfo = ({ project, t }) => (
               </div>
             )}
 
-            {/* ✅ CTA con estilo mejorado */}
+            {/* ✅ CTA con estilo mejorado - Ahora abre Kuula directamente */}
             {project.kuulaUrl && (
               <div className="pt-6 border-t border-gray-200">
                 <a
-                  href="#virtual-tour"
+                  href={project.kuulaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-light text-white bg-naranjaDivanco hover:bg-orange-600 rounded-none transition-all duration-200 shadow-sm hover:shadow-md tracking-wider uppercase"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 002 2v8a2 2 0 002 2z" />
+                  {/* Icono de VR/Oculus */}
+                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 4H5C3.89543 4 3 4.89543 3 6V18C3 19.1046 3.89543 20 5 20H9C10.1046 20 11 19.1046 11 18V6C11 4.89543 10.1046 4 9 4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M19 4H15C13.8954 4 13 4.89543 13 6V18C13 19.1046 13.8954 20 15 20H19C20.1046 20 21 19.1046 21 18V6C21 4.89543 20.1046 4 19 4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 12C4 11.4477 4.44772 11 5 11H9C9.55228 11 10 11.4477 10 12C10 12.5523 9.55228 13 9 13H5C4.44772 13 4 12.5523 4 12Z" fill="currentColor"/>
+                    <path d="M14 12C14 11.4477 14.4477 11 15 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H15C14.4477 13 14 12.5523 14 12Z" fill="currentColor"/>
+                    <path d="M7 8V8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M17 8V8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   {t('projectDetail.verTourVirtual')}
                 </a>
@@ -305,13 +313,9 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
   );
 };
 
-// Tour virtual - Ahora con botón para abrir Kuula directamente
+// Tour virtual - Ahora con enlace directo a Kuula
 const VirtualTour = ({ kuulaUrl, t }) => {
   if (!kuulaUrl) return null;
-  
-  const handleOpenKuula = () => {
-    window.open(kuulaUrl, '_blank', 'noopener,noreferrer');
-  };
   
   return (
     <div id="virtual-tour" className="bg-gray-900 py-16 md:py-24">
@@ -330,8 +334,10 @@ const VirtualTour = ({ kuulaUrl, t }) => {
         
         {/* Botón para abrir Kuula en nueva ventana */}
         <div className="flex justify-center">
-          <button
-            onClick={handleOpenKuula}
+          <a
+            href={kuulaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white px-10 py-5 rounded-lg shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             {/* Efecto de partículas en el fondo */}
@@ -342,13 +348,13 @@ const VirtualTour = ({ kuulaUrl, t }) => {
             </div>
             
             <div className="relative flex items-center space-x-3">
-              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 9V3H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3 15V21H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M21 3L14 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 14L3 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M17 15.5C17.8284 15.5 18.5 14.8284 18.5 14C18.5 13.1716 17.8284 12.5 17 12.5C16.1716 12.5 15.5 13.1716 15.5 14C15.5 14.8284 16.1716 15.5 17 15.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Icono de VR/Oculus más descriptivo */}
+              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 12.5V13.5C3 16.5376 5.46243 19 8.5 19C10.7504 19 12.7127 17.6457 13.5 15.6914C14.2873 17.6457 16.2496 19 18.5 19C21.5376 19 24 16.5376 24 13.5V12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M13.5 15.5V19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M3 12.5V7.5C3 6.67157 3.67157 6 4.5 6H7.5C8.32843 6 9 6.67157 9 7.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M24 12.5V7.5C24 6.67157 23.3284 6 22.5 6H19.5C18.6716 6 18 6.67157 18 7.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M1.99219 13.5H6.00019C7.65705 13.5 9.00019 12.1569 9.00019 10.5V9.50001C9.00019 7.84315 10.3433 6.50001 12.0002 6.50001H15.0002C16.657 6.50001 18.0002 7.84315 18.0002 9.50001V10.5C18.0002 12.1569 19.3433 13.5 21.0002 13.5H25.0082" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
               <span className="text-lg font-medium tracking-wide">{t('projectDetail.abrirTourVirtual')}</span>
               <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,12 +365,24 @@ const VirtualTour = ({ kuulaUrl, t }) => {
         </div>
         
         {/* Vista previa */}
-        <div className="mt-10 relative aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10 group cursor-pointer" onClick={handleOpenKuula}>
+        <a 
+          href={kuulaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 relative aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10 group cursor-pointer block"
+        >
           {/* Capa de overlay con efecto hover */}
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all duration-300">
             <div className="text-white text-center transform group-hover:scale-110 transition-all duration-300">
-              <svg className="w-16 h-16 mx-auto mb-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              {/* Icono de VR/Oculus para la vista previa */}
+              <svg className="w-20 h-20 mx-auto mb-4 text-white/90" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 8C1 6.89543 1.89543 6 3 6H21C22.1046 6 23 6.89543 23 8V16C23 17.1046 22.1046 18 21 18H3C1.89543 18 1 17.1046 1 16V8Z" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M8 6V18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M16 6V18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="4.5" cy="12" r="0.5" fill="currentColor"/>
+                <circle cx="12" cy="12" r="0.5" fill="currentColor"/>
+                <circle cx="19.5" cy="12" r="0.5" fill="currentColor"/>
+                <path d="M8 10.5C8 9.67157 8.67157 9 9.5 9H14.5C15.3284 9 16 9.67157 16 10.5V13.5C16 14.3284 15.3284 15 14.5 15H9.5C8.67157 15 8 14.3284 8 13.5V10.5Z" fill="currentColor" fillOpacity="0.2"/>
               </svg>
               <p className="text-lg font-light tracking-wider">{t('projectDetail.clickParaAbrir')}</p>
             </div>
@@ -373,15 +391,17 @@ const VirtualTour = ({ kuulaUrl, t }) => {
           {/* Imagen de fondo (screenshot del tour) */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
             <div className="text-white space-y-4 text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-orange-500" viewBox="0 0 24 24" fill="none">
+                <path d="M21 7.5V6.375C21 5.61561 20.3284 5 19.5 5H4.5C3.67157 5 3 5.61561 3 6.375V17.625C3 18.3844 3.67157 19 4.5 19H19.5C20.3284 19 21 18.3844 21 17.625V16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M11.9995 16C13.9995 16 15.9995 13.5 15.9995 12C15.9995 10.5 13.9995 8 11.9995 8C9.99951 8 7.99951 10.5 7.99951 12C7.99951 13.5 9.99951 16 11.9995 16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <p className="font-light tracking-wider uppercase text-sm text-gray-300">
                 {t('projectDetail.tourvirtual360')}
               </p>
             </div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   );
