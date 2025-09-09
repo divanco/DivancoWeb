@@ -23,7 +23,6 @@ const ShowroomSection = () => {
   useEffect(() => {
     // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
     if (!isLoading && categories.length > 0) {
-      console.log('ShowroomSection - Marcando como cargado');
       setSectionLoaded('showroom', true); // true = cargado (ya no está cargando)
     }
   }, [isLoading, categories, setSectionLoaded]);

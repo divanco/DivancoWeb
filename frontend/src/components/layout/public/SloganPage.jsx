@@ -22,7 +22,6 @@ function SloganPage() {
             alt="DIVANCO Logo"
             className="w-16 h-16 md:w-20 md:h-20 lg:w-28 lg:h-28 opacity-90 hover:opacity-100 transition-opacity duration-500"
             onError={(e) => {
-              console.log('Error loading logo:', e.target.src);
               e.target.style.display = 'none';
             }}
           />

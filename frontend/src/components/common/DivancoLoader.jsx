@@ -52,7 +52,7 @@ export const SectionLoader = ({
   showLogo = true,
   size = 'medium'
 }) => {
-  console.log('SectionLoader - isLoading:', isLoading);
+  
   
   // IMPORTANTE: Si isLoading es true, mostramos el loader
   if (isLoading) {
@@ -64,7 +64,7 @@ export const SectionLoader = ({
   }
 
   // Si isLoading es false, mostramos el contenido
-  console.log('SectionLoader - rendering children');
+  
   return children;
 };
 

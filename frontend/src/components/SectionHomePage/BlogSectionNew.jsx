@@ -25,7 +25,6 @@ const BlogSection = () => {
   useEffect(() => {
     // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
     if (!isLoading && (featuredPosts.length > 0 || recentPosts.length > 0)) {
-      console.log('BlogSection - Marcando como cargado');
       setSectionLoaded('blog', true); // true = cargado (ya no está cargando)
     }
   }, [isLoading, featuredPosts, recentPosts, setSectionLoaded]);
@@ -37,8 +36,6 @@ const BlogSection = () => {
   };
 
   const getImageUrl = (post) => {
-    console.log('🖼️ [getImageUrl] Post:', post.title);
-    console.log('🖼️ [getImageUrl] featuredImage:', post.featuredImage);
     
     // Si es un objeto Cloudinary con variantes
     if (post.featuredImage && typeof post.featuredImage === 'object') {
@@ -47,23 +44,19 @@ const BlogSection = () => {
                       post.featuredImage.thumbnail?.url ||
                       post.featuredImage.url;
       
-      console.log('🖼️ [getImageUrl] URL encontrada:', imageUrl);
       return imageUrl || '/images/blog/default-blog.jpg';
     }
     
     // Si es una URL directa (string)
     if (typeof post.featuredImage === 'string') {
-      console.log('🖼️ [getImageUrl] URL directa:', post.featuredImage);
       return post.featuredImage;
     }
     
-    console.log('🖼️ [getImageUrl] Usando imagen por defecto');
     return '/images/blog/default-blog.jpg';
   };
 
   // Debug: mostrar siempre algo para ver si el componente se renderiza
   if (isLoading) {
-    console.log('⏳ [BlogSectionNew] Está cargando...');
     return (
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,7 +69,6 @@ const BlogSection = () => {
   }
 
   if (error) {
-    console.log('❌ [BlogSectionNew] Error:', error);
     return (
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

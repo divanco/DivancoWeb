@@ -30,7 +30,6 @@ const EditorJSComponent = ({
   const createEditor = (initialData) => {
     if (!editorRef.current) return null;
 
-    console.log('🏗️ [EditorJS] Creando nueva instancia con datos:', initialData);
 
     const editorInstance = new EditorJS({
       holder: editorRef.current,
@@ -122,13 +121,10 @@ const EditorJSComponent = ({
         }
       },
       onChange: async () => {
-        console.log('🔄 [EditorJS] onChange disparado, isReady:', isReady);
         // Solo proceder si el editor está listo
         if (isReady && onChangeRef.current && editorInstance) {
           try {
-            console.log('💾 [EditorJS] Guardando datos del editor...');
             const outputData = await editorInstance.save();
-            console.log('📤 [EditorJS] Datos guardados:', outputData);
             onChangeRef.current(outputData);
           } catch (error) {
             console.error('❌ [EditorJS] Error saving editor data:', error);
@@ -138,11 +134,9 @@ const EditorJSComponent = ({
         }
       },
       onReady: () => {
-        console.log('✅ [EditorJS] Editor listo para usar');
         // Dar un pequeño tiempo para que el editor se estabilice
         setTimeout(() => {
           setIsReady(true);
-          console.log('📝 Editor.js está listo');
           if (onReady && typeof onReady === 'function') {
             onReady(editorInstance);
           }
@@ -155,11 +149,9 @@ const EditorJSComponent = ({
 
   // Efecto principal para manejar la creación/recreación del editor
   useEffect(() => {
-    console.log('🔄 [EditorJS] Efecto principal disparado. Data:', data);
     
     // Si ya hay un editor, destruirlo primero
     if (editor && typeof editor.destroy === 'function') {
-      console.log('🗑️ [EditorJS] Destruyendo editor existente');
       editor.destroy();
       setEditor(null);
       setIsReady(false);
@@ -183,7 +175,6 @@ const EditorJSComponent = ({
   useEffect(() => {
     return () => {
       if (editor && typeof editor.destroy === 'function') {
-        console.log('🗑️ [EditorJS] Limpieza final - destruyendo editor');
         editor.destroy();
       }
     };

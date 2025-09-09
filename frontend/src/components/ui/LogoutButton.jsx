@@ -26,7 +26,6 @@ const LogoutButton = ({
 
     try {
       setIsLoggingOut(true);
-      console.log('🚪 Iniciando logout...');
       
       // Ejecutar logout a través de la API
       await logoutUser().unwrap();
@@ -35,7 +34,6 @@ const LogoutButton = ({
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       
-      console.log('✅ Logout exitoso');
       
       // Redirigir después del logout
       navigate(redirectTo, { replace: true });

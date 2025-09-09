@@ -17,7 +17,6 @@ export const HomeLoadingProvider = ({ children }) => {
   // loaded = true significa "carga completada"
   // loaded = false significa "está cargando"
   const setSectionLoaded = (section, loaded) => {
-    console.log(`Setting section ${section} loaded:`, loaded);
     
     // Forzamos el valor directamente para garantizar el cambio
     if (loaded) {
@@ -26,7 +25,6 @@ export const HomeLoadingProvider = ({ children }) => {
         if (prev[section] === false) return prev;
         
         const newState = { ...prev, [section]: false };
-        console.log('New loading states:', newState);
         return newState;
       });
     }

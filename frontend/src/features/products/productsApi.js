@@ -54,11 +54,7 @@ export const productsApi = baseApi.injectEndpoints({
     getProductBySlug: builder.query({
       query: (slug) => `/products/${slug}`,
       transformResponse: (response) => {
-        console.log('🔄 API transformResponse - Raw response:', response);
-        console.log('🔄 API transformResponse - response.data:', response.data);
-        console.log('🔄 API transformResponse - response.data.product:', response.data?.product);
         const product = response.data?.product || null;
-        console.log('🔄 API transformResponse - Final product:', product);
         return product;
       },
       providesTags: (result, error, slug) => [{ type: 'Product', id: slug }],
@@ -70,7 +66,6 @@ export const productsApi = baseApi.injectEndpoints({
     getFeaturedProducts: builder.query({
       query: (limit = 8) => `/products/featured?limit=${limit}`,
       transformResponse: (response) => {
-        console.log('🌟 Featured Products Response:', response);
         // El backend devuelve { success: true, data: { products: [...] } }
         return response.data?.products || [];
       },
@@ -90,7 +85,6 @@ export const productsApi = baseApi.injectEndpoints({
         return `/products/subcategory/${subcategorySlug}?${params}`;
       },
       transformResponse: (response) => {
-        console.log('📂 Products by Subcategory Response:', response);
         // El backend devuelve { success: true, data: { subcategory: {...}, products: [...], pagination: {...} } }
         return {
           products: response.data?.products || [],
@@ -118,7 +112,6 @@ export const productsApi = baseApi.injectEndpoints({
         return `/products/category/${categorySlug}?${params}`;
       },
       transformResponse: (response) => {
-        console.log('📁 Products by Category Response:', response);
         // El backend devuelve { success: true, data: { category: {...}, products: [...], pagination: {...} } }
         return {
           products: response.data?.products || [],

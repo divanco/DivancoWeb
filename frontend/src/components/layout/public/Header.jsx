@@ -231,7 +231,6 @@ const MinimalMobileMenu = ({
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    console.log("categoriesData:", categoriesData);
   }, [categoriesData]);
 
   return (
@@ -500,7 +499,6 @@ function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
   
   if (subcategories && subcategories.length > 0) {
     subcategories.forEach((subcat) => {
-      console.log(`Subcat: ${subcat.name}, content:`, subcat.content);
     });
   }
   return (
