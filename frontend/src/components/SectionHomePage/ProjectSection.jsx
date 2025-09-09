@@ -4,11 +4,25 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useGetSliderProjectsQuery } from '../../features/projects/projectsApi';
 import { scrollToSection } from '../../utils/simpleScroll';
 import { useTranslation } from '../../hooks';
+import { useHomeLoading } from '../../contexts/HomeLoadingContext';
 
 const ProjectSection = ({ limit = 6 }) => {
   const { t } = useTranslation();
   const { data, isLoading, error } = useGetSliderProjectsQuery(limit);
   const projects = data?.data || [];
+  
+  // Acceder al contexto de carga
+  const { setSectionLoaded } = useHomeLoading();
+
+  // Actualizar el estado de carga en el contexto
+  useEffect(() => {
+    console.log('ProjectSection - isLoading:', isLoading);
+    console.log('ProjectSection - hasData:', projects.length > 0);
+    
+    // Solo marcar como cargado cuando no está cargando Y tenemos datos
+    const isLoaded = !isLoading && projects.length > 0;
+    setSectionLoaded('projects', isLoaded);
+  }, [isLoading, setSectionLoaded, projects.length]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);

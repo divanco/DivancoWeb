@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGetProjectsByYearQuery } from '../../../features/projects/projectsApi';
 import { scrollToSection } from '../../../utils/simpleScroll';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useHomeLoading } from '../../../contexts/HomeLoadingContext';
 
 function EdicionesPage() {
   const { t } = useTranslation();
@@ -12,6 +13,19 @@ function EdicionesPage() {
 
   // ✅ Obtener proyectos del año actual desde la API
   const { data: projectsData, isLoading, error } = useGetProjectsByYearQuery(currentYear);
+  
+  // Acceder al contexto de carga
+  const { setSectionLoaded } = useHomeLoading();
+  
+  // Actualizar el estado de carga en el contexto
+  useEffect(() => {
+    console.log('EdicionesPage - isLoading:', isLoading);
+    console.log('EdicionesPage - hasData:', projects.length > 0);
+    
+    // Solo marcar como cargado cuando no está cargando Y tenemos datos o al menos hay imágenes por defecto
+    const isLoaded = !isLoading;
+    setSectionLoaded('ediciones', isLoaded);
+  }, [isLoading, setSectionLoaded, projects.length]);
   
   // ✅ Procesar proyectos para crear el slideshow
   const projects = projectsData?.data?.projects || [];
