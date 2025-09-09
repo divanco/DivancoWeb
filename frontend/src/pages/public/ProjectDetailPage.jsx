@@ -305,9 +305,14 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
   );
 };
 
-// Tour virtual
+// Tour virtual - Ahora con botón para abrir Kuula directamente
 const VirtualTour = ({ kuulaUrl, t }) => {
   if (!kuulaUrl) return null;
+  
+  const handleOpenKuula = () => {
+    window.open(kuulaUrl, '_blank', 'noopener,noreferrer');
+  };
+  
   return (
     <div id="virtual-tour" className="bg-gray-900 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-8 md:px-16">
@@ -318,20 +323,62 @@ const VirtualTour = ({ kuulaUrl, t }) => {
               — {t('projectDetail.tourVirtualSubtitle')}
             </span>
           </h2>
+          <p className="text-gray-300 mt-4 max-w-2xl mx-auto font-light">
+            {t('projectDetail.verMejorExperiencia')}
+          </p>
         </div>
-        <div className="relative aspect-video bg-gray-800 rounded-none overflow-hidden shadow-2xl ring-1 ring-white/10">
-          <iframe
-            src={kuulaUrl}
-            title={t('projectDetail.tourVirtual')}
-            className="w-full h-full"
-            allowFullScreen
-            frameBorder="0"
-          />
-          {/* Indicador de carga */}
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+        
+        {/* Botón para abrir Kuula en nueva ventana */}
+        <div className="flex justify-center">
+          <button
+            onClick={handleOpenKuula}
+            className="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white px-10 py-5 rounded-lg shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            {/* Efecto de partículas en el fondo */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-white/20 absolute animate-ping" style={{ left: '20%', top: '30%' }}></div>
+              <div className="w-2 h-2 rounded-full bg-white/20 absolute animate-ping" style={{ left: '70%', top: '60%', animationDelay: '0.5s' }}></div>
+              <div className="w-1 h-1 rounded-full bg-white/20 absolute animate-ping" style={{ left: '40%', top: '80%', animationDelay: '1s' }}></div>
+            </div>
+            
+            <div className="relative flex items-center space-x-3">
+              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 9V3H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 15V21H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 3L14 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M10 14L3 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M17 15.5C17.8284 15.5 18.5 14.8284 18.5 14C18.5 13.1716 17.8284 12.5 17 12.5C16.1716 12.5 15.5 13.1716 15.5 14C15.5 14.8284 16.1716 15.5 17 15.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-lg font-medium tracking-wide">{t('projectDetail.abrirTourVirtual')}</span>
+              <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </button>
+        </div>
+        
+        {/* Vista previa */}
+        <div className="mt-10 relative aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10 group cursor-pointer" onClick={handleOpenKuula}>
+          {/* Capa de overlay con efecto hover */}
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all duration-300">
+            <div className="text-white text-center transform group-hover:scale-110 transition-all duration-300">
+              <svg className="w-16 h-16 mx-auto mb-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <p className="text-lg font-light tracking-wider">{t('projectDetail.clickParaAbrir')}</p>
+            </div>
+          </div>
+          
+          {/* Imagen de fondo (screenshot del tour) */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
             <div className="text-white space-y-4 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-white mx-auto"></div>
-              <p className="text-gray-300 font-light tracking-wider uppercase text-sm">{t('projectDetail.cargandoTour')}</p>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              <p className="font-light tracking-wider uppercase text-sm text-gray-300">
+                {t('projectDetail.tourvirtual360')}
+              </p>
             </div>
           </div>
         </div>

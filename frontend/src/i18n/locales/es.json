@@ -102,7 +102,11 @@
     "sinImagen": "Sin imagen",
     "deslizaContenido": "Desliza para ver más contenido",
     "enlaceCopiado": "¡Enlace copiado al portapapeles!",
-    "cargandoProyecto": "Cargando proyecto..."
+    "cargandoProyecto": "Cargando proyecto...",
+    "verMejorExperiencia": "Para una mejor experiencia, abre el tour virtual en una nueva ventana",
+    "abrirTourVirtual": "Abrir Tour Virtual",
+    "clickParaAbrir": "Click para abrir en nueva ventana",
+    "tourvirtual360": "Tour Virtual 360°"
   },
   "footer": {
     "companyDescription": "Estudio de arquitectura especializado en diseño contemporáneo y showroom de materiales de construcción de alta calidad.",
