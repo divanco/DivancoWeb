@@ -33,7 +33,7 @@ async function syncProductionDatabase() {
     console.log('✅ Conexión establecida');
     
     // Usar alter: true para actualizar sin perder datos
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: true });
     console.log('✅ Base de datos sincronizada con alter');
     
     await sequelize.close();
