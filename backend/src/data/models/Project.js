@@ -23,6 +23,12 @@ Project.init(
         len: [0, 1500],
       },
     },
+    shortDescription: {
+      type: DataTypes.TEXT(200),
+      validate: {
+        len: [0, 200],
+      },
+    },
     slug: {
       type: DataTypes.STRING(220),
       allowNull: false,
@@ -207,7 +213,7 @@ Project.init(
           const tagsText = project.tags ? project.tags.join(" ") : "";
           project.searchableText = `${project.title || ""} ${
             project.description || ""
-          } ${project.content || ""} ${project.location || ""} ${
+          } ${project.shortDescription || ""} ${project.content || ""} ${project.location || ""} ${
             project.client || ""
           } ${project.architect || ""} ${tagsText} ${
             project.year || ""

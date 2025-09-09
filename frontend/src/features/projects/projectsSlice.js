@@ -382,7 +382,6 @@ const projectsSlice = createSlice({
       }
     },
     clearCache: (state) => {
-      console.log('🧹 Cache de proyectos limpiado');
       state.cache = {};
     },
 
@@ -412,7 +411,6 @@ const projectsSlice = createSlice({
 
     // ✅ RESET COMPLETO
     resetProjects: (state) => {
-      console.log('🔄 Estado de proyectos reseteado');
       return { ...initialState };
     },
 
@@ -420,7 +418,6 @@ const projectsSlice = createSlice({
     loadProjectFromCache: (state, action) => {
       const { slug } = action.payload;
       if (state.cache[slug]) {
-        console.log('⚡ Proyecto cargado desde cache:', slug);
         state.currentProject = state.cache[slug];
         state.isLoadingProject = false;
         state.error = null;

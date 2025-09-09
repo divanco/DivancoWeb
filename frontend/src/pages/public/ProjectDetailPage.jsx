@@ -8,16 +8,28 @@ import { ScrollProgress, ProjectBreadcrumbs, FloatingActions } from '../../compo
 import ProjectSEO from '../../components/ui/ProjectSEO';
 import { useTranslation } from '../../hooks';
 
-// Imagen principal limpia
+// Imagen principal con descripción corta
 const ProjectHero = ({ project, mainImage, t }) => (
-
   <div className="relative h-[60vh] w-full overflow-hidden">
     {mainImage ? (
-      <img
-        src={mainImage.urls?.desktop || mainImage.urls?.mobile || mainImage.url}
-        alt={project.title}
-        className="w-full h-full object-cover"
-      />
+      <>
+        <img
+          src={mainImage.urls?.desktop || mainImage.urls?.mobile || mainImage.url}
+          alt={project.title}
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Capa con descripción corta */}
+        {project.shortDescription && (
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-10 text-white p-6 md:p-8 backdrop-blur-sm">
+            <div className="max-w-5xl mx-auto">
+              <p className="text-lg md:text-xl font-light leading-relaxed">
+                {project.shortDescription}
+              </p>
+            </div>
+          </div>
+        )}
+      </>
     ) : (
       <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
         <span className="text-gray-400 text-xl font-alt">{t('projectDetail.sinImagen')}</span>

@@ -10,8 +10,36 @@ const AdminProjectPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const closeModalRef = useRef(null);
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
+  // Función para cerrar el modal
+  const closeModal = () => {
+    console.log("Cerrando modal desde closeModal - ANTES:", { showForm });
+    
+    // Forzar el cierre del modal por DOM como fallback
+    try {
+      const modalElement = document.getElementById("projectModal");
+      if (modalElement) {
+        modalElement.style.display = "none";
+      }
+    } catch (error) {
+      console.error("Error forzando cierre del modal:", error);
+    }
+    
+    // Actualizar el estado React con timeouts para asegurar cambios de estado
+    setTimeout(() => {
+      setShowForm(false);
+      setTimeout(() => {
+        setSelectedProject(null);
+        // Refrescar los datos
+        refetch();
+      }, 100);
+    }, 100);
+    
+    console.log("Cerrando modal desde closeModal - DESPUÉS:", { showForm: false });
+  };
+
   // Cambiar showInSlider
   const handleToggleSlider = async (project) => {
     try {
@@ -112,9 +140,14 @@ const AdminProjectPage = () => {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proyecto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Año</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destacado</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slider</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Img Slider</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Destacado</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Mostrar en Slider</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-1">
+                        <MdImage className="w-4 h-4" />
+                        <span>Imagen Principal</span>
+                      </div>
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
                   </tr>
@@ -143,32 +176,60 @@ const AdminProjectPage = () => {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <button
-                          className={project.showInSlider ? 'text-blue-500' : 'text-gray-300'}
+                          className={`w-10 h-6 rounded-full flex items-center transition-all duration-300 focus:outline-none shadow ${
+                            project.showInSlider 
+                              ? 'bg-blue-500 justify-end' 
+                              : 'bg-gray-300 justify-start'
+                          }`}
                           title={project.showInSlider ? 'Quitar del slider' : 'Mostrar en slider'}
                           onClick={() => handleToggleSlider(project)}
                           disabled={isUpdating}
                         >
-                          <MdTune className="w-5 h-5 inline" />
+                          <span className={`bg-white w-4 h-4 rounded-full transform mx-1 shadow-sm ${
+                            isUpdating ? 'animate-pulse' : ''
+                          }`}></span>
                         </button>
                       </td>
                       <td className="px-6 py-4 text-center">
                         {project.media && project.media.length > 0 ? (
-                          <div className="flex flex-col items-center gap-1">
+                          <div className="flex flex-row items-center gap-2 flex-wrap justify-center">
                             {project.media.map((img) => (
-                              <button
-                                key={img.id}
-                                className={img.isSliderImage ? 'text-green-600' : 'text-gray-400 hover:text-blue-500'}
-                                title={img.isSliderImage ? 'Imagen del slider' : 'Marcar como imagen del slider'}
-                                onClick={() => handleSetSliderImage(project.id, img.id)}
-                                disabled={isTogglingSliderImage}
-                              >
-                                <MdImage className="w-5 h-5 inline" />
-                                {img.isSliderImage && <span className="ml-1 text-xs">Slider</span>}
-                              </button>
+                              <div key={img.id} className="relative group">
+                                <img 
+                                  src={img.urls?.thumbnail || img.urls?.mobile} 
+                                  alt={`Imagen ${img.id}`}
+                                  className={`w-12 h-12 object-cover rounded-md border-2 transition-all
+                                    ${img.isSliderImage 
+                                      ? 'border-green-500 ring-2 ring-green-300' 
+                                      : 'border-gray-200 hover:border-blue-400 cursor-pointer'
+                                    }`}
+                                  onClick={() => handleSetSliderImage(project.id, img.id)}
+                                  title={img.isSliderImage ? 'Imagen actual del slider' : 'Marcar como imagen del slider'}
+                                />
+                                {/* Tooltip que muestra la imagen ampliada - reemplazado para corregir el problema */}
+                                <div 
+                                  className="fixed z-50 invisible group-hover:visible bg-white p-2 rounded-md shadow-lg"
+                                  style={{
+                                    top: 'calc(50% - 120px)',
+                                    left: 'calc(50% - 60px)',
+                                  }}
+                                >
+                                  <img 
+                                    src={img.urls?.medium || img.urls?.mobile} 
+                                    alt={`Vista previa ${img.id}`}
+                                    className="w-32 h-32 object-cover rounded-md" 
+                                  />
+                                </div>
+                                {img.isSliderImage && (
+                                  <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                    ✓
+                                  </span>
+                                )}
+                              </div>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-gray-300">-</span>
+                          <span className="text-gray-300">Sin imágenes</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">{project.status || project.etapa}</td>
@@ -212,25 +273,34 @@ const AdminProjectPage = () => {
 
       {/* Modal para crear/editar proyecto */}
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full p-6 relative">
+        <div 
+          id="projectModal" 
+          className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start md:items-center justify-center p-4 md:p-6 overflow-auto"
+          onClick={(e) => {
+            // Solo cerrar si el clic fue directamente en el fondo oscuro (no en el contenido)
+            if (e.target === e.currentTarget) {
+              console.log("Clic fuera del modal detectado");
+              closeModal();
+            }
+          }}
+        >
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] relative overflow-hidden my-8">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-              onClick={() => {
-                setShowForm(false);
-                setSelectedProject(null);
-                refetch();
+              id="modalCloseButton"
+              className="absolute top-3 right-3 text-gray-800 hover:text-gray-900 text-3xl font-bold z-50 bg-white rounded-full h-10 w-10 flex items-center justify-center shadow-md border border-gray-300 hover:border-gray-400"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Botón cerrar del modal padre clickeado");
+                closeModal();
               }}
             >
               ×
             </button>
             <ProjectUpload
               projectId={selectedProject?.id || null}
-              onProjectCreated={() => {
-                setShowForm(false);
-                setSelectedProject(null);
-                refetch();
-              }}
+              closeModalRef={closeModalRef}
+              onProjectCreated={closeModal}
             />
           </div>
         </div>

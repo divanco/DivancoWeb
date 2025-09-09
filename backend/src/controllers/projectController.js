@@ -731,6 +731,7 @@ export const debugCreateProject = async (req, res) => {
     const {
       title,
       description,
+      shortDescription,
       content,
       year,
       location,
@@ -796,6 +797,7 @@ if (!projectType || !validProjectTypes.includes(projectType)) {
     const projectData = {
       title: title.trim(),
       description: description?.trim(),
+      shortDescription: shortDescription?.trim(),
       content: content?.trim(),
       year: parseInt(year),
       location: location?.trim(),
@@ -902,6 +904,7 @@ export const createProject = async (req, res) => {
     const {
       title,
       description,
+      shortDescription,
       content,
       year,
       location,
@@ -979,6 +982,7 @@ export const createProject = async (req, res) => {
     const projectData = {
       title: title.trim(),
       description: description?.trim(),
+      shortDescription: shortDescription?.trim(),
       content: content?.trim(),
       year: parseInt(year),
       location: location?.trim(),
@@ -1154,6 +1158,7 @@ export const updateProject = async (req, res) => {
     const {
       title,
       description,
+      shortDescription,
       content,
       year,
       location,
@@ -1191,6 +1196,7 @@ export const updateProject = async (req, res) => {
     // Solo actualizar campos que vienen en el body
     if (title !== undefined) updateData.title = title.trim();
     if (description !== undefined) updateData.description = description?.trim();
+    if (shortDescription !== undefined) updateData.shortDescription = shortDescription?.trim();
     if (content !== undefined) updateData.content = content?.trim();
     if (year !== undefined) updateData.year = parseInt(year);
     if (location !== undefined) updateData.location = location?.trim();

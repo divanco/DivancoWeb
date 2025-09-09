@@ -171,7 +171,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "projects",
-          element: <ProjectUpload />,
+          element: <Navigate to="/admin/proyectosEdit" replace />, // Redirigir para evitar duplicación
         },
         {
           path: "/admin/proyectosEdit",

@@ -15,40 +15,54 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();  return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="col-span-1 lg:col-span-2">
-  <div className="flex items-center mb-2">
-    <img 
-      src="/images/DIVANCOHV3.png" 
-      alt="Divanco Logo" 
-      className="h-28 w-auto"
-    />
-  </div>
-  <p className="text-gray-300 mb-6 max-w-md">
-    {t('footer.companyDescription')}
-  </p>
+        {/* Header with Logo and Description - Full Width */}
+        <div className="flex flex-col md:flex-row items-center justify-center text-center md:text-left mb-10">
+          <img 
+            src="/images/DIVANCOHV3.png" 
+            alt="Divanco Logo" 
+            className="h-28 w-auto mb-4 md:mb-0 md:mr-6"
+          />
+          <p className="text-gray-300 max-w-2xl">
+            {t('footer.companyDescription')}
+          </p>
+        </div>
+        
+        {/* Three columns layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          {/* Column 1: Contact Info and Map */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.ourLocation')}</h3>
             
             {/* Contact Info */}
-            <div className="space-y-3">
+            <div className="space-y-3 mb-4">
               <div className="flex items-center">
-                <MapPinIcon className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-300">
+                <MapPinIcon className="h-5 w-5 text-primary-400 mr-3 flex-shrink-0" />
+                <a 
+                  href="https://maps.google.com/?q=Cl.+9+%235+60,+Restrepo,+Meta,+Colombia" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-300 hover:text-primary-300 transition-colors"
+                >
                   Cl. 9 #5 60, Restrepo, Meta, Colombia
-                </span>
+                </a>
               </div>
               <div className="flex items-center">
-                <PhoneIcon className="h-5 w-5 text-primary-400 mr-3" />
+                <PhoneIcon className="h-5 w-5 text-primary-400 mr-3 flex-shrink-0" />
                 <span className="text-gray-300">+57 310 5706816</span>
               </div>
               <div className="flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-primary-400 mr-3" />
+                <EnvelopeIcon className="h-5 w-5 text-primary-400 mr-3 flex-shrink-0" />
                 <span className="text-gray-300">info@grupodivanco.com</span>
               </div>
             </div>
+            
+            {/* Map - Smaller and Square */}
+            <div className="h-48 w-full rounded-lg overflow-hidden mt-4">
+              <MapLocation />
+            </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Column 2: Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4">{t('footer.links')}</h3>
             <ul className="space-y-2">
@@ -85,14 +99,9 @@ const Footer = () => {
             </ul>
           </div>
 
-          <Newsletter />
-        </div>
-
-        {/* Map Section */}
-        <div className="mt-12 mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-center">{t('footer.ourLocation')}</h3>
-          <div className="max-w-4xl mx-auto">
-            <MapLocation />
+          {/* Column 3: Newsletter */}
+          <div>
+            <Newsletter />
           </div>
         </div>
 

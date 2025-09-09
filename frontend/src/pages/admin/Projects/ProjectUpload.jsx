@@ -38,10 +38,22 @@ const PROJECT_TYPES = [
   "Dirección de Obra"
 ];
 
-const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
+const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log("Función onProjectCreated por defecto"), closeModalRef }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const isEdit = !!projectId;
+  
+  // Exponer función de cierre para el componente padre
+  useEffect(() => {
+    if (closeModalRef) {
+      closeModalRef.current = {
+        closeModal: () => {
+          console.log("Cerrando modal desde ref");
+          onProjectCreated();
+        }
+      };
+    }
+  }, [closeModalRef, onProjectCreated]);
 
   // Estados Redux
   const isUploading = useSelector(selectIsUploading);
@@ -70,6 +82,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
   const [form, setForm] = useState({
     title: "",
     description: "",
+    shortDescription: "", // Campo para descripción corta
     year: new Date().getFullYear(),
     location: "",
     client: "",
@@ -436,9 +449,50 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
     }
   };
 
+  const closeModalAndRefresh = () => {
+    console.log("Intentando cerrar modal desde closeModalAndRefresh");
+    
+    // Intenta cerrar desde el padre primero
+    if (closeModalRef && closeModalRef.current) {
+      closeModalRef.current.closeModal();
+    } else {
+      console.log("Usando onProjectCreated directamente");
+      onProjectCreated();
+    }
+    
+    // Como último recurso, busca el modal padre y lo cierra
+    try {
+      const modalElement = document.getElementById("projectModal");
+      if (modalElement) {
+        console.log("Encontrado elemento modal por ID, intentando remover");
+        // Forzar varias técnicas de cierre
+        modalElement.style.display = "none";
+        modalElement.classList.add("hidden");
+        
+        // También podemos intentar simular un clic en el botón de cierre
+        const closeButton = document.getElementById("modalCloseButton");
+        if (closeButton) {
+          console.log("Encontrado botón de cierre, simulando clic");
+          closeButton.click();
+        }
+      }
+      
+      // Forzar llamada al parent con timeouts para asegurar ejecución
+      setTimeout(() => {
+        if (typeof onProjectCreated === 'function') {
+          onProjectCreated();
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Error intentando cerrar modal manualmente:", error);
+    }
+  };
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     if (!form.title.trim()) {
       alert("El título es requerido");
       return;
@@ -452,6 +506,9 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
 
       if (isEdit) {
         await updateProject({ id: projectId, ...finalFormData }).unwrap();
+        // Llamar a onProjectCreated para cerrar el modal después de guardar
+        console.log("Guardar en modo edición");
+        closeModalAndRefresh();
       } else {
         const projectResult = await createProject(finalFormData).unwrap();
         const newProjectId = projectResult.data.id;
@@ -462,10 +519,11 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
 
         if (Object.values(uploadProgress).every(p => p.status !== "error")) {
           resetForm();
+          // Llamar a onProjectCreated para cerrar el modal después de guardar
+          console.log("Guardar en modo creación");
+          closeModalAndRefresh();
         }
       }
-
-      onProjectCreated?.();
     } catch (error) {
       alert("Error al guardar el proyecto");
     }
@@ -475,6 +533,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
     setForm({
       title: "",
       description: "",
+      shortDescription: "", // Campo para descripción corta
       year: new Date().getFullYear(),
       location: "",
       client: "",
@@ -500,33 +559,26 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-        {/* Header fijo */}
-        <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {isEdit ? "Editar Proyecto" : "Crear Proyecto"}
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {isEdit 
-                  ? "Modifica la información del proyecto" 
-                  : "Completa la información del proyecto y sube los archivos"}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onProjectCreated}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
+    <div className="bg-white w-full h-full flex flex-col overflow-hidden">
+      {/* Header fijo */}
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isEdit ? "Editar Proyecto" : "Crear Proyecto"}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {isEdit 
+                ? "Modifica la información del proyecto" 
+                : "Completa la información del proyecto y sube los archivos"}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Contenido scrolleable */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+      {/* Contenido scrolleable y formulario */}
+      <form onSubmit={handleSubmit} className="flex flex-col flex-1 h-full">
+        <div className="flex-1 overflow-y-auto px-6 py-4" style={{ maxHeight: "calc(90vh - 140px)" }}>
           {/* Indicador de progreso de subida */}
           {isUploadingFiles && Object.keys(uploadProgress).length > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
@@ -590,8 +642,8 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
             </div>
           )}
 
-          {/* Formulario del proyecto */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Formulario del proyecto (sin tag form) */}
+          <div className="space-y-4 overflow-y-auto">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-base font-medium text-gray-900 mb-3">Información del proyecto</h3>
               
@@ -715,8 +767,28 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                 </div>
 
                 {/* Descripción */}
+                {/* Descripción Corta */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Descripción Corta <span className="text-gray-500">(Máx 200 caracteres)</span>
+                  </label>
+                  <textarea
+                    name="shortDescription"
+                    value={form.shortDescription || ""}
+                    onChange={handleChange}
+                    rows={2}
+                    className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Descripción breve para mostrar en listados..."
+                    maxLength={200}
+                  />
+                  <div className="text-xs text-gray-500 text-right mt-1">{(form.shortDescription || "").length}/200</div>
+                </div>
+
+                {/* Descripción completa */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Descripción Completa <span className="text-gray-500">(Máx 1500 caracteres)</span>
+                  </label>
                   <textarea
                     name="description"
                     value={form.description}
@@ -805,10 +877,10 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
             {/* Zona de subida - Solo para nuevos proyectos y más compacta */}
             {!isEdit && (
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-base font-medium text-gray-900 mb-3">Archivos del proyecto</h3>
+                <h3 className="text-base font-medium text-gray-900 mb-2">Archivos del proyecto</h3>
                 
                 <div
-                  className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 ${
+                  className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-all duration-200 ${
                     isDragging
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-300 hover:border-gray-400"
@@ -825,9 +897,9 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <CloudArrowUpIcon className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">Arrastra archivos aquí</h4>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <CloudArrowUpIcon className="mx-auto h-6 w-6 text-gray-400 mb-1" />
+                  <h4 className="text-sm font-medium text-gray-900 mb-0.5">Arrastra archivos aquí</h4>
+                  <p className="text-xs text-gray-500 mb-1">
                     O{" "}
                     <button
                       type="button"
@@ -842,8 +914,8 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
 
                 {/* Lista de archivos - Más compacta */}
                 {files.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex justify-between items-center mb-3">
+                  <div className="mt-3">
+                    <div className="flex justify-between items-center mb-2">
                       <h4 className="text-sm font-medium text-gray-900">
                         Archivos ({files.length})
                       </h4>
@@ -856,14 +928,14 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                               setUploadProgress({});
                             }
                           }}
-                          className="text-xs text-red-600 hover:text-red-700 px-2 py-1 rounded"
+                          className="text-xs text-red-600 hover:text-red-700 px-2 py-0.5 rounded"
                         >
                           🗑️ Eliminar todos
                         </button>
                       )}
                     </div>
 
-                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                    <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded p-2">
                       {files.map((fileData) => {
                         const fileType = fileTypes[fileData.type];
                         const IconComponent = fileType.icon;
@@ -872,14 +944,14 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                         return (
                           <div
                             key={fileData.id}
-                            className={`flex items-center gap-3 p-3 rounded transition-all ${
+                            className={`flex items-center gap-2 p-2 rounded transition-all ${
                               progress?.status === "completed"
                                 ? "bg-green-50 border border-green-200"
                                 : progress?.status === "error"
                                 ? "bg-red-50 border border-red-200"
                                 : progress?.status === "uploading"
                                 ? "bg-blue-50 border border-blue-200"
-                                : "bg-white border border-gray-200"
+                                : "bg-white border border-gray-100"
                             }`}
                           >
                             {/* Preview pequeño */}
@@ -888,7 +960,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                                 <img
                                   src={fileData.preview}
                                   alt=""
-                                  className="w-12 h-12 object-cover rounded"
+                                  className="w-8 h-8 object-cover rounded"
                                 />
                               ) : (
                                 <div className={`w-12 h-12 ${fileType.bgColor} rounded flex items-center justify-center`}>
@@ -958,22 +1030,28 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
                 </div>
               </div>
             )}
-          </form>
+          </div>
         </div>
 
         {/* Footer fijo con botones */}
-        <div className="px-6 py-4 border-t border-gray-200 flex-shrink-0">
+        <div className="px-6 py-4 border-t border-gray-200 flex-shrink-0 bg-white sticky bottom-0">
           <div className="flex gap-3 justify-end">
             <button
               type="button"
-              onClick={onProjectCreated}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Botón Cancelar clickeado - Intentando cerrar modal directamente");
+                
+                // Usa la función de cierre mejorada
+                closeModalAndRefresh();
+              }}
               className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              onClick={handleSubmit}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
               disabled={isCreating || isUploadingFiles}
             >
@@ -981,7 +1059,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated }) => {
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

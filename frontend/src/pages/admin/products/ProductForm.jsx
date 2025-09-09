@@ -5,6 +5,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
   const [form, setForm] = useState({
     name: product?.name || '',
     description: product?.description || '',
+    shortDescription: product?.shortDescription || '',
     brand: product?.brand || '',
     model: product?.model || '',
     price: product?.price || '',
@@ -102,9 +103,16 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     setDimensions(dimensions.filter((_, i) => i !== index));
   };
 
+  const handleClose = () => {
+    if (onClose && typeof onClose === 'function') {
+      onClose();
+    }
+  };
+
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedImages(files);
+    // Mantener las imágenes ya seleccionadas y agregar las nuevas
+    setSelectedImages(prevImages => [...prevImages, ...files]);
   };
 
   const handleImageUpload = async (productId) => {
@@ -215,6 +223,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
         setForm({
           name: '',
           description: '',
+          shortDescription: '', // Agregamos la descripción corta
           brand: '',
           model: '',
           price: '',
@@ -249,7 +258,8 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <button
-              onClick={onClose}
+              type="button"
+              onClick={handleClose}
               className="text-gray-600 hover:text-gray-800 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,6 +314,23 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                   URL amigable (se genera automáticamente)
                 </p>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Descripción corta
+              </label>
+              <input
+                type="text"
+                name="shortDescription"
+                value={form.shortDescription}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                placeholder="Descripción breve que aparecerá sobre la imagen en ProjectSection"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Esta descripción corta se mostrará sobre la imagen en la sección de proyectos.
+              </p>
             </div>
 
             <div>
@@ -657,12 +684,25 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {selectedImages.map((file, index) => (
-                      <div key={index} className="relative">
+                      <div key={index} className="relative group">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Preview ${index + 1}`}
                           className="w-full h-16 object-cover rounded border"
                         />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = [...selectedImages];
+                            newImages.splice(index, 1);
+                            setSelectedImages(newImages);
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                         {uploadProgress[index] !== undefined && (
                           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
                             {uploadProgress[index] === -1 ? (
@@ -692,7 +732,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
           <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
             >
               Cancelar

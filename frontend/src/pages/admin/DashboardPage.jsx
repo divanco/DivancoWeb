@@ -23,8 +23,8 @@ const DashboardPage = () => {
       color: 'bg-blue-50 text-blue-600',
       borderColor: 'border-blue-200 hover:border-blue-300',
       actions: [
-        { label: 'Crear', icon: PlusIcon, href: '/admin/projects' }, // ✅ Corregido
-    { label: 'Ver todos', icon: EyeIcon, href: '/admin/proyectosEdit' }, // ✅ Corregido
+        { label: 'Crear', icon: PlusIcon, href: '/admin/proyectosEdit' }, // Modificado para usar la misma ruta
+        { label: 'Ver todos', icon: EyeIcon, href: '/admin/proyectosEdit' },
       ]
     },
     {
