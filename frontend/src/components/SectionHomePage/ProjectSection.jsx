@@ -23,7 +23,16 @@ const ProjectSection = ({ limit = 6 }) => {
     }
   }, [isLoading, projects, setSectionLoaded]);
 
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // Ajustar slide inicial basado en la cantidad de proyectos disponibles
+  useEffect(() => {
+    if (projects.length > 0) {
+      // Si solo hay un proyecto o menos de 3, comenzar desde el índice 0
+      // Si hay 2 o más, comenzar desde el índice 1 (segunda imagen)
+      setCurrentSlide(projects.length >= 3 ? 1 : 0);
+    }
+  }, [projects.length]);
+
+  const [currentSlide, setCurrentSlide] = useState(1); // Comenzar desde la segunda imagen (índice 1)
   const [isMobile, setIsMobile] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
@@ -109,6 +118,7 @@ const ProjectSection = ({ limit = 6 }) => {
               paddingRight: '5%'
             } : {
               // Desktop: Slide central visible + partes de los adyacentes (estilo Minotti)
+              // Ajustamos la transformación para que el slider comience correctamente centrado
               transform: `translateX(calc(50% - ${currentSlide * 60}% - 30%))`,
               width: `${projects.length * 60}%`,
               gap: '2rem'
