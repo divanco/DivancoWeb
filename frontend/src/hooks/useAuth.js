@@ -32,14 +32,11 @@ export const useAuth = () => {
   // 🆕 NUEVO: Logout SIN navegación (para usar desde fuera del Router)
   const handleLogoutWithoutNavigate = async () => {
     try {
-      console.log('🚪 Logout sin navegación...');
-      
       // 1. Logout del servidor
       try {
         await logoutUser().unwrap();
         showSuccess('Sesión cerrada exitosamente');
       } catch (apiError) {
-        console.warn('⚠️ Error en logout del servidor:', apiError);
         showError('Error al cerrar sesión en el servidor');
       }
       
@@ -48,7 +45,6 @@ export const useAuth = () => {
       
       return true;
     } catch (error) {
-      console.error('❌ Error en logout:', error);
       dispatch(logoutAction());
       showError('Error inesperado al cerrar sesión');
       return false;

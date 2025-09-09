@@ -17,6 +17,7 @@ const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action) => {
+      console.log('🔐 Login exitoso:', action.payload);
       state.isLoading = false;
       state.token = action.payload.token;
       state.user = action.payload.user;
@@ -29,6 +30,7 @@ const authSlice = createSlice({
       }
     },
     loginFailure: (state, action) => {
+      console.log('❌ Login falló:', action.payload);
       state.isLoading = false;
       state.token = null;
       state.user = null;
@@ -38,6 +40,7 @@ const authSlice = createSlice({
       localStorage.removeItem('user');
     },
     logout: (state) => {
+      console.log('🚪 Ejecutando logout en authSlice...');
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
@@ -45,6 +48,7 @@ const authSlice = createSlice({
       state.error = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      console.log('✅ Estado de auth limpiado');
     },
     setUser: (state, action) => {
       state.user = action.payload;
@@ -63,6 +67,7 @@ const authSlice = createSlice({
           state.token = token;
           state.user = JSON.parse(userStr);
           state.isAuthenticated = true;
+          console.log('🔄 Estado hidratado desde localStorage');
         } catch (error) {
           console.error('Error al hidratar estado:', error);
           localStorage.removeItem('token');

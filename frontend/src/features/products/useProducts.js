@@ -40,6 +40,16 @@ export const useProduct = (slug) => {
     refetchOnMountOrArgChange: true,
   });
 
+  console.log('🎣 useProduct Hook Debug:');
+  console.log('  Slug:', slug);
+  console.log('  Raw result:', result);
+  console.log('  Product data:', result.data);
+  console.log('  Product type:', typeof result.data);
+  console.log('  Product keys:', result.data ? Object.keys(result.data) : 'no data');
+  console.log('  Images:', result.data?.images);
+  console.log('  Price:', result.data?.price);
+  console.log('  Is loading:', result.isLoading);
+  console.log('  Error:', result.error);
 
   return {
     product: result.data,

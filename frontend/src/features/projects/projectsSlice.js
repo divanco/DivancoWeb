@@ -122,6 +122,7 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchProjectSuccess: (state, action) => {
+      console.log('📋 Proyecto cargado:', action.payload.data?.title);
       state.isLoadingProject = false;
       state.currentProject = action.payload.data;
       state.error = null;
@@ -132,6 +133,7 @@ const projectsSlice = createSlice({
       }
     },
     fetchProjectFailure: (state, action) => {
+      console.log('❌ Error cargando proyecto:', action.payload);
       state.isLoadingProject = false;
       state.error = action.payload;
       state.currentProject = null;
@@ -143,11 +145,13 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchFeaturedSuccess: (state, action) => {
+      console.log('⭐ Proyectos destacados cargados:', action.payload.data?.length);
       state.isLoadingFeatured = false;
       state.featuredProjects = action.payload.data || [];
       state.error = null;
     },
     fetchFeaturedFailure: (state, action) => {
+      console.log('❌ Error cargando destacados:', action.payload);
       state.isLoadingFeatured = false;
       state.error = action.payload;
     },
@@ -158,13 +162,13 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchRecentSuccess: (state, action) => {
+      console.log('🕒 Proyectos recientes cargados:', action.payload.data?.length);
       state.isLoadingRecent = false;
       state.recentProjects = action.payload.data || [];
       state.error = null;
     },
     fetchRecentFailure: (state, action) => {
-      state.isLoadingRecent = false;
-      state.error = action.payload;
+      console.log('❌ Error cargando recientes:', action.payload);
       state.isLoadingRecent = false;
       state.error = action.payload;
     },
@@ -175,6 +179,7 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchProjectsByYearSuccess: (state, action) => {
+      console.log('📅 Proyectos por año cargados:', action.payload.data?.count);
       state.isLoadingByYear = false;
       state.projectsByYear = {
         year: action.payload.data?.year || null,
@@ -184,6 +189,7 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchProjectsByYearFailure: (state, action) => {
+      console.log('❌ Error cargando proyectos por año:', action.payload);
       state.isLoadingByYear = false;
       state.error = action.payload;
     },
@@ -194,13 +200,13 @@ const projectsSlice = createSlice({
       state.error = null;
     },
     fetchAvailableYearsSuccess: (state, action) => {
+      console.log('📊 Años disponibles cargados:', action.payload.data?.length);
       state.isLoadingYears = false;
       state.availableYears = action.payload.data || [];
       state.error = null;
     },
     fetchAvailableYearsFailure: (state, action) => {
-      state.isLoadingYears = false;
-      state.error = action.payload;
+      console.log('❌ Error cargando años:', action.payload);
       state.isLoadingYears = false;
       state.error = action.payload;
     },
@@ -210,10 +216,12 @@ const projectsSlice = createSlice({
       state.isLoadingFilters = true;
     },
     fetchFilterOptionsSuccess: (state, action) => {
+      console.log('🎛️ Opciones de filtro cargadas');
       state.isLoadingFilters = false;
       state.filterOptions = action.payload.data || state.filterOptions;
     },
     fetchFilterOptionsFailure: (state, action) => {
+      console.log('❌ Error cargando opciones de filtro:', action.payload);
       state.isLoadingFilters = false;
       state.error = action.payload;
     },
@@ -238,6 +246,7 @@ const projectsSlice = createSlice({
       state.createError = null;
     },
     createProjectSuccess: (state, action) => {
+      console.log('➕ Proyecto creado:', action.payload.data?.title);
       state.isCreating = false;
       state.createError = null;
       
@@ -249,6 +258,7 @@ const projectsSlice = createSlice({
       }
     },
     createProjectFailure: (state, action) => {
+      console.log('❌ Error creando proyecto:', action.payload);
       state.isCreating = false;
       state.createError = action.payload;
     },
@@ -259,6 +269,7 @@ const projectsSlice = createSlice({
       state.updateError = null;
     },
     updateProjectSuccess: (state, action) => {
+      console.log('✏️ Proyecto actualizado:', action.payload.data?.title);
       state.isUpdating = false;
       state.updateError = null;
       
@@ -282,6 +293,7 @@ const projectsSlice = createSlice({
       }
     },
     updateProjectFailure: (state, action) => {
+      console.log('❌ Error actualizando proyecto:', action.payload);
       state.isUpdating = false;
       state.updateError = action.payload;
     },
@@ -292,6 +304,7 @@ const projectsSlice = createSlice({
       state.deleteError = null;
     },
     deleteProjectSuccess: (state, action) => {
+      console.log('🗑️ Proyecto eliminado:', action.payload.projectId);
       state.isDeleting = false;
       state.deleteError = null;
       
@@ -315,17 +328,20 @@ const projectsSlice = createSlice({
       state.pagination.total_items = Math.max(0, state.pagination.total_items - 1);
     },
     deleteProjectFailure: (state, action) => {
+      console.log('❌ Error eliminando proyecto:', action.payload);
       state.isDeleting = false;
       state.deleteError = action.payload;
     },
 
     // ✅ MANEJO DE FILTROS
     setFilters: (state, action) => {
+      console.log('🎛️ Filtros actualizados:', action.payload);
       state.currentFilters = { ...state.currentFilters, ...action.payload };
       // Resetear paginación al cambiar filtros
       state.pagination.current_page = 1;
     },
     clearFilters: (state) => {
+      console.log('🧹 Filtros limpiados');
       state.currentFilters = {
         title: '',
         tags: [],
@@ -352,6 +368,7 @@ const projectsSlice = createSlice({
       state.uploadError = null;
     },
     uploadMediaSuccess: (state, action) => {
+      console.log('📤 Archivo subido exitosamente:', action.payload.data?.type);
       state.isUploading = false;
       state.uploadError = null;
       
@@ -373,6 +390,7 @@ const projectsSlice = createSlice({
       }
     },
     uploadMediaFailure: (state, action) => {
+      console.log('❌ Error subiendo archivo:', action.payload);
       state.isUploading = false;
       state.uploadError = action.payload;
     },
@@ -385,6 +403,7 @@ const projectsSlice = createSlice({
       }
     },
     clearCache: (state) => {
+      console.log('🧹 Cache de proyectos limpiado');
       state.cache = {};
     },
 
@@ -414,6 +433,7 @@ const projectsSlice = createSlice({
 
     // ✅ RESET COMPLETO
     resetProjects: (state) => {
+      console.log('🔄 Estado de proyectos reseteado');
       return { ...initialState };
     },
 
@@ -421,6 +441,7 @@ const projectsSlice = createSlice({
     loadProjectFromCache: (state, action) => {
       const { slug } = action.payload;
       if (state.cache[slug]) {
+        console.log('⚡ Proyecto cargado desde cache:', slug);
         state.currentProject = state.cache[slug];
         state.isLoadingProject = false;
         state.error = null;

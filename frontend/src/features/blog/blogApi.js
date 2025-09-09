@@ -17,6 +17,7 @@ export const blogApi = baseApi.injectEndpoints({
       },
       providesTags: ['BlogPost'],
       transformResponse: (response) => {
+        console.log('getBlogPosts response:', response);
         return response;
       }
     }),
@@ -26,6 +27,7 @@ export const blogApi = baseApi.injectEndpoints({
       query: (limit = 3) => `/blog/featured?limit=${limit}`,
       providesTags: ['BlogPost'],
       transformResponse: (response) => {
+        console.log('getFeaturedBlogPosts response:', response);
         return response;
       }
     }),
@@ -35,6 +37,7 @@ export const blogApi = baseApi.injectEndpoints({
       query: (limit = 5) => `/blog/recent?limit=${limit}`,
       providesTags: ['BlogPost'],
       transformResponse: (response) => {
+        console.log('getRecentBlogPosts response:', response);
         return response;
       }
     }),
