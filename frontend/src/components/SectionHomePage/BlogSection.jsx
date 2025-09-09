@@ -13,6 +13,7 @@ const BlogSection = () => {
   const { data: blogResponse, isLoading, error } = useGetFeaturedBlogPostsQuery(3);
 
   const blogPosts = blogResponse?.data || [];
+  console.log("📝 blogPosts:", blogPosts); // <-- Ahora siempre se ejecuta
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,6 +29,7 @@ const BlogSection = () => {
 
   const getImageUrl = (post) => {
     // Debug: ver la estructura real de featuredImage
+    console.log('🖼️ post.featuredImage:', post.featuredImage);
     return post.featuredImage?.desktop?.url ||
            post.featuredImage?.mobile?.url ||
            post.featuredImage?.thumbnail?.url ||

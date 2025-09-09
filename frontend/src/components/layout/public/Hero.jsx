@@ -71,6 +71,7 @@ const Hero = ({
             alt="Hero Background"
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
             onLoad={() => console.log('✅ Imagen cargada!')}
+            onError={() => console.log('❌ Error cargando imagen')}
           />
         </>
       )}

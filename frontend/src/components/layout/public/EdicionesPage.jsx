@@ -22,7 +22,7 @@ function EdicionesPage() {
     // Importante: EdicionesPage siempre se marca como cargado cuando los datos están listos
     // porque incluso sin proyectos tiene imágenes por defecto
     if (!isLoading) {
-      
+      console.log('EdicionesPage - Marcando como cargado');
       setSectionLoaded('ediciones', true); // true = cargado (ya no está cargando)
     }
   }, [isLoading, setSectionLoaded]);
@@ -98,10 +98,12 @@ function EdicionesPage() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  
+                  console.log('🖱️ Click en imagen:', image.project.title);
+                  console.log('🔗 Slug del proyecto:', image.project.slug);
+                  console.log('🌐 Navegando a:', `/proyectos/${image.project.slug}`);
                   navigate(`/proyectos/${image.project.slug}`);
                 }}
-               style={{ pointerEvents: 'auto' }}
+                style={{ pointerEvents: 'auto' }}
               >
                 <img
                   src={image.src}
@@ -228,7 +230,8 @@ function EdicionesPage() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  
+                  console.log('🔘 Click en botón Ver detalles');
+                  console.log('🔗 Navegando a:', `/proyectos/${images[currentImage].project.slug}`);
                   navigate(`/proyectos/${images[currentImage].project.slug}`);
                 }}
                 className="inline-flex items-center text-white/80 hover:text-white text-sm font-light uppercase tracking-widest transition-colors duration-300 group cursor-pointer bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-black/50"

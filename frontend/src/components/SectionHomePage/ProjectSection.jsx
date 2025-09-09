@@ -18,6 +18,7 @@ const ProjectSection = ({ limit = 6 }) => {
   useEffect(() => {
     // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
     if (!isLoading && projects.length > 0) {
+      console.log('ProjectSection - Marcando como cargado');
       setSectionLoaded('projects', true); // true = cargado (ya no está cargando)
     }
   }, [isLoading, projects, setSectionLoaded]);
