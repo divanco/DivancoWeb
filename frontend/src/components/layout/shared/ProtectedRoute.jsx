@@ -74,6 +74,7 @@ const ProtectedRoute = ({
 
     // 🚫 No autenticado
     if (!isAuthenticated) {
+      console.log('🚫 Usuario no autenticado, redirigiendo a:', fallbackPath);
       return <Navigate to={fallbackPath} replace />;
     }
 
@@ -107,6 +108,7 @@ const ProtectedRoute = ({
     }
 
     // ✅ Todo OK: renderizar contenido protegido
+    console.log('✅ Acceso autorizado para:', user?.role);
     return children;
 
   } catch (error) {
