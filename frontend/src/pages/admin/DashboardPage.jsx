@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ Importar useNavigate
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   FolderIcon, 
   DocumentTextIcon, 
@@ -9,9 +9,47 @@ import {
   EyeIcon,
   PencilIcon
 } from '@heroicons/react/24/outline';
+import { useGetProjectsQuery } from '../../features/projects/projectsApi';
+import { useGetBlogPostsQuery } from '../../features/blog/blogApi';
+import { useGetCategoriesQuery } from '../../features/categories/categoriesApi';
 
 const DashboardPage = () => {
-  const navigate = useNavigate(); // ✅ Hook para navegación
+  const navigate = useNavigate();
+  
+  // Estados para almacenar los conteos
+  const [counts, setCounts] = useState({
+    projects: 0,
+    blog: 0,
+    categories: 0
+  });
+
+  // Obtener datos reales mediante RTK Query
+  const { data: projectsData } = useGetProjectsQuery({ 
+    publicOnly: false, // incluir proyectos privados también
+    limit: 100 // valor alto para obtener la mayoría
+  });
+  
+  const { data: blogData } = useGetBlogPostsQuery({
+    limit: 100 // valor alto para obtener la mayoría
+  });
+  
+  const { data: categoriesData } = useGetCategoriesQuery({
+    active: true,
+    limit: 100 // valor alto para obtener la mayoría
+  });
+  
+  // Actualizar conteos cuando los datos estén disponibles
+  useEffect(() => {
+    const projectsCount = projectsData?.data?.length || 0;
+    const blogCount = blogData?.data?.length || 0;
+    const categoriesCount = categoriesData?.data?.length || 0;
+    
+    setCounts({
+      projects: projectsCount,
+      blog: blogCount,
+      categories: categoriesCount
+    });
+  }, [projectsData, blogData, categoriesData]);
 
   const sections = [
     {
@@ -19,7 +57,7 @@ const DashboardPage = () => {
       title: 'Proyectos',
       description: 'Gestiona tu portfolio de proyectos',
       icon: FolderIcon,
-      count: 24,
+      count: counts.projects,
       color: 'bg-blue-50 text-blue-600',
       borderColor: 'border-blue-200 hover:border-blue-300',
       actions: [
@@ -32,7 +70,7 @@ const DashboardPage = () => {
       title: 'Blog',
       description: 'Entradas y artículos del blog',
       icon: DocumentTextIcon,
-      count: 12,
+      count: counts.blog,
       color: 'bg-green-50 text-green-600',
       borderColor: 'border-green-200 hover:border-green-300',
       actions: [
@@ -45,7 +83,7 @@ const DashboardPage = () => {
       title: 'Showroom',
       description: 'Categorías del showroom',
       icon: TagIcon,
-      count: 8,
+      count: counts.categories,
       color: 'bg-purple-50 text-purple-600',
       borderColor: 'border-purple-200 hover:border-purple-300',
       actions: [
@@ -153,16 +191,19 @@ const DashboardPage = () => {
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-light text-blue-600">24</div>
+            <div className="text-2xl font-light text-blue-600">{counts.projects}</div>
             <div className="text-sm text-gray-500">Proyectos activos</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-light text-green-600">12</div>
+            <div className="text-2xl font-light text-green-600">{counts.blog}</div>
             <div className="text-sm text-gray-500">Entradas blog</div>
           </div>
           
-          
+          <div className="text-center">
+            <div className="text-2xl font-light text-purple-600">{counts.categories}</div>
+            <div className="text-sm text-gray-500">Categorías</div>
+          </div>
         </div>
       </div>
 
