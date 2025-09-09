@@ -33,30 +33,13 @@ async function initializeDatabase() {
     await sequelize.authenticate();
     console.log('✅ Conexión a base de datos establecida');
     
-    // Sincronizar modelos (crear tablas si no existen)
-    await sequelize.sync({ alter: false });
-    console.log('📊 Tablas sincronizadas');
+    // Sincronizar modelos (BORRANDO todas las tablas existentes)
+    console.log('⚠️ Borrando todas las tablas y recreándolas vacías...');
+    await sequelize.sync({ force: true });
+    console.log('📊 Tablas recreadas correctamente');
     
-    // Ejecutar seeding
-    console.log('🌱 Ejecutando seeding...');
-    const { spawn } = require('child_process');
-    
-    return new Promise((resolve, reject) => {
-      const seedProcess = spawn('node', ['src/data/seedDataStandalone.cjs'], {
-        stdio: 'inherit',
-        cwd: process.cwd()
-      });
-      
-      seedProcess.on('close', (code) => {
-        if (code === 0) {
-          console.log('✅ Inicialización de base de datos completada');
-          resolve();
-        } else {
-          console.error('❌ Error en el seeding');
-          reject(new Error(`Seeding failed with code ${code}`));
-        }
-      });
-    });
+    console.log('✅ Inicialización de base de datos completada');
+    return true;
     
   } catch (error) {
     console.error('❌ Error inicializando base de datos:', error);
