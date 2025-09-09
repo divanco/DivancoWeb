@@ -7,16 +7,25 @@ const PORT = process.env.PORT || 3001;
 const env = process.env.NODE_ENV || 'development';
 const isProduction = env === 'production' || !!process.env.DB_DEPLOY;
 
+// IMPORTANTE: Cambiar a false después del primer despliegue
+// para preservar los datos en futuras actualizaciones
+const FORCE_RESET = false;
+
 // Función para inicializar la aplicación
 async function initializeApp() {
   try {
     
     
     // Sincronizar modelos en orden correcto
-    // Siempre usar force: true en producción
     console.log(`⚠️ Entorno detectado: ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
-    console.log('⚠️ RECREANDO TODAS LAS TABLAS - MODO FORCE: true');
-    await syncAllModels(true);
+    
+    if (FORCE_RESET) {
+      console.log('⚠️ MODO RESET: Borrando todas las tablas (FORCE: true)');
+      await syncAllModels(true); // force: true - borra todo
+    } else {
+      console.log('🔄 MODO NORMAL: Actualizando estructura sin borrar datos (ALTER: true)');
+      await syncAllModels(false); // force: false, usará alter: true en desarrollo
+    }
     
     // Iniciar servidor
     app.listen(PORT, () => {
