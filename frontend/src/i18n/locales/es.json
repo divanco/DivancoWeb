@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "showrooms": "Showrooms",
+    "showrooms": "Salon De Venta",
     "nosotros": "Nosotros",
     "projects": "Proyectos",
     "editions": "Ediciones",
@@ -111,7 +111,7 @@
   "footer": {
     "companyDescription": "Estudio de arquitectura especializado en diseño contemporáneo y showroom de materiales de construcción de alta calidad.",
     "links": "Enlaces",
-    "showroom": "Showroom",
+    "showroom": "Salon de Ventas",
     "projects": "Proyectos",
     "blog": "Blog",
     "about": "Nosotros",
