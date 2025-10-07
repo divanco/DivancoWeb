@@ -31,14 +31,28 @@ app.use(morgan('dev'));
 
 // ✅ CONFIGURAR CORS PRIMERO
 app.use(cors({
-  origin: [
-    'https://divanco-web.vercel.app',
-    'https://divanco-8y4f6l47s-divancos-projects.vercel.app',
-    'https://divancoweb.onrender.com',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3000'
-  ],
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://divanco-web.vercel.app',
+      'https://divancoweb.onrender.com',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000'
+    ];
+    
+    // Permitir cualquier URL de preview de Vercel para el proyecto divanco
+    const isVercelPreview = origin.match(/https:\/\/divanco-.*\.vercel\.app$/);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || isVercelPreview) {
+      callback(null, true);
+    } else {
+      console.warn('🚫 CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with'],
   credentials: true
