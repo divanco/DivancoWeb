@@ -503,7 +503,7 @@ function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
   }
   return (
     <div className="ml-3 border-l border-white/5">
-      {/* Enlace a la categoría completa */}
+      
       <Link
         to={`/showroom/${categorySlug}`}
         className="block text-xs text-white/60 hover:text-naranjaDivanco py-1 px-2 rounded transition-all duration-200 font-medium"
@@ -512,7 +512,7 @@ function ShowroomSubcategories({ categorySlug, setMobileMenuOpen }) {
         {t('common.seeAll')} {category?.name}
       </Link>
       
-      {/* Subcategorías */}
+     
       {subcategories && subcategories.length > 0
         ? subcategories.map((subcat) => (
             <div key={subcat.slug}>
