@@ -112,7 +112,7 @@ const AdminNavigation = () => {
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path || 
-                (item.path === '/admin/showroom' && location.pathname === '/admin/categories');
+                (item.path === '/admin/showroom' && location.pathname.startsWith('/admin/showroom'));
               
               return (
                 <NavLink
