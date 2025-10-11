@@ -55,13 +55,18 @@ const AdminNavigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           
+          {/* Mobile Navigation Title */}
+          <div className="flex md:hidden items-center">
+            <h1 className="text-lg font-semibold text-gray-900">Admin Panel</h1>
+          </div>
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex">
             <div className="flex space-x-8">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path || 
-                  (item.path === '/admin/showroom' && location.pathname === '/admin/categories');
+                  (item.path === '/admin/showroom' && location.pathname.startsWith('/admin/showroom'));
                 
                 return (
                   <NavLink
@@ -96,11 +101,6 @@ const AdminNavigation = () => {
                 <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
               )}
             </button>
-          </div>
-
-          {/* Mobile Navigation Title (Optional) */}
-          <div className="md:hidden flex items-center">
-            <h1 className="text-lg font-semibold text-gray-900">Admin Panel</h1>
           </div>
         </div>
       </div>
