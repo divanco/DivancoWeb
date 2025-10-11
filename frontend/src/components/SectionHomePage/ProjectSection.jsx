@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useGetSliderProjectsQuery } from '../../features/projects/projectsApi';
@@ -13,15 +13,19 @@ const ProjectSection = ({ limit = 6 }) => {
   
   // Acceder al contexto de carga
   const { setSectionLoaded } = useHomeLoading();
+  
+  // Usar ref para rastrear si ya marcamos como cargado
+  const hasMarkedLoaded = useRef(false);
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
-    if (!isLoading && projects.length > 0) {
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos Y no lo hayamos hecho antes
+    if (!isLoading && projects.length > 0 && !hasMarkedLoaded.current) {
       console.log('ProjectSection - Marcando como cargado');
       setSectionLoaded('projects', true); // true = cargado (ya no está cargando)
+      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
     }
-  }, [isLoading, projects, setSectionLoaded]);
+  }, [isLoading, projects.length, setSectionLoaded]);
 
   // Ajustar slide inicial basado en la cantidad de proyectos disponibles
   useEffect(() => {

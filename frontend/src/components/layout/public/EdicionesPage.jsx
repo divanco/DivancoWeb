@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetProjectsByYearQuery } from '../../../features/projects/projectsApi';
 import { scrollToSection } from '../../../utils/simpleScroll';
@@ -17,13 +17,16 @@ function EdicionesPage() {
   // Acceder al contexto de carga
   const { setSectionLoaded } = useHomeLoading();
   
+  // Usar ref para rastrear si ya marcamos como cargado
+  const hasMarkedLoaded = useRef(false);
+  
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
     // Importante: EdicionesPage siempre se marca como cargado cuando los datos están listos
     // porque incluso sin proyectos tiene imágenes por defecto
-    if (!isLoading) {
-      
+    if (!isLoading && !hasMarkedLoaded.current) {
       setSectionLoaded('ediciones', true); // true = cargado (ya no está cargando)
+      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
     }
   }, [isLoading, setSectionLoaded]);
   

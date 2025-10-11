@@ -3,7 +3,7 @@ import { useGetFeaturedBlogPostsQuery, useGetRecentBlogPostsQuery } from '../../
 import { scrollToSection } from '../../utils/simpleScroll';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useHomeLoading } from '../../contexts/HomeLoadingContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const BlogSection = () => {
   const { t } = useTranslation();
@@ -12,6 +12,9 @@ const BlogSection = () => {
   
   // Acceder al contexto de carga
   const { setSectionLoaded } = useHomeLoading();
+  
+  // Usar ref para rastrear si ya marcamos como cargado
+  const hasMarkedLoaded = useRef(false);
   
   // Usar posts destacados si existen, si no usar posts recientes
   const featuredPosts = featuredResponse?.data || [];
@@ -23,12 +26,13 @@ const BlogSection = () => {
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
-    if (!isLoading && (featuredPosts.length > 0 || recentPosts.length > 0)) {
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos Y no lo hayamos hecho antes
+    if (!isLoading && (featuredPosts.length > 0 || recentPosts.length > 0) && !hasMarkedLoaded.current) {
       console.log('BlogSection - Marcando como cargado');
       setSectionLoaded('blog', true); // true = cargado (ya no está cargando)
+      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
     }
-  }, [isLoading, featuredPosts, recentPosts, setSectionLoaded]);
+  }, [isLoading, featuredPosts.length, recentPosts.length, setSectionLoaded]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

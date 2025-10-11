@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApi';
@@ -17,16 +17,20 @@ const ShowroomSection = () => {
   // Acceder al contexto de carga
   const { setSectionLoaded } = useHomeLoading();
   
+  // Usar ref para rastrear si ya marcamos como cargado
+  const hasMarkedLoaded = useRef(false);
+  
   const categories = data?.data?.filter(cat => cat.featuredImage) || [];
 
   // Actualizar el estado de carga en el contexto
   useEffect(() => {
-    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos
-    if (!isLoading && categories.length > 0) {
+    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos Y no lo hayamos hecho antes
+    if (!isLoading && categories.length > 0 && !hasMarkedLoaded.current) {
       console.log('ShowroomSection - Marcando como cargado');
       setSectionLoaded('showroom', true); // true = cargado (ya no está cargando)
+      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
     }
-  }, [isLoading, categories, setSectionLoaded]);
+  }, [isLoading, categories.length, setSectionLoaded]);
 
   // Ajustar slide inicial basado en la cantidad de categorías disponibles
   useEffect(() => {
