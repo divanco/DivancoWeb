@@ -69,7 +69,8 @@ const AdminProjectPage = () => {
   } = useGetProjectsQuery({
     page: currentPage,
     limit: 10,
-    search: searchTerm || undefined
+    search: searchTerm || undefined,
+    publicOnly: false  // Ver todos los proyectos (incluidos inactivos) en admin
   });
 
   const projects = projectsData?.data || [];
@@ -77,10 +78,14 @@ const AdminProjectPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Eliminar este proyecto? Esta acción no se puede deshacer.')) {
       try {
-        await deleteProject(id).unwrap();
+        const result = await deleteProject(id).unwrap();
+        console.log('✅ Proyecto eliminado:', result);
+        alert('Proyecto eliminado exitosamente');
         refetch();
       } catch (err) {
-        alert('Error al eliminar el proyecto.');
+        console.error('❌ Error al eliminar proyecto:', err);
+        const errorMessage = err?.data?.message || err?.message || 'Error desconocido al eliminar el proyecto.';
+        alert(`Error: ${errorMessage}`);
       }
     }
   };
@@ -154,7 +159,10 @@ const AdminProjectPage = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {projects.map(project => (
-                    <tr key={project.id} className="hover:bg-gray-50">
+                    <tr 
+                      key={project.id} 
+                      className={`hover:bg-gray-50 ${!project.isActive ? 'opacity-50 bg-red-50' : ''}`}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           {project.media && project.media.length > 0 && project.media[0].urls?.mobile && (
@@ -165,7 +173,14 @@ const AdminProjectPage = () => {
                             />
                           )}
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{project.title}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-900">{project.title}</span>
+                              {!project.isActive && (
+                                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                  ELIMINADO
+                                </span>
+                              )}
+                            </div>
                             <div className="text-xs text-gray-500">{project.slug}</div>
                           </div>
                         </div>
@@ -232,7 +247,25 @@ const AdminProjectPage = () => {
                           <span className="text-gray-300">Sin imágenes</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{project.status || project.etapa}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-sm text-gray-500">{project.status || project.etapa}</span>
+                          <div className="flex gap-1">
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                              project.isActive 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {project.isActive ? 'Activo' : 'Inactivo'}
+                            </span>
+                            {!project.isPublic && (
+                              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                                Privado
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <button

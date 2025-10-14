@@ -17,7 +17,7 @@ export const getAllProjects = async (req, res) => {
       page = 1
     } = req.query;
 
-    const whereClause = {};
+    const whereClause = { isActive: true };  // ✅ Siempre filtrar por activos por defecto
     
     if (publicOnly === 'true') whereClause.isPublic = true;
     if (year) whereClause.year = year;
