@@ -190,7 +190,8 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
         specifications: specificationsObj,
         dimensions: dimensionsObj,
         price: form.price ? parseFloat(form.price) : null,
-        salePrice: form.salePrice ? parseFloat(form.salePrice) : null
+        salePrice: form.salePrice ? parseFloat(form.salePrice) : null,
+        currency: 'COP' // Asegurar que siempre sea COP
       };
 
       console.log('🔵 [ProductForm] Enviando datos:', payload);

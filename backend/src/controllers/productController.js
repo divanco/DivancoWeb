@@ -180,7 +180,7 @@ export const createProduct = async (req, res) => {
       specifications: specifications || {},
       whatsappMessage: whatsappMessage?.trim(),
       price: price ? parseFloat(price) : null,
-      currency: currency || 'USD',
+      currency: currency || 'COP', // Cambiar default de USD a COP
       order: parseInt(order) || 0,
       isFeatured: Boolean(isFeatured),
       isNew: Boolean(isNew),
@@ -643,6 +643,116 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Endpoint de administración: Actualizar moneda de todos los productos a COP
+export const fixProductCurrency = async (req, res) => {
+  try {
+    console.log('🔄 Iniciando actualización de monedas...');
+    
+    // Buscar productos con USD
+    const productsUSD = await Product.findAll({
+      where: {
+        currency: 'USD'
+      },
+      attributes: ['id', 'name', 'currency']
+    });
+
+    console.log(`📊 Encontrados ${productsUSD.length} productos con USD`);
+
+    if (productsUSD.length === 0) {
+      // Verificar si hay productos con NULL
+      const productsNull = await Product.findAll({
+        where: {
+          currency: null
+        },
+        attributes: ['id', 'name', 'currency']
+      });
+
+      if (productsNull.length > 0) {
+        console.log(`📊 Encontrados ${productsNull.length} productos con currency NULL`);
+        
+        // Actualizar productos con NULL a COP
+        const [updatedNull] = await Product.update(
+          { currency: 'COP' },
+          {
+            where: {
+              currency: null
+            }
+          }
+        );
+
+        return res.json({
+          success: true,
+          message: 'Productos actualizados exitosamente',
+          data: {
+            updatedFromNull: updatedNull,
+            updatedFromUSD: 0,
+            total: updatedNull
+          }
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'No hay productos para actualizar',
+        data: {
+          updatedFromNull: 0,
+          updatedFromUSD: 0,
+          total: 0
+        }
+      });
+    }
+
+    // Actualizar productos de USD a COP
+    const [updatedUSD] = await Product.update(
+      { currency: 'COP' },
+      {
+        where: {
+          currency: 'USD'
+        }
+      }
+    );
+
+    // También actualizar los que tengan NULL
+    const [updatedNull] = await Product.update(
+      { currency: 'COP' },
+      {
+        where: {
+          currency: null
+        }
+      }
+    );
+
+    console.log(`✅ Actualizados ${updatedUSD} productos de USD a COP`);
+    console.log(`✅ Actualizados ${updatedNull} productos de NULL a COP`);
+
+    // Verificar cambios
+    const remainingUSD = await Product.count({
+      where: {
+        currency: 'USD'
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Productos actualizados exitosamente',
+      data: {
+        updatedFromUSD: updatedUSD,
+        updatedFromNull: updatedNull,
+        total: updatedUSD + updatedNull,
+        remainingUSD: remainingUSD
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error al actualizar monedas:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar monedas',
       error: error.message
     });
   }

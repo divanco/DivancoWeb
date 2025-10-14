@@ -6,6 +6,7 @@ import { useProducts } from '../../../features/products/useProducts';
 import CategoryManagement from './CategoryManagement';
 import SubcategoryManagement from './SubcategoryManagement';
 import ProductManagement from '../products/ProductManagement';
+import AllProductsManagement from '../products/AllProductsManagement';
 
 const ShowroomAdminPage = () => {
   const [activeTab, setActiveTab] = useState('categories');
@@ -17,9 +18,15 @@ const ShowroomAdminPage = () => {
     selectedCategory ? { categoryId: selectedCategory.id, limit: 100, active: false } : { limit: 100, active: false }
   );
 
+  // Productos filtrados por subcategoría (para la vista por categorías)
   const { products, isLoading: loadingProducts, refetch: refetchProducts } = useProducts({
     subcategoryId: selectedSubcategory?.id,
     limit: 20
+  });
+
+  // Todos los productos (para la vista general)
+  const { products: allProducts, isLoading: loadingAllProducts, refetch: refetchAllProducts } = useProducts({
+    limit: 100
   });
 
   // Debug temporal - remover después
@@ -30,13 +37,15 @@ const ShowroomAdminPage = () => {
   const subcategories = subcategoriesData?.data || [];
 
   const tabs = [
+    { id: 'all-products', label: 'Todos los Productos', icon: '📦' },
     { id: 'categories', label: 'Categorías', icon: '📁' },
     { id: 'subcategories', label: 'Subcategorías', icon: '📂' },
-    { id: 'products', label: 'Productos', icon: '📦' }
+    { id: 'products', label: 'Productos por Categoría', icon: '🏷️' }
   ];
 
   const getTabCounts = () => {
     return {
+      'all-products': allProducts.length,
       categories: categories.length,
       subcategories: subcategories.length,
       products: products.length
@@ -54,7 +63,7 @@ const ShowroomAdminPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Administración del Showroom
+                  Administración del Salón de Ventas
                 </h1>
                 <p className="mt-2 text-gray-600">
                   Gestiona categorías, subcategorías y productos de tu showroom
@@ -64,16 +73,16 @@ const ShowroomAdminPage = () => {
               {/* Quick Stats */}
               <div className="hidden md:flex gap-6">
                 <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{counts['all-products']}</div>
+                  <div className="text-sm text-gray-600">Productos Totales</div>
+                </div>
+                <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900">{counts.categories}</div>
                   <div className="text-sm text-gray-600">Categorías</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900">{counts.subcategories}</div>
                   <div className="text-sm text-gray-600">Subcategorías</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{counts.products}</div>
-                  <div className="text-sm text-gray-600">Productos</div>
                 </div>
               </div>
             </div>
@@ -156,6 +165,14 @@ const ShowroomAdminPage = () => {
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'all-products' && (
+          <AllProductsManagement
+            products={allProducts}
+            isLoading={loadingAllProducts}
+            onRefresh={refetchAllProducts}
+          />
+        )}
+
         {activeTab === 'categories' && (
           <CategoryManagement
             categories={categories}

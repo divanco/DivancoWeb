@@ -10,7 +10,8 @@ import {
   getProductsBySubcategory,
   getProductsByCategory,
   uploadProductImage,
-  deleteProductImage
+  deleteProductImage,
+  fixProductCurrency
 } from '../controllers/productController.js';
 
 const router = express.Router();
@@ -46,6 +47,9 @@ router.get('/:slug', getProductBySlug);
 // ====================================
 // RUTAS ADMINISTRATIVAS
 // ====================================
+
+// Endpoint de mantenimiento: Actualizar moneda de productos a COP
+router.post('/admin/fix-currency', fixProductCurrency);
 
 // Crear nuevo producto
 router.post('/', createProduct);
