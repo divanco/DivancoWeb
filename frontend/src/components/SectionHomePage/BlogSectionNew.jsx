@@ -265,7 +265,7 @@ const BlogSection = () => {
       <button 
         onClick={() => scrollToSection('#showroom-section')}
         className="absolute bottom-6 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform duration-300"
-        aria-label="Ver showroom"
+        aria-label="Ver Salón de Ventas"
       >
         <div className="w-px h-6 bg-gray-300 mx-auto mb-2"></div>
         <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors duration-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">

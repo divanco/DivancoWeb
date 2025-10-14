@@ -128,7 +128,7 @@ const SubcategoryProductsPage = () => {
             <span className="text-gray-400">/</span>
             <li>
               <Link to="/showroom" className="text-gray-500 hover:text-gray-700">
-                Showroom
+                Salón de Ventas
               </Link>
             </li>
             <span className="text-gray-400">/</span>
@@ -316,7 +316,7 @@ const SubcategoryProductsPage = () => {
                 to="/showroom"
                 className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300"
               >
-                Ver showroom
+                Ver Salón de Ventas
               </Link>
             </div>
           </div>

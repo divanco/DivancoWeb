@@ -37,10 +37,30 @@ const ShowroomAdminPage = () => {
   const subcategories = subcategoriesData?.data || [];
 
   const tabs = [
-    { id: 'all-products', label: 'Todos los Productos', icon: '📦' },
-    { id: 'categories', label: 'Categorías', icon: '📁' },
-    { id: 'subcategories', label: 'Subcategorías', icon: '📂' },
-    { id: 'products', label: 'Productos por Categoría', icon: '🏷️' }
+    { 
+      id: 'all-products', 
+      label: 'Todos los Productos', 
+      shortLabel: 'Todos',
+      icon: '📦' 
+    },
+    { 
+      id: 'categories', 
+      label: 'Categorías', 
+      shortLabel: 'Categorías',
+      icon: '📁' 
+    },
+    { 
+      id: 'subcategories', 
+      label: 'Subcategorías', 
+      shortLabel: 'Subcategorías',
+      icon: '📂' 
+    },
+    { 
+      id: 'products', 
+      label: 'Productos por Categoría', 
+      shortLabel: 'Por Categoría',
+      icon: '🏷️' 
+    }
   ];
 
   const getTabCounts = () => {
@@ -66,7 +86,7 @@ const ShowroomAdminPage = () => {
                   Administración del Salón de Ventas
                 </h1>
                 <p className="mt-2 text-gray-600">
-                  Gestiona categorías, subcategorías y productos de tu showroom
+                  Gestiona categorías, subcategorías y productos de tu Salón de Ventas
                 </p>
               </div>
               
@@ -91,22 +111,23 @@ const ShowroomAdminPage = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`py-4 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors flex items-center ${
                   activeTab === tab.id
                     ? 'border-orange-500 text-orange-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-                <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                <span className="mr-1 sm:mr-2">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
+                <span className={`ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs rounded-full ${
                   activeTab === tab.id
                     ? 'bg-orange-100 text-orange-800'
                     : 'bg-gray-100 text-gray-600'

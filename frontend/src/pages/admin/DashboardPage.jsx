@@ -80,8 +80,8 @@ const DashboardPage = () => {
     },
     {
       id: 'categories',
-      title: 'Showroom',
-      description: 'Categorías del showroom',
+      title: 'Salón de Ventas',
+      description: 'Categorías del Salón de Ventas',
       icon: TagIcon,
       count: counts.categories,
       color: 'bg-purple-50 text-purple-600',
@@ -222,7 +222,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/showroom')}
               className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
             >
-              🏪 Ver showroom público
+              🏪 Ver Salón de Ventas
             </button>
             <button
               onClick={() => navigate('/blog')}

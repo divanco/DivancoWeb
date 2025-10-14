@@ -66,7 +66,7 @@ const CategoryManagement = ({ categories, isLoading, onSelectCategory }) => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Categorías</h2>
-          <p className="text-gray-600">Gestiona las categorías principales de tu showroom</p>
+          <p className="text-gray-600">Gestiona las categorías principales de tu Salón de Ventas</p>
         </div>
         <button
           onClick={handleCreate}
@@ -117,7 +117,7 @@ const CategoryManagement = ({ categories, isLoading, onSelectCategory }) => {
           <p className="text-gray-600 mb-4">
             {searchTerm 
               ? 'Intenta buscar con otros términos' 
-              : 'Comienza creando tu primera categoría para organizar tu showroom'
+              : 'Comienza creando tu primera categoría'
             }
           </p>
           {!searchTerm && (

@@ -23,7 +23,7 @@ const AdminNavigation = () => {
       icon: HomeIcon,
     },
     {
-      name: 'Showroom',
+      name: 'Salón de Ventas',
       path: '/admin/showroom',
       icon: BuildingStorefrontIcon,
       description: 'Categorías, Subcategorías y Productos'

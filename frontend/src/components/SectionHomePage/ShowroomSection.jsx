@@ -85,7 +85,7 @@ const ShowroomSection = () => {
   if (isLoading) {
     return (
       <section className="py-16 bg-gray-50">
-        <div className="text-center py-12 text-gray-400">Cargando showroom...</div>
+        <div className="text-center py-12 text-gray-400">Cargando Salón de Ventas...</div>
       </section>
     );
   }
