@@ -25,22 +25,29 @@ const Hero = ({
   const handleTouchStart = (e) => {
     if (!isMobile) return;
     const touch = e.touches[0];
-    setIsPanning(true);
     startPos.current = { x: touch.clientX, y: touch.clientY };
     startPan.current = { ...panPosition };
   };
 
   const handleTouchMove = (e) => {
-    if (!isPanning || !isMobile) return;
+    if (!isMobile) return;
     const touch = e.touches[0];
-    const deltaX = (touch.clientX - startPos.current.x) / window.innerWidth * 30;
-    const deltaY = (touch.clientY - startPos.current.y) / window.innerHeight * 30;
+    const deltaX = Math.abs(touch.clientX - startPos.current.x);
+    const deltaY = Math.abs(touch.clientY - startPos.current.y);
 
-    setPanPosition({
-      x: Math.max(20, Math.min(80, startPan.current.x - deltaX)),
-      y: Math.max(20, Math.min(80, startPan.current.y - deltaY))
-    });
-    e.preventDefault();
+    // Solo activar pan si el movimiento es más horizontal que vertical
+    if (deltaX > deltaY && deltaX > 10) {
+      if (!isPanning) setIsPanning(true);
+      
+      const panDeltaX = (touch.clientX - startPos.current.x) / window.innerWidth * 30;
+      const panDeltaY = (touch.clientY - startPos.current.y) / window.innerHeight * 30;
+
+      setPanPosition({
+        x: Math.max(20, Math.min(80, startPan.current.x - panDeltaX)),
+        y: Math.max(20, Math.min(80, startPan.current.y - panDeltaY))
+      });
+      e.preventDefault(); // Solo prevenir si estamos haciendo pan
+    }
   };
 
   const handleTouchEnd = () => setIsPanning(false);
@@ -91,26 +98,29 @@ const Hero = ({
         />
       )}
 
-      {/* ✅ Scroll Indicator - Clickeable */}
+      {/* ✅ Scroll Indicator - Clickeable y más visible */}
       <button 
         onClick={() => scrollToSection('#slogan-section')}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 cursor-pointer hover:scale-110 transition-transform duration-300"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 cursor-pointer hover:scale-110 transition-all duration-300 group"
         aria-label="Desplazarse hacia abajo"
       >
-        <div className="w-px h-16 bg-white/50 mx-auto mb-4"></div>
-        <svg 
-          className="w-6 h-6 text-white/70 animate-bounce hover:text-white transition-colors duration-300" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={1} 
-            d="M19 14l-7 7m0 0l-7-7m7 7V3" 
-          />
-        </svg>
+        {/* Contenedor con fondo para mejor visibilidad */}
+        <div className="flex flex-col items-center px-4 py-3 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-all duration-300">
+          <div className="w-px h-12 bg-white/70 mb-2"></div>
+          <svg 
+            className="w-6 h-6 text-white animate-bounce group-hover:text-white transition-colors duration-300" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+            />
+          </svg>
+        </div>
       </button>
     </section>
   );
