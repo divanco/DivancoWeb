@@ -15,6 +15,7 @@ import {
   getFilterOptions,
   getSearchSuggestions,
   uploadProjectMedia,
+  deleteProjectMedia,    // ✅ AGREGAR ESTA LÍNEA
   testProjectCreation,
   debugCreateProject
 } from '../controllers/projectController.js';
@@ -112,6 +113,13 @@ router.put('/:projectId/media/:mediaId/slider-toggle',
   authenticateToken, 
   requireRole(['admin', 'editor']), 
   toggleSliderImage
+);
+
+// ✅ NUEVA RUTA: Eliminar archivo de media
+router.delete('/:projectId/media/:mediaId', 
+  authenticateToken, 
+  requireRole(['admin']), 
+  deleteProjectMedia
 );
 
 export default router;

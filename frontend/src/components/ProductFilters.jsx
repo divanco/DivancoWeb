@@ -12,7 +12,7 @@ const ProductFilters = ({
   const [localFilters, setLocalFilters] = useState(filters);
 
   const { data: categoriesData } = useGetCategoriesQuery();
-  const categories = categoriesData?.categories || [];
+  const categories = categoriesData?.data || []; // ✅ Cambiar de .categories a .data
 
   // Sync local filters with parent
   useEffect(() => {
@@ -53,7 +53,7 @@ const ProductFilters = ({
   };
 
   const selectedCategory = categories.find(cat => cat.id === localFilters.categoryId);
-  const subcategories = selectedCategory?.Subcategories || [];
+  const subcategories = selectedCategory?.subcategories || [];
 
   const getActiveFiltersCount = () => {
     let count = 0;

@@ -167,31 +167,28 @@ export const productsApi = baseApi.injectEndpoints({
 
     // Subir imagen de producto
     uploadProductImage: builder.mutation({
-      query: ({ productId, imageFile }) => {
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        
+      query: ({ id, formData }) => {
         return {
-          url: `/products/${productId}/upload-image`,
+          url: `/products/${id}/upload-image`,
           method: 'POST',
           body: formData,
           // No establecer Content-Type - el navegador lo hará automáticamente para FormData
         };
       },
-      invalidatesTags: (result, error, { productId }) => [
-        { type: 'Product', id: productId },
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Product', id },
         'Product'
       ],
     }),
 
     // Eliminar imagen de producto
     deleteProductImage: builder.mutation({
-      query: ({ productId, imageId }) => ({
-        url: `/products/${productId}/images/${imageId}`,
+      query: ({ id, imageId }) => ({
+        url: `/products/${id}/images/${imageId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { productId }) => [
-        { type: 'Product', id: productId },
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Product', id },
         'Product'
       ],
     }),

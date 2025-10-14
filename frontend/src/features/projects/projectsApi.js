@@ -169,8 +169,8 @@ export const projectsApi = baseApi.injectEndpoints({
 
     // Eliminar proyecto (soft delete)
     deleteProject: builder.mutation({
-      query: (id) => ({
-        url: `/projects/${id}`,
+      query: ({ id, permanent = false }) => ({
+        url: `/projects/${id}${permanent ? '?permanent=true' : ''}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Project', 'FilterOptions'],
@@ -226,6 +226,19 @@ export const projectsApi = baseApi.injectEndpoints({
         { type: 'ProjectMedia', id: projectId },
         { type: 'Project', id: 'LIST' },
         'SliderProjects'
+      ],
+    }),
+
+    // ✅ NUEVA MUTACIÓN: Eliminar archivo de media
+    deleteProjectMedia: builder.mutation({
+      query: ({ projectId, mediaId }) => ({
+        url: `/projects/${projectId}/media/${mediaId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        { type: 'Project', id: projectId },
+        { type: 'ProjectMedia', id: projectId },
+        { type: 'Project', id: 'LIST' }
       ],
     }),
 
@@ -315,6 +328,7 @@ export const {
   useUploadProjectMediaMutation,
   useGetProjectMediaQuery,
   useToggleSliderImageMutation,     // ✅ NUEVO HOOK
+  useDeleteProjectMediaMutation,    // ✅ AGREGAR ESTE HOOK
   useUpdateMediaFileMutation,
   useDeleteMediaFileMutation,
   useReorderProjectMediaMutation,

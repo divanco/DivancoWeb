@@ -55,13 +55,26 @@ Project.init(
     architect: {
       type: DataTypes.STRING(150),
     },
-    // Tipo de participación
+    // Tipo de participación (puede tener múltiples tipos)
     projectType: {
-      type: DataTypes.ENUM("Diseño", "Proyecto", "Dirección de Obra"),
-      allowNull: false, // ✅ CAMBIAR: ahora es requerido
+      type: DataTypes.ARRAY(DataTypes.TEXT), // ✅ Cambiar de ENUM a TEXT para evitar conflictos
+      allowNull: false,
+      defaultValue: ["Proyecto"],
       validate: {
         notEmpty: true,
-        isIn: [["Diseño", "Proyecto", "Dirección de Obra"]],
+        isValidArray(value) {
+          if (!Array.isArray(value)) {
+            throw new Error('projectType debe ser un array');
+          }
+          if (value.length === 0) {
+            throw new Error('Debe seleccionar al menos un tipo de proyecto');
+          }
+          const validTypes = ["Diseño", "Proyecto", "Dirección de Obra"];
+          const allValid = value.every(type => validTypes.includes(type));
+          if (!allValid) {
+            throw new Error('Tipos de proyecto inválidos');
+          }
+        }
       },
     },
     // Estado del proyecto

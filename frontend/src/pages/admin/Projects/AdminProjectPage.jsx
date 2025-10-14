@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { MdAdd, MdEdit, MdDelete, MdVisibility, MdStar, MdTune, MdImage } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdVisibility, MdStar, MdTune, MdImage, MdDeleteForever } from 'react-icons/md';
 
 import { useGetProjectsQuery, useDeleteProjectMutation, useUpdateProjectMutation, useToggleSliderImageMutation } from '../../../features/projects/projectsApi';
 import ProjectUpload from './ProjectUpload';
@@ -75,12 +75,16 @@ const AdminProjectPage = () => {
 
   const projects = projectsData?.data || [];
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Eliminar este proyecto? Esta acción no se puede deshacer.')) {
+  const handleDelete = async (id, permanent = false) => {
+    const confirmMessage = permanent 
+      ? '⚠️ BORRADO PERMANENTE\n\n¿Estás seguro de ELIMINAR COMPLETAMENTE este proyecto?\n\nEsta acción NO se puede deshacer y borrará:\n- El proyecto\n- Todas sus imágenes\n- Toda su información\n\n¿Continuar?' 
+      : '¿Desactivar este proyecto? (Podrás reactivarlo después)';
+    
+    if (window.confirm(confirmMessage)) {
       try {
-        const result = await deleteProject(id).unwrap();
+        const result = await deleteProject({ id, permanent }).unwrap();
         console.log('✅ Proyecto eliminado:', result);
-        alert('Proyecto eliminado exitosamente');
+        alert(result.message || 'Proyecto eliminado exitosamente');
         refetch();
       } catch (err) {
         console.error('❌ Error al eliminar proyecto:', err);
@@ -285,14 +289,25 @@ const AdminProjectPage = () => {
                           >
                             <MdEdit className="w-4 h-4" />
                           </button>
-                          <button
-                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                            title="Eliminar proyecto"
-                            onClick={() => handleDelete(project.id)}
-                            disabled={isDeleting}
-                          >
-                            <MdDelete className="w-4 h-4" />
-                          </button>
+                          {project.isActive ? (
+                            <button
+                              className="text-orange-600 hover:text-orange-900 disabled:opacity-50"
+                              title="Desactivar proyecto"
+                              onClick={() => handleDelete(project.id, false)}
+                              disabled={isDeleting}
+                            >
+                              <MdDelete className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                              title="Borrar permanentemente"
+                              onClick={() => handleDelete(project.id, true)}
+                              disabled={isDeleting}
+                            >
+                              <MdDeleteForever className="w-5 h-5" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

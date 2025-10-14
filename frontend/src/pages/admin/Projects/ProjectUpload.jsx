@@ -17,8 +17,10 @@ import {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useGetProjectByIdQuery,
-  useToggleSliderImageMutation,  // ✅ AGREGAR ESTE IMPORT
+  useToggleSliderImageMutation,
+  useDeleteProjectMediaMutation,  // ✅ AGREGAR ESTE IMPORT
 } from "../../../features/projects/projectsApi";
+import ExistingMediaManager from './ExistingMediaManager';  // ✅ AGREGAR ESTE IMPORT
 import {
   selectIsUploading,
   selectUploadError,
@@ -66,9 +68,10 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [toggleSliderImage] = useToggleSliderImageMutation();
+  const [deleteMedia, { isLoading: isDeleting }] = useDeleteProjectMediaMutation();  // ✅ AGREGAR ESTA LÍNEA
   
   // Query para obtener datos del proyecto si estamos editando
-  const { data: projectData, isLoading } = useGetProjectByIdQuery(projectId, { skip: !isEdit });
+  const { data: projectData, isLoading, refetch: refetchProject } = useGetProjectByIdQuery(projectId, { skip: !isEdit });
 
   // Estados locales
   const [isDragging, setIsDragging] = useState(false);
@@ -87,7 +90,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
     location: "",
     client: "",
     architect: "",
-    projectType: "Proyecto",
+    projectType: ["Proyecto"], // ✅ Cambiar a array
     etapa: "render",
     area: "",
     content: "",
@@ -112,6 +115,12 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
         year: projectData.data.year || new Date().getFullYear(),
         etapa: projectData.data.etapa || "render",
         tags: projectData.data.tags || [],
+        // ✅ Asegurar que projectType sea array
+        projectType: Array.isArray(projectData.data.projectType) 
+          ? projectData.data.projectType 
+          : projectData.data.projectType 
+            ? [projectData.data.projectType] 
+            : ["Proyecto"],
       });
     }
     // eslint-disable-next-line
@@ -488,6 +497,33 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
     }
   };
 
+  // ✅ Función para eliminar una imagen existente
+  const handleDeleteMedia = async (mediaId) => {
+    if (!window.confirm('¿Eliminar esta imagen? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      await deleteMedia({ projectId, mediaId }).unwrap();
+      alert('Imagen eliminada exitosamente');
+      refetchProject(); // Recargar datos del proyecto
+    } catch (error) {
+      console.error('Error al eliminar imagen:', error);
+      alert('Error al eliminar la imagen');
+    }
+  };
+
+  // ✅ Función para marcar/desmarcar imagen del slider
+  const handleToggleSlider = async (mediaId) => {
+    try {
+      await toggleSliderImage({ projectId, mediaId }).unwrap();
+      refetchProject(); // Recargar datos del proyecto
+    } catch (error) {
+      console.error('Error al cambiar imagen del slider:', error);
+      alert('Error al actualizar imagen del slider');
+    }
+  };
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -506,9 +542,20 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
 
       if (isEdit) {
         await updateProject({ id: projectId, ...finalFormData }).unwrap();
+        
+        // ✅ AGREGAR: Subir archivos nuevos si hay alguno
+        if (files.length > 0) {
+          console.log(`📤 Subiendo ${files.length} archivos nuevos al proyecto ${projectId}`);
+          await uploadFiles(projectId);
+        }
+        
         // Llamar a onProjectCreated para cerrar el modal después de guardar
         console.log("Guardar en modo edición");
-        closeModalAndRefresh();
+        
+        // Solo cerrar si la subida fue exitosa o no había archivos
+        if (files.length === 0 || Object.values(uploadProgress).every(p => p.status !== "error")) {
+          closeModalAndRefresh();
+        }
       } else {
         const projectResult = await createProject(finalFormData).unwrap();
         const newProjectId = projectResult.data.id;
@@ -538,7 +585,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
       location: "",
       client: "",
       architect: "",
-      projectType: "Proyecto",
+      projectType: ["Proyecto"], // ✅ Cambiar a array
       etapa: "render",
       area: "",
       content: "",
@@ -711,19 +758,38 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
                   />
                 </div>
 
-                {/* Tipo de Proyecto */}
+                {/* Tipo de Proyecto - Selección múltiple */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Proyecto</label>
-                  <select
-                    name="projectType"
-                    value={form.projectType}
-                    onChange={handleChange}
-                    className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de Proyecto (puede seleccionar varios)
+                  </label>
+                  <div className="space-y-2">
                     {PROJECT_TYPES.map(type => (
-                      <option key={type} value={type}>{type}</option>
+                      <label key={type} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(form.projectType) && form.projectType.includes(type)}
+                          onChange={(e) => {
+                            const currentTypes = Array.isArray(form.projectType) ? form.projectType : [];
+                            if (e.target.checked) {
+                              // Agregar el tipo
+                              setForm({ ...form, projectType: [...currentTypes, type] });
+                            } else {
+                              // Remover el tipo (solo si no es el último)
+                              const newTypes = currentTypes.filter(t => t !== type);
+                              if (newTypes.length > 0) {
+                                setForm({ ...form, projectType: newTypes });
+                              } else {
+                                alert('Debe seleccionar al menos un tipo de proyecto');
+                              }
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{type}</span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
                 {/* Etapa */}
@@ -874,10 +940,23 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
               </div>
             </div>
 
-            {/* Zona de subida - Solo para nuevos proyectos y más compacta */}
-            {!isEdit && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-base font-medium text-gray-900 mb-2">Archivos del proyecto</h3>
+            {/* ✅ Gestor de imágenes existentes - Solo al editar */}
+            {isEdit && projectData?.data?.media && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <ExistingMediaManager
+                  media={projectData.data.media}
+                  onDelete={handleDeleteMedia}
+                  onToggleSlider={handleToggleSlider}
+                  isDeleting={isDeleting}
+                />
+              </div>
+            )}
+
+            {/* ✅ Zona de subida - Para editar y crear */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-base font-medium text-gray-900 mb-2">
+                {isEdit ? 'Agregar más archivos' : 'Archivos del proyecto'}
+              </h3>
                 
                 <div
                   className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-all duration-200 ${
@@ -1019,7 +1098,6 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
                   </div>
                 )}
               </div>
-            )}
 
             {/* Errores */}
             {(uploadError || createError) && (

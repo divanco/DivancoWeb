@@ -1487,8 +1487,14 @@ export const uploadProjectMedia = async (req, res) => {
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
+    const { permanent } = req.query; // Query param para borrado permanente
 
-    const project = await Project.findByPk(id);
+    const project = await Project.findByPk(id, {
+      include: [{
+        model: MediaFile,
+        as: 'media'
+      }]
+    });
 
     if (!project) {
       return res.status(404).json({
@@ -1497,12 +1503,30 @@ export const deleteProject = async (req, res) => {
       });
     }
 
-    // Soft delete
+    // Si permanent=true, borrar completamente
+    if (permanent === 'true') {
+      // Eliminar archivos de media asociados (opcional - Cloudinary los maneja)
+      if (project.media && project.media.length > 0) {
+        await MediaFile.destroy({
+          where: { projectId: id }
+        });
+      }
+
+      // Borrado permanente del proyecto
+      await project.destroy();
+
+      return res.json({
+        success: true,
+        message: 'Proyecto eliminado permanentemente'
+      });
+    }
+
+    // Soft delete por defecto
     await project.update({ isActive: false });
 
     res.json({
       success: true,
-      message: 'Proyecto eliminado exitosamente'
+      message: 'Proyecto desactivado exitosamente'
     });
   } catch (error) {
     console.error('Error eliminando proyecto:', error);
@@ -1693,6 +1717,54 @@ export const getProjectById = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error obteniendo proyecto por ID:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+// ✅ ELIMINAR ARCHIVO DE MEDIA
+export const deleteProjectMedia = async (req, res) => {
+  try {
+    const { projectId, mediaId } = req.params;
+
+    // Verificar que el proyecto existe
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proyecto no encontrado'
+      });
+    }
+
+    // Buscar el archivo de media
+    const mediaFile = await MediaFile.findOne({
+      where: {
+        id: mediaId,
+        projectId: projectId
+      }
+    });
+
+    if (!mediaFile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Archivo de media no encontrado'
+      });
+    }
+
+    // Eliminar el archivo (soft delete)
+    await mediaFile.update({ isActive: false });
+
+    // O eliminación permanente si lo prefieres:
+    // await mediaFile.destroy();
+
+    res.json({
+      success: true,
+      message: 'Archivo eliminado exitosamente'
+    });
+  } catch (error) {
+    console.error('Error eliminando archivo de media:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'

@@ -4,8 +4,8 @@ export const categoriesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Obtener todas las categorías
     getCategories: builder.query({
-      query: ({ limit = 20, page = 1, active = true } = {}) => 
-        `/categories?limit=${limit}&page=${page}&active=${active}`,
+      query: ({ limit = 20, page = 1, active = true, includeSubcategories = true } = {}) => 
+        `/categories?limit=${limit}&page=${page}&active=${active}&includeSubcategories=${includeSubcategories}`,
       providesTags: ['Category'],
     }),
 
