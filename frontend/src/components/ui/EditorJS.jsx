@@ -153,16 +153,14 @@ const EditorJSComponent = ({
     return editorInstance;
   };
 
-  // Efecto principal para manejar la creación/recreación del editor
+  // Efecto principal para manejar la creación del editor (SOLO UNA VEZ)
   useEffect(() => {
     console.log('🔄 [EditorJS] Efecto principal disparado. Data:', data);
     
-    // Si ya hay un editor, destruirlo primero
-    if (editor && typeof editor.destroy === 'function') {
-      console.log('🗑️ [EditorJS] Destruyendo editor existente');
-      editor.destroy();
-      setEditor(null);
-      setIsReady(false);
+    // Si ya hay un editor, no hacer nada (dejarlo vivir)
+    if (editor) {
+      console.log('⏭️ [EditorJS] Editor ya existe, saltando creación');
+      return;
     }
 
     // Crear nueva instancia con un pequeño delay para asegurar que el DOM esté limpio
@@ -177,7 +175,7 @@ const EditorJSComponent = ({
     return () => {
       clearTimeout(timer);
     };
-  }, [data]); // Recrear cuando cambien los datos
+  }, []); // ✅ Solo crear el editor una vez al montar el componente
 
   // Efecto de limpieza al desmontar
   useEffect(() => {
