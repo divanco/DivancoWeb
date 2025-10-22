@@ -9,7 +9,8 @@
     "dev": "nodemon src/index.js",
     "test": "jest",
     "reset-db": "node src/data/forceSync.cjs",
-    "build": "echo 'Build completed'"
+    "build": "echo 'Build completed'",
+    "migrate:projecttype": "node migrate-projecttype.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

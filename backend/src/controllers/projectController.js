@@ -874,7 +874,6 @@ export const debugCreateProject = async (req, res) => {
     console.error('   - Name:', error.name);
     console.error('   - Message:', error.message);
     console.error('   - Code:', error.code);
-    console.error('   - Stack:', error.stack);
     
     if (error.original) {
       console.error('   - Original error:', error.original);
@@ -887,9 +886,22 @@ export const debugCreateProject = async (req, res) => {
       });
     }
     
+    // Determinar mensaje de error más descriptivo
+    let errorMessage = 'Error al crear el proyecto';
+    
+    if (error.original?.message?.includes('enum_Projects_projectType')) {
+      errorMessage = 'Error de base de datos: La columna projectType necesita migración. Ejecuta: npm run migrate';
+    } else if (error.name === 'SequelizeValidationError') {
+      errorMessage = error.errors?.map(e => e.message).join(', ') || 'Error de validación';
+    } else if (error.name === 'SequelizeUniqueConstraintError') {
+      errorMessage = 'Ya existe un proyecto con ese slug o título';
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'DEBUG: Error en creación',
+      message: errorMessage,
       error: error.message,
       errorType: error.name,
       debug: {
@@ -1094,10 +1106,16 @@ export const createProject = async (req, res) => {
       console.log('   - Error de base de datos');
       console.log('   - Original error:', error.original?.message);
       
+      let errorMessage = 'Error de base de datos';
+      
+      if (error.original?.message?.includes('enum_Projects_projectType')) {
+        errorMessage = 'La columna projectType necesita actualización. Ejecuta las migraciones: npm run migrate';
+      }
+      
       return res.status(500).json({
         success: false,
-        message: 'Error de base de datos',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.original?.message || error.message : undefined
       });
     }
 
@@ -1105,7 +1123,7 @@ export const createProject = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: error.message || 'Error interno del servidor',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
