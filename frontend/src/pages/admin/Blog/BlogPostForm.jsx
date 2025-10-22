@@ -3,7 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FiSave, FiEye, FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { EditorJSComponent } from "../../../components/ui";
-import { useGetAvailableProjectsQuery } from "../../../features/blog/blogApi";
+import { 
+  useGetAvailableProjectsQuery,
+  useCreateBlogPostMutation,
+  useUpdateBlogPostMutation,
+  useUploadFeaturedImageMutation,
+  useGetBlogPostByIdQuery
+} from "../../../features/blog/blogApi";
 
 const BlogPostForm = ({ post, onClose, onSuccess }) => {
   const navigate = useNavigate();
@@ -23,6 +29,16 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     "editingId:",
     editingId
   );
+
+  // ✅ RTK Query Hooks
+  const [createBlogPost, { isLoading: isCreating }] = useCreateBlogPostMutation();
+  const [updateBlogPost, { isLoading: isUpdating }] = useUpdateBlogPostMutation();
+  const [uploadFeaturedImage, { isLoading: isUploadingImage }] = useUploadFeaturedImageMutation();
+  
+  // Cargar post si estamos editando
+  const { data: postData, isLoading: isLoadingPost } = useGetBlogPostByIdQuery(editingId, {
+    skip: !isEditing || !editingId || Boolean(post), // Skip si no editamos o ya tenemos el post
+  });
 
   // Obtener token de Redux
   const token = useSelector((state) => state.auth.token);
@@ -63,10 +79,12 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   };
 
   const [projects, setProjects] = useState([]); // Cambiar categories por projects
-  const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [editorInstance, setEditorInstance] = useState(null);
   const [editorData, setEditorData] = useState({ blocks: [] });
+
+  // ✅ Combinar todos los estados de loading
+  const loading = isCreating || isUpdating || isUploadingImage || isLoadingPost;
 
   // ✅ NUEVO: Usar hook para obtener proyectos disponibles
   const { data: projectsData, isLoading: loadingProjects } =
@@ -198,52 +216,25 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     }));
   };
 
-  // Función helper para hacer peticiones autenticadas
-  const authenticatedFetch = async (url, options = {}) => {
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers,
-    };
-
-    if (token) {
-      headers["authorization"] = `Bearer ${token}`;
-    }
-
-    return fetch(url, {
-      ...options,
-      headers,
-    });
-  };
-
-  // Efecto separado para cargar datos del post al editar
+  // ✅ REFACTORIZADO: Cargar post desde postData (RTK Query) o desde prop
   useEffect(() => {
     console.log(
-      "🔄 [BlogPostForm] useEffect disparado - isEditing:",
+      "🔄 [BlogPostForm] useEffect - isEditing:",
       isEditing,
-      "editingId:",
-      editingId,
+      "postData:",
+      postData,
       "post prop:",
       post
     );
 
     if (isEditing) {
-      // Si tenemos la prop post, usarla directamente
-      if (post) {
-        console.log("📝 [BlogPostForm] Usando post de prop:", post);
-        loadPostFromProp(post);
+      const sourcePost = postData?.data || post;
+      if (sourcePost) {
+        console.log("📝 Cargando datos del post para editar:", sourcePost);
+        loadPostFromProp(sourcePost);
       }
-      // Si no tenemos prop post pero sí ID de URL, cargar desde API
-      else if (editingId) {
-        console.log(
-          "📖 [BlogPostForm] Cargando post desde API, ID:",
-          editingId
-        );
-        fetchBlogPost();
-      }
-    } else {
-      console.log("⚠️ [BlogPostForm] Modo creación - no se carga post");
     }
-  }, [isEditing, editingId, post]);
+  }, [isEditing, postData, post]);
 
   // Nueva función para cargar post desde prop
   const loadPostFromProp = (postData) => {
@@ -269,51 +260,6 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       editorContent
     );
     setEditorData(editorContent);
-  };
-
-  const fetchBlogPost = async () => {
-    try {
-      setLoading(true);
-      console.log(
-        "🔍 [BlogPostForm] Obteniendo post del backend, ID:",
-        editingId
-      );
-
-      const response = await authenticatedFetch(`/blog/id/${editingId}`);
-      if (response.ok) {
-        const post = await response.json();
-        console.log("📝 [BlogPostForm] Post obtenido:", post);
-
-        setFormData({
-          title: post.title || "",
-          author: post.author || "Administrador",
-          slug: post.slug || "",
-          excerpt: post.excerpt || "",
-          content: post.content || [],
-          featuredImage: post.featuredImage || "",
-          metaTitle: post.metaTitle || "",
-          metaDescription: post.metaDescription || "",
-          status: post.status || "draft",
-          projectId: post.projectId || "", // Cambiar category por projectId
-        });
-
-        // Convertir contenido del backend al formato de Editor.js
-        const editorContent = convertToEditorFormat(post.content);
-        console.log(
-          "🔄 [BlogPostForm] Contenido convertido para editor:",
-          editorContent
-        );
-        setEditorData(editorContent);
-      } else {
-        console.error("❌ [BlogPostForm] Error response:", response.status);
-        alert("Error al cargar el post");
-      }
-    } catch (error) {
-      console.error("❌ [BlogPostForm] Error fetching blog post:", error);
-      alert("Error al cargar el post");
-    } finally {
-      setLoading(false);
-    }
   };
 
   // Convertir de formato backend a formato Editor.js
@@ -494,64 +440,42 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     });
   };
 
-  // Función para subir imagen destacada a Cloudinary
+  // ✅ REFACTORIZADO: Función para subir imagen destacada usando RTK Query
   const handleFeaturedImageUpload = async (file) => {
     try {
-      setLoading(true);
       console.log("📸 Subiendo imagen destacada a Cloudinary:", file.name);
 
       const formData = new FormData();
       formData.append("image", file);
 
-      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
-      const headers = {};
-      if (token) {
-        headers["authorization"] = `Bearer ${token}`;
+      // ✅ Usar la mutación de RTK Query
+      const result = await uploadFeaturedImage(formData).unwrap();
+      console.log("✅ Imagen destacada subida:", result);
+
+      // Extraer la URL correcta del resultado de Cloudinary
+      const imageUrl = result.desktop?.url || result.url || "";
+      console.log("🖼️ URL de imagen extraída:", imageUrl);
+
+      // Actualizar el campo de imagen destacada con la URL de Cloudinary
+      setFormData((prev) => ({
+        ...prev,
+        featuredImage: imageUrl,
+      }));
+
+      // ✅ Limpiar error de imagen si existe
+      if (errors.featuredImage) {
+        setErrors((prev) => ({ ...prev, featuredImage: "" }));
       }
 
-      const response = await fetch("/blog/upload-featured-image", {
-        method: "POST",
-        body: formData,
-        headers: headers, // Sin Content-Type para que el browser lo establezca correctamente
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("✅ Imagen destacada subida:", result);
-
-        // Extraer la URL correcta del resultado de Cloudinary
-        const imageUrl = result.desktop?.url || result.url || "";
-        console.log("🖼️ URL de imagen extraída:", imageUrl);
-
-        // Actualizar el campo de imagen destacada con la URL de Cloudinary
-        setFormData((prev) => ({
-          ...prev,
-          featuredImage: imageUrl,
-        }));
-
-        // ✅ NUEVO: Limpiar error de imagen si existe
-        if (errors.featuredImage) {
-          setErrors((prev) => ({ ...prev, featuredImage: "" }));
-        }
-
-        alert("Imagen destacada subida exitosamente");
-        return result;
-      } else {
-        const error = await response.json();
-        console.error("❌ Error subiendo imagen:", error);
-        alert(
-          "Error al subir la imagen: " + (error.message || "Error desconocido")
-        );
-      }
+      alert("Imagen destacada subida exitosamente");
+      return result;
     } catch (error) {
       console.error("❌ Error uploading featured image:", error);
-      alert("Error al subir la imagen destacada");
-    } finally {
-      setLoading(false);
+      alert("Error al subir la imagen destacada: " + (error.message || JSON.stringify(error)));
     }
   };
 
-  // Función para subir imágenes del contenido
+  // ✅ REFACTORIZADO: Función para subir imágenes del contenido usando RTK Query
   const handleImageUpload = async (file) => {
     try {
       console.log("📸 Subiendo imagen del contenido:", file.name);
@@ -559,31 +483,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      // Para FormData, no usar authenticatedFetch porque agrega Content-Type: application/json
-      const headers = {};
-      if (token) {
-        headers["authorization"] = `Bearer ${token}`;
-      }
+      // ✅ Usar la mutación de RTK Query
+      const result = await uploadFeaturedImage(formData).unwrap();
+      console.log("✅ Imagen del contenido subida:", result);
 
-      const response = await fetch("/blog/upload-featured-image", {
-        method: "POST",
-        body: formData,
-        headers: headers, // Sin Content-Type para que el browser lo establezca correctamente
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("✅ Imagen del contenido subida:", result);
-
-        // Extraer la URL correcta del resultado de Cloudinary
-        const imageUrl = result.desktop?.url || result.url || "";
-        return { url: imageUrl };
-      } else {
-        console.error("❌ Error subiendo imagen del contenido");
-        // Fallback: crear URL temporal para la imagen
-        const url = URL.createObjectURL(file);
-        return { url };
-      }
+      // Extraer la URL correcta del resultado de Cloudinary
+      const imageUrl = result.desktop?.url || result.url || "";
+      return { url: imageUrl };
     } catch (error) {
       console.error("Error uploading image:", error);
       // Fallback: crear URL temporal para la imagen
@@ -685,39 +591,22 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
 
       console.log("📤 Enviando datos:", submitData);
 
-      const url = isEditing ? `/blog/${editingId}` : "/blog";
-      const method = isEditing ? "PUT" : "POST";
-
-      console.log(
-        "🔗 URL para envío:",
-        url,
-        "Método:",
-        method,
-        "editingId:",
-        editingId
-      );
-
-      const response = await authenticatedFetch(url, {
-        method,
-        body: JSON.stringify(submitData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("✅ Post guardado:", result);
-        handleSuccess();
+      // ✅ REFACTORIZADO: Usar mutaciones de RTK Query
+      let result;
+      if (isEditing) {
+        console.log("✏️ Actualizando post existente, ID:", editingId);
+        result = await updateBlogPost({ id: editingId, ...submitData }).unwrap();
       } else {
-        const error = await response.json();
-        console.error("❌ Error saving blog post:", error);
-        alert(
-          "Error al guardar el post: " + (error.message || "Error desconocido")
-        );
+        console.log("📝 Creando nuevo post");
+        result = await createBlogPost(submitData).unwrap();
       }
+
+      console.log("✅ Post guardado:", result);
+      handleSuccess();
     } catch (error) {
       console.error("❌ Error saving blog post:", error);
-      alert("Error al guardar el post");
-    } finally {
-      setLoading(false);
+      const errorMessage = error?.data?.message || error?.message || "Error desconocido";
+      alert("Error al guardar el post: " + errorMessage);
     }
   };
 

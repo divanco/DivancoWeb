@@ -87,6 +87,15 @@ export const blogApi = baseApi.injectEndpoints({
       ],
     }),
 
+    // ✅ NUEVO: Admin - Subir imagen destacada (independiente, sin post creado)
+    uploadFeaturedImage: builder.mutation({
+      query: (formData) => ({
+        url: '/blog/upload-featured-image',
+        method: 'POST',
+        body: formData,
+      }),
+    }),
+
     // Admin: Subir imagen a post
     uploadBlogPostImage: builder.mutation({
       query: ({ id, formData }) => ({
@@ -168,6 +177,7 @@ export const {
   useGetRelatedBlogPostsQuery,
   useCreateBlogPostMutation,
   useUpdateBlogPostMutation,
+  useUploadFeaturedImageMutation, // ✅ NUEVO HOOK
   useUploadBlogPostImageMutation,
   useUploadBlogPostVideoMutation,
   useDeleteBlogPostMutation,

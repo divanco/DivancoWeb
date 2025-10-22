@@ -6,7 +6,63 @@
 1. **Acceso a Azure Portal**
    - URL: https://portal.azure.com
    - Usuario y contraseña con permisos de Contributor/Owner
-   - Subscription ID
+   - Subscription ID (se obtiene GRATIS al crear cuenta Azure - ver instrucciones abajo)
+
+### 🔑 Sobre los Permisos Contributor/Owner
+
+**Si TÚ creaste la cuenta de Azure:**
+- ✅ Ya eres **Owner automáticamente**
+- No necesitas hacer nada más
+- Tienes todos los permisos necesarios
+
+**Si tu CLIENTE creó la cuenta de Azure:**
+El cliente debe darte permisos siguiendo estos pasos:
+
+1. **Ir a Azure Portal** → https://portal.azure.com
+2. **Ir a "Subscriptions"** (buscar en el menú superior)
+3. **Seleccionar su suscripción** (hacer clic en el nombre)
+4. **Ir a "Access control (IAM)"** (menú lateral izquierdo)
+5. **Hacer clic en "+ Add"** → **"Add role assignment"**
+6. **Seleccionar rol "Contributor"** → Hacer clic en "Next"
+7. **Hacer clic en "+ Select members"**
+8. **Buscar tu email** y seleccionarte
+9. **Hacer clic en "Select"** y luego **"Review + assign"**
+
+Ver guía detallada para el cliente en: `CLIENTE_INFO_AZURE.md`
+
+### ⚠️ IMPORTANTE: Sobre el Subscription ID
+El **Subscription ID NO es algo que se compra**. Es un identificador único que Azure asigna automáticamente y GRATIS cuando creas una cuenta de Azure.
+
+**¿Cómo obtener tu Subscription ID?**
+
+**Opción 1: Desde Azure Portal (Más Fácil)**
+1. Ir a https://portal.azure.com
+2. Iniciar sesión con tu cuenta Microsoft/Azure
+3. En el menú superior, buscar "Subscriptions" o "Suscripciones"
+4. Verás una lista con tu(s) suscripción(es)
+5. El **Subscription ID** es el código tipo: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+6. Copiarlo (hay un botón de copiar al lado)
+
+**Opción 2: Desde Azure CLI**
+```bash
+az login  # Primero iniciar sesión
+az account list --output table  # Ver todas tus suscripciones
+az account show --query id --output tsv  # Ver solo el ID de la suscripción activa
+```
+
+**Opción 3: Si no tienes cuenta Azure aún**
+1. Ir a https://azure.microsoft.com/free/
+2. Crear cuenta GRATIS (incluye $200 USD en créditos)
+3. Al completar el registro, automáticamente se crea una suscripción
+4. Seguir los pasos de "Opción 1" para ver el Subscription ID
+
+**Tipos de Suscripción (todos tienen Subscription ID):**
+- ✅ Cuenta gratuita (Free Trial) - $200 USD crédito
+- ✅ Pay-As-You-Go (pago por uso)
+- ✅ Suscripción empresarial
+- ✅ Suscripción de estudiante
+
+**Nota**: El cliente NO necesita comprar ningún "plan especial" para tener un Subscription ID. Solo necesita tener una cuenta de Azure activa (puede ser la gratuita).
 
 2. **Herramientas Necesarias**
    - Azure CLI instalado localmente
