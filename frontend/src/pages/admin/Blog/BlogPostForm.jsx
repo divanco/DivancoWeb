@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FiSave, FiEye, FiArrowLeft, FiAlertCircle } from "react-icons/fi";
@@ -11,7 +11,7 @@ import {
   useGetBlogPostByIdQuery
 } from "../../../features/blog/blogApi";
 
-const BlogPostForm = ({ post, onClose, onSuccess }) => {
+const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -359,15 +359,20 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   };
 
   // Manejar cambios en Editor.js
-  const handleEditorChange = (data) => {
+  const handleEditorChange = useCallback((data) => {
     console.log("📝 Editor cambió:", data);
     setEditorData(data);
 
-    // ✅ NUEVO: Limpiar error de contenido cuando el editor cambia
-    if (errors.content) {
-      setErrors((prev) => ({ ...prev, content: "" }));
-    }
-  };
+    // ✅ Limpiar error de contenido cuando el editor cambia
+    setErrors((prev) => {
+      if (prev.content) {
+        const newErrors = { ...prev };
+        delete newErrors.content;
+        return newErrors;
+      }
+      return prev;
+    });
+  }, []);
 
   // Efecto para debuggear cambios en editorData
   useEffect(() => {
@@ -452,14 +457,14 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
   };
 
   // ✅ REFACTORIZADO: Función para subir imagen destacada usando RTK Query
-  const handleFeaturedImageUpload = async (file) => {
+  const handleFeaturedImageUpload = useCallback(async (file) => {
     try {
       console.log("📸 Subiendo imagen destacada a Cloudinary:", file.name);
 
       const formData = new FormData();
       formData.append("image", file);
 
-      // ✅ Usar la mutación de RTK Query
+      // ✅ Usar la mutación de RTK Query para imagen destacada
       const result = await uploadFeaturedImage(formData).unwrap();
       console.log("✅ Imagen destacada subida:", result);
 
@@ -474,9 +479,11 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       }));
 
       // ✅ Limpiar error de imagen si existe
-      if (errors.featuredImage) {
-        setErrors((prev) => ({ ...prev, featuredImage: "" }));
-      }
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.featuredImage;
+        return newErrors;
+      });
 
       alert("Imagen destacada subida exitosamente");
       return result;
@@ -484,22 +491,42 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       console.error("❌ Error uploading featured image:", error);
       alert("Error al subir la imagen destacada: " + (error.message || JSON.stringify(error)));
     }
-  };
+  }, [uploadFeaturedImage]);
 
-  // ✅ REFACTORIZADO: Función para subir imágenes del contenido usando RTK Query
-  const handleImageUpload = async (file) => {
+  // ✅ REFACTORIZADO: Función para subir imágenes del contenido del editor
+  const handleImageUpload = useCallback(async (file) => {
     try {
-      console.log("📸 Subiendo imagen del contenido:", file.name);
+      console.log("📸 Subiendo imagen del contenido (editor):", file.name);
 
       const formData = new FormData();
       formData.append("image", file);
 
-      // ✅ Usar la mutación de RTK Query
-      const result = await uploadFeaturedImage(formData).unwrap();
+      // ✅ Usar endpoint diferente para imágenes del contenido
+      // Usamos /blog/new/upload-image que guardará en blog/YYYY/uploads
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      const headers = {};
+      if (token) {
+        headers["authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${baseUrl}/blog/new/upload-image`, {
+        method: "POST",
+        body: formData,
+        headers: headers,
+      });
+
+      if (!response.ok) {
+        console.error("❌ Error subiendo imagen del contenido - Status:", response.status);
+        // Fallback: crear URL temporal para la imagen
+        const url = URL.createObjectURL(file);
+        return { url };
+      }
+
+      const result = await response.json();
       console.log("✅ Imagen del contenido subida:", result);
 
       // Extraer la URL correcta del resultado de Cloudinary
-      const imageUrl = result.desktop?.url || result.url || "";
+      const imageUrl = result.desktop?.url || result.data?.desktop?.url || result.url || "";
       return { url: imageUrl };
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -507,7 +534,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       const url = URL.createObjectURL(file);
       return { url };
     }
-  };
+  }, [token]);
 
   // ✅ MEJORADO: Generar slug automáticamente y hacerlo más robusto
   const generateSlug = (title) => {
@@ -1158,6 +1185,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       </div>
     </div>
   );
-};
+});
+
+// ✅ Agregar displayName para debugging
+BlogPostForm.displayName = 'BlogPostForm';
 
 export default BlogPostForm;
