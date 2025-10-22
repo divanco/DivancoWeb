@@ -161,8 +161,8 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     }
   };
 
-  // ✅ NUEVO: Validar todo el formulario
-  const validateForm = () => {
+  // ✅ MEJORADO: Validar todo el formulario (async para obtener datos del editor)
+  const validateForm = async () => {
     const newErrors = {};
 
     // Validar campos básicos
@@ -173,8 +173,19 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
       }
     });
 
+    // ✅ MEJORADO: Obtener datos actuales del editor antes de validar
+    let currentEditorData = editorData;
+    if (editorInstance && editorInstance.save) {
+      try {
+        currentEditorData = await editorInstance.save();
+        console.log("📝 [Validación] Datos del editor:", currentEditorData);
+      } catch (error) {
+        console.warn("⚠️ [Validación] Error obteniendo datos del editor:", error);
+      }
+    }
+
     // Validar contenido del editor
-    if (!editorData || !editorData.blocks || editorData.blocks.length === 0) {
+    if (!currentEditorData || !currentEditorData.blocks || currentEditorData.blocks.length === 0) {
       newErrors.content = "El contenido es requerido";
     } else {
       // Validar que haya al menos un bloque con contenido significativo
@@ -553,15 +564,14 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     });
     setTouched(newTouched);
 
-    // ✅ NUEVO: Validar todo el formulario antes de enviar
-    if (!validateForm()) {
+    // ✅ MEJORADO: Validar todo el formulario antes de enviar (ahora es async)
+    const isValid = await validateForm();
+    if (!isValid) {
       alert(
         "Por favor corrige los errores en el formulario antes de continuar"
       );
       return;
     }
-
-    setLoading(true);
 
     try {
       // Si hay una instancia del editor, obtener los datos actuales
