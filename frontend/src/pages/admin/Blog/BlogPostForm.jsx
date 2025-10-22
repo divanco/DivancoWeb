@@ -1016,7 +1016,7 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                 )}
               </div>
               <EditorJSComponent
-                key={`editor-${id || "new"}-${JSON.stringify(editorData)}`} // Forzar re-render cuando cambie el ID o datos
+                key={`editor-${editingId || "new"}`} // Solo reiniciar cuando cambie el post que estamos editando
                 data={editorData}
                 onChange={handleEditorChange}
                 onImageUpload={handleImageUpload}
