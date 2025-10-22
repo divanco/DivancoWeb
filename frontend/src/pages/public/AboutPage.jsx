@@ -1,7 +1,14 @@
-
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from '../../hooks';
+import { 
+  FaLightbulb, 
+  FaHeart, 
+  FaStar, 
+  FaUsers, 
+  FaGlobeAmericas, 
+  FaHandshake 
+} from 'react-icons/fa';
 
 const AboutPage = () => {
   const { t } = useTranslation();
@@ -15,8 +22,7 @@ const AboutPage = () => {
 
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center">
-          {/* Background Pattern - Subtle grid */}
+        <section className="relative h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
           <div className="absolute inset-0 opacity-5">
             <div className="absolute inset-0" style={{
               backgroundImage: `
@@ -28,18 +34,16 @@ const AboutPage = () => {
           </div>
 
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            {/* Small title */}
             <div className="mb-12">
               <span className="text-xs font-medium text-gray-500 tracking-wider uppercase">
                 — {t('aboutPage.sectionTitle')}
               </span>
             </div>
 
-            {/* Main content */}
             <div className="space-y-8">
               <h1 className="text-5xl lg:text-6xl xl:text-7xl font-light text-gray-900 leading-tight">
                 {t('aboutPage.heroTitle')}{' '}
-                <span className="italic text-gray-600">{t('aboutPage.heroTitleHighlight')}</span>
+                <span className="italic text-blue-600">{t('aboutPage.heroTitleHighlight')}</span>
                 <br />
                 {t('aboutPage.heroTitleEnd')}
               </h1>
@@ -61,81 +65,229 @@ const AboutPage = () => {
           </div>
         </section>
 
-        {/* Content Section */}
-        <section className="py-24 lg:py-32">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-              
-              {/* Left Column - Quote */}
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <div className="w-16 h-px bg-gray-300"></div>
-                  <blockquote className="text-2xl lg:text-3xl font-light text-gray-900 leading-relaxed">
-                    "{t('aboutPage.quote')}"
-                  </blockquote>
-                </div>
-              </div>
-
-              {/* Right Column - Philosophy */}
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h2 className="text-xl font-medium text-gray-900">
-                    {t('aboutPage.philosophyTitle')}
+        {/* Misión y Visión */}
+        <section className="py-24 lg:py-32 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+              {/* Misión */}
+              <div className="space-y-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                    <FaStar className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-light text-gray-900">
+                    {t('aboutPage.mission.title')}
                   </h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    {t('aboutPage.philosophyText1')}
-                  </p>
-                  <p className="text-gray-600 leading-relaxed">
-                    {t('aboutPage.philosophyText2')}
-                  </p>
                 </div>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  {t('aboutPage.mission.description')}
+                </p>
               </div>
 
+              {/* Visión */}
+              <div className="space-y-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                    <FaGlobeAmericas className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-light text-gray-900">
+                    {t('aboutPage.vision.title')}
+                  </h2>
+                </div>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  {t('aboutPage.vision.description')}
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Values Section */}
+        {/* Propósito */}
+        <section className="py-24 lg:py-32 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="space-y-8">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FaHeart className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-light text-gray-900">
+                {t('aboutPage.purpose.title')}
+              </h2>
+              <p className="text-xl text-gray-600 leading-relaxed max-w-4xl mx-auto">
+                {t('aboutPage.purpose.description')}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Propuesta de Valor - Hero */}
+        <section className="py-24 lg:py-32 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-4xl lg:text-5xl font-light">
+                  {t('aboutPage.valueProposition.title')}
+                </h2>
+                <p className="text-xl text-blue-100 italic">
+                  {t('aboutPage.valueProposition.subtitle')}
+                </p>
+              </div>
+              <div className="h-px bg-blue-400 w-24 mx-auto"></div>
+              <p className="text-lg leading-relaxed text-blue-50 max-w-4xl mx-auto">
+                {t('aboutPage.valueProposition.mainStatement')}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Naturaleza del Servicio */}
+        <section className="py-24 lg:py-32 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-light text-gray-900 mb-6">
+                {t('aboutPage.valueProposition.nature.title')}
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">
+                {t('aboutPage.valueProposition.nature.description')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
+              {/* Pilar 1 */}
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                  <FaLightbulb className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">
+                  {t('aboutPage.valueProposition.nature.pillars.design.title')}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {t('aboutPage.valueProposition.nature.pillars.design.description')}
+                </p>
+              </div>
+
+              {/* Pilar 2 */}
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                  <FaStar className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">
+                  {t('aboutPage.valueProposition.nature.pillars.construction.title')}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {t('aboutPage.valueProposition.nature.pillars.construction.description')}
+                </p>
+              </div>
+
+              {/* Pilar 3 */}
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                  <FaHandshake className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900">
+                  {t('aboutPage.valueProposition.nature.pillars.hardware.title')}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {t('aboutPage.valueProposition.nature.pillars.hardware.description')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Diferenciales */}
         <section className="py-24 lg:py-32 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
-              
-              <div className="text-center space-y-4">
-                <div className="w-12 h-12 mx-auto bg-gray-900 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-light text-gray-900">
+                {t('aboutPage.valueProposition.differentiators.title')}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div key={index} className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    {t(`aboutPage.valueProposition.differentiators.items.${index}.title`)}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {t(`aboutPage.valueProposition.differentiators.items.${index}.description`)}
+                  </p>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">{t('aboutPage.values.innovation.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('aboutPage.values.innovation.description')}
-                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Valores Funcional, Emocional y Social */}
+        <section className="py-24 lg:py-32 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="space-y-20">
+              {/* Valor Funcional */}
+              <div>
+                <h2 className="text-3xl font-light text-gray-900 mb-8 text-center">
+                  {t('aboutPage.valueProposition.functionalValue.title')}
+                </h2>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                  {[0, 1, 2, 3].map((index) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-gray-600">
+                        {t(`aboutPage.valueProposition.functionalValue.items.${index}`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              <div className="text-center space-y-4">
-                <div className="w-12 h-12 mx-auto bg-gray-900 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
+              {/* Valor Emocional */}
+              <div className="bg-blue-50 p-12 rounded-2xl">
+                <div className="max-w-4xl mx-auto text-center">
+                  <h2 className="text-3xl font-light text-gray-900 mb-6">
+                    {t('aboutPage.valueProposition.emotionalValue.title')}
+                  </h2>
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    {t('aboutPage.valueProposition.emotionalValue.description')}
+                  </p>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">{t('aboutPage.values.exclusivity.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('aboutPage.values.exclusivity.description')}
-                </p>
               </div>
 
-              <div className="text-center space-y-4">
-                <div className="w-12 h-12 mx-auto bg-gray-900 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900">{t('aboutPage.values.harmony.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('aboutPage.values.harmony.description')}
-                </p>
+              {/* Valor Social */}
+              <div>
+                <h2 className="text-3xl font-light text-gray-900 mb-8 text-center">
+                  {t('aboutPage.valueProposition.socialValue.title')}
+                </h2>
+                <ul className="space-y-6 max-w-4xl mx-auto">
+                  {[0, 1, 2].map((index) => (
+                    <li key={index} className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <FaUsers className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-gray-600 text-lg leading-relaxed">
+                        {t(`aboutPage.valueProposition.socialValue.items.${index}`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Posicionamiento Final */}
+        <section className="py-24 lg:py-32 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="space-y-8">
+              <h2 className="text-3xl lg:text-4xl font-light">
+                {t('aboutPage.valueProposition.positioning.title')}
+              </h2>
+              <div className="h-px bg-gray-600 w-24 mx-auto"></div>
+              <p className="text-2xl lg:text-3xl font-light leading-relaxed text-gray-100 italic">
+                "{t('aboutPage.valueProposition.positioning.statement')}"
+              </p>
             </div>
           </div>
         </section>

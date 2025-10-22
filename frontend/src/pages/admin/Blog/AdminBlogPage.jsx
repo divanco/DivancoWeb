@@ -257,8 +257,12 @@ const AdminBlogPage = () => {
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end space-x-2">
                             <button
+                              onClick={() => {
+                                // Abrir en nueva pestaña la vista pública del post
+                                window.open(`/blog/${post.slug}`, '_blank');
+                              }}
                               className="text-blue-600 hover:text-blue-900"
-                              title="Ver post"
+                              title="Ver post en el sitio público"
                             >
                               <MdVisibility className="w-4 h-4" />
                             </button>

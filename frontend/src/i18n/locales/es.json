@@ -141,28 +141,109 @@
   },
   "aboutPage": {
     "title": "Nosotros - Divanco Arquitectura",
-    "metaDescription": "En Divanco Constructora, no solo edificamos, diseñamos el futuro de la arquitectura. Cada espacio que creamos es una manifestación de exclusividad, innovación y armonía con el entorno.",
+    "metaDescription": "DIVANCO S.A.S diseña y construye espacios exclusivos que combinan innovación bioclimática, excelencia técnica y atención personalizada.",
     "sectionTitle": "NOSOTROS",
-    "heroTitle": "Diseñamos el",
-    "heroTitleHighlight": "futuro",
-    "heroTitleEnd": "de la arquitectura",
-    "heroDescription": "En Divanco Constructora, no solo edificamos, diseñamos el futuro de la arquitectura. Cada espacio que creamos es una manifestación de exclusividad, innovación y armonía con el entorno.",
-    "quote": "Nos convertimos en el puente entre la visión de nuestros clientes y la materialización de espacios que inspiran, transforman y trascienden.",
-    "philosophyTitle": "Nuestra Filosofía",
-    "philosophyText1": "Nuestra huella arquitectónica no sigue tendencias, las impone, redefiniendo el estilo de vida y la manera en que se habita el mundo.",
-    "philosophyText2": "Cada proyecto es único, cada espacio cuenta una historia, y cada diseño establece un nuevo estándar de excelencia en la arquitectura contemporánea.",
-    "values": {
-      "innovation": {
-        "title": "Innovación",
-        "description": "Implementamos tecnologías y metodologías de vanguardia en cada proyecto."
+    "heroTitle": "Construimos con",
+    "heroTitleHighlight": "el alma",
+    "heroTitleEnd": "espacios que inspiran",
+    "heroDescription": "En DIVANCO S.A.S diseñamos, creamos y construimos espacios habitacionales y comerciales personalizados que integran innovación, arte y sostenibilidad.",
+    
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "Diseñamos y construimos espacios exclusivos que combinan innovación bioclimática, excelencia técnica y una atención personalizada, para transformar las ideas de nuestros clientes en realidades habitables únicas y memorables."
+    },
+    
+    "vision": {
+      "title": "Nuestra Visión",
+      "description": "En DIVANCO S.A.S diseñamos, creamos y construimos espacios habitacionales y comerciales personalizados que integran innovación, arte y sostenibilidad. Convertimos la visión de cada cliente en experiencias arquitectónicas únicas que reflejan su esencia, estilo y propósito. Nuestra pasión es crear obras que inspiran y elevan la arquitectura colombiana hacia el mundo."
+    },
+    
+    "purpose": {
+      "title": "Nuestro Propósito",
+      "description": "Inspirar y materializar la esencia de cada persona, empresa o territorio a través de espacios arquitectónicos únicos y memorables, que combinan arte, innovación y excelencia técnica, impulsando el crecimiento sostenible de Colombia hacia el mundo."
+    },
+    
+    "valueProposition": {
+      "title": "Propuesta de Valor",
+      "subtitle": "Arquitectura con Alma",
+      "mainStatement": "DIVANCO ofrece soluciones arquitectónicas integrales que fusionan diseño personalizado, innovación y excelencia constructiva, impulsadas por la pasión de un equipo que construye con el alma, para crear espacios únicos que reflejan la esencia y los sueños de cada cliente, proyectando la calidad del talento colombiano al mundo.",
+      
+      "nature": {
+        "title": "Naturaleza del Servicio",
+        "description": "DIVANCO es más que una empresa de diseño y construcción: es una firma que convierte ideas en experiencias habitables, guiada por la convicción de que cada proyecto tiene una historia, una emoción y una esencia que merecen ser materializadas con maestría.",
+        "pillars": {
+          "design": {
+            "title": "Diseño Personalizado de Alto Nivel",
+            "description": "La visión y el estilo del cliente son el punto de partida"
+          },
+          "construction": {
+            "title": "Ejecución Constructiva Impecable",
+            "description": "Respaldada por procesos técnicos rigurosos y materiales de la más alta calidad"
+          },
+          "hardware": {
+            "title": "Ferretería Premium",
+            "description": "Espacio de inspiración, asesoría y conexión donde la innovación se convierte en experiencia tangible"
+          }
+        }
       },
-      "exclusivity": {
-        "title": "Exclusividad",
-        "description": "Cada espacio es único y refleja la personalidad de quienes lo habitan."
+      
+      "differentiators": {
+        "title": "Valor Diferencial",
+        "items": [
+          {
+            "title": "Pasión por el Detalle",
+            "description": "Cada obra es una creación hecha con el corazón, cuidando lo estético, lo funcional y lo emocional"
+          },
+          {
+            "title": "Personalización Profunda",
+            "description": "DIVANCO traduce la esencia del cliente en espacios que hablan de su identidad, su historia y su propósito"
+          },
+          {
+            "title": "Innovación Constante",
+            "description": "Adoptamos las tendencias arquitectónicas mundiales y las reinterpretamos con sello colombiano"
+          },
+          {
+            "title": "Excelencia Técnica y Humana",
+            "description": "Nuestro equipo de expertos construye con precisión, compromiso y alma"
+          },
+          {
+            "title": "Experiencia del Cliente como Centro",
+            "description": "La relación es cercana, transparente y empática desde el primer boceto hasta la entrega final"
+          },
+          {
+            "title": "Ferretería como Punto de Conexión",
+            "description": "Un lugar donde la calidad se muestra, se siente y se comparte"
+          }
+        ]
       },
-      "harmony": {
-        "title": "Armonía",
-        "description": "Diseñamos en perfecta sintonía con el entorno y la naturaleza."
+      
+      "functionalValue": {
+        "title": "Valor Funcional",
+        "items": [
+          "Procesos integrales de diseño y construcción que garantizan eficiencia y cumplimiento",
+          "Supervisión técnica profesional en todas las etapas del proyecto",
+          "Transparencia presupuestal y comunicación constante con el cliente",
+          "Acabados de alta durabilidad con estándares internacionales"
+        ]
+      },
+      
+      "emotionalValue": {
+        "title": "Valor Emocional",
+        "description": "Construir con el alma: Cada proyecto nace del vínculo genuino con el cliente; se diseña con sensibilidad y se construye con pasión. El cliente siente orgullo y pertenencia al ver su esencia reflejada en el espacio creado. DIVANCO no solo entrega obras: entrega emociones tangibles y memorias habitables."
+      },
+      
+      "socialValue": {
+        "title": "Valor Social y Simbólico",
+        "items": [
+          "Eleva la arquitectura colombiana a escenarios internacionales, mostrando su creatividad, calidad y humanidad",
+          "Promueve prácticas responsables y sostenibles que respetan el entorno y fortalecen la economía local",
+          "Genera empleo digno y fomenta el crecimiento profesional del talento técnico y creativo"
+        ]
+      },
+      
+      "positioning": {
+        "title": "Posicionamiento",
+        "statement": "En DIVANCO, cada espacio se diseña con propósito y se construye con el alma: obras únicas que inspiran, conectan y trascienden."
       }
     }
   }
