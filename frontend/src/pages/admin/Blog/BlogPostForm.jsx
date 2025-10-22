@@ -189,7 +189,7 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       newErrors.content = "El contenido es requerido";
     } else {
       // Validar que haya al menos un bloque con contenido significativo
-      const hasValidContent = editorData.blocks.some((block) => {
+      const hasValidContent = currentEditorData.blocks.some((block) => {
         if (block.type === "paragraph" || block.type === "text") {
           const text = block.data?.text || block.value || "";
           return text.trim().length >= 10;
