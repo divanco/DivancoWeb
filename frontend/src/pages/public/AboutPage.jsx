@@ -43,7 +43,7 @@ const AboutPage = () => {
             <div className="space-y-8">
               <h1 className="text-5xl lg:text-6xl xl:text-7xl font-light text-gray-900 leading-tight">
                 {t('aboutPage.heroTitle')}{' '}
-                <span className="italic text-blue-600">{t('aboutPage.heroTitleHighlight')}</span>
+                <span className="italic text-naranjaDivanco">{t('aboutPage.heroTitleHighlight')}</span>
                 <br />
                 {t('aboutPage.heroTitleEnd')}
               </h1>
@@ -72,7 +72,7 @@ const AboutPage = () => {
               {/* Misión */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-naranjaDivanco rounded-full flex items-center justify-center">
                     <FaStar className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-3xl font-light text-gray-900">
@@ -87,7 +87,7 @@ const AboutPage = () => {
               {/* Visión */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-naranjaDivanco rounded-full flex items-center justify-center">
                     <FaGlobeAmericas className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-3xl font-light text-gray-900">
@@ -107,7 +107,7 @@ const AboutPage = () => {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="space-y-8">
               <div className="flex justify-center">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-naranjaDivanco rounded-full flex items-center justify-center">
                   <FaHeart className="w-8 h-8 text-white" />
                 </div>
               </div>
@@ -122,19 +122,19 @@ const AboutPage = () => {
         </section>
 
         {/* Propuesta de Valor - Hero */}
-        <section className="py-24 lg:py-32 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+        <section className="py-24 lg:py-32 bg-gradient-to-br from-naranjaDivanco to-orange-700 text-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-4xl lg:text-5xl font-light">
                   {t('aboutPage.valueProposition.title')}
                 </h2>
-                <p className="text-xl text-blue-100 italic">
+                <p className="text-xl text-orange-100 italic">
                   {t('aboutPage.valueProposition.subtitle')}
                 </p>
               </div>
-              <div className="h-px bg-blue-400 w-24 mx-auto"></div>
-              <p className="text-lg leading-relaxed text-blue-50 max-w-4xl mx-auto">
+              <div className="h-px bg-orange-300 w-24 mx-auto"></div>
+              <p className="text-lg leading-relaxed text-orange-50 max-w-4xl mx-auto">
                 {t('aboutPage.valueProposition.mainStatement')}
               </p>
             </div>
@@ -156,8 +156,8 @@ const AboutPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
               {/* Pilar 1 */}
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                  <FaLightbulb className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center">
+                  <FaLightbulb className="w-8 h-8 text-naranjaDivanco" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900">
                   {t('aboutPage.valueProposition.nature.pillars.design.title')}
@@ -169,8 +169,8 @@ const AboutPage = () => {
 
               {/* Pilar 2 */}
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                  <FaStar className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center">
+                  <FaStar className="w-8 h-8 text-naranjaDivanco" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900">
                   {t('aboutPage.valueProposition.nature.pillars.construction.title')}
@@ -182,8 +182,8 @@ const AboutPage = () => {
 
               {/* Pilar 3 */}
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                  <FaHandshake className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center">
+                  <FaHandshake className="w-8 h-8 text-naranjaDivanco" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900">
                   {t('aboutPage.valueProposition.nature.pillars.hardware.title')}
@@ -232,7 +232,7 @@ const AboutPage = () => {
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                   {[0, 1, 2, 3].map((index) => (
                     <li key={index} className="flex items-start space-x-3">
-                      <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-6 h-6 text-naranjaDivanco flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-gray-600">
@@ -244,7 +244,7 @@ const AboutPage = () => {
               </div>
 
               {/* Valor Emocional */}
-              <div className="bg-blue-50 p-12 rounded-2xl">
+              <div className="bg-orange-50 p-12 rounded-2xl">
                 <div className="max-w-4xl mx-auto text-center">
                   <h2 className="text-3xl font-light text-gray-900 mb-6">
                     {t('aboutPage.valueProposition.emotionalValue.title')}
@@ -263,7 +263,7 @@ const AboutPage = () => {
                 <ul className="space-y-6 max-w-4xl mx-auto">
                   {[0, 1, 2].map((index) => (
                     <li key={index} className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-8 h-8 bg-naranjaDivanco rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                         <FaUsers className="w-4 h-4 text-white" />
                       </div>
                       <span className="text-gray-600 text-lg leading-relaxed">
