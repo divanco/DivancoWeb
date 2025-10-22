@@ -177,6 +177,29 @@ const EditorJSComponent = ({
     };
   }, []); // ✅ Solo crear el editor una vez al montar el componente
 
+  // ✅ NUEVO: Efecto para actualizar contenido cuando cambia data (modo edición)
+  useEffect(() => {
+    // Solo actualizar si:
+    // 1. El editor existe y está listo
+    // 2. Los datos nuevos son diferentes de los actuales
+    // 3. Los datos nuevos tienen contenido válido
+    if (editor && isReady && data && data.blocks && data.blocks.length > 0) {
+      const isDifferent = JSON.stringify(data) !== JSON.stringify(dataRef.current);
+      
+      if (isDifferent) {
+        console.log('🔄 [EditorJS] Datos cambiaron, actualizando editor con:', data);
+        dataRef.current = data;
+        
+        // Usar el método render de EditorJS para actualizar el contenido
+        editor.render(data).then(() => {
+          console.log('✅ [EditorJS] Contenido actualizado exitosamente');
+        }).catch((error) => {
+          console.error('❌ [EditorJS] Error actualizando contenido:', error);
+        });
+      }
+    }
+  }, [data, editor, isReady]);
+
   // Efecto de limpieza al desmontar
   useEffect(() => {
     return () => {
