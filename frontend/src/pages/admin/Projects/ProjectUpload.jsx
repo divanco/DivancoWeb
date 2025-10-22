@@ -342,6 +342,13 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
     setFiles(prev => prev.map(f => ({ ...f, isMain: f.id === fileId })));
   };
 
+  // Prevenir submit al presionar Enter en inputs (excepto textarea)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  };
+
   // Función para subir archivos
   const uploadFiles = async (targetProjectId = projectId) => {
     if (!targetProjectId || files.length === 0) return;
@@ -644,7 +651,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
       </div>
 
       {/* Contenido scrolleable y formulario */}
-      <form onSubmit={handleSubmit} className="flex flex-col flex-1 h-full">
+      <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col flex-1 h-full">
         <div className="flex-1 overflow-y-auto px-6 py-4" style={{ maxHeight: "calc(90vh - 140px)" }}>
           {/* Indicador de progreso de subida */}
           {isUploadingFiles && Object.keys(uploadProgress).length > 0 && (
