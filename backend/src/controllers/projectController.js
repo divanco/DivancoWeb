@@ -778,15 +778,30 @@ export const debugCreateProject = async (req, res) => {
     }
     console.log('✅ Year validation passed');
     
+    // Validar projectType (puede ser array o string)
     const validProjectTypes = ['Diseño', 'Proyecto', 'Dirección de Obra'];
-if (!projectType || !validProjectTypes.includes(projectType)) {
-  console.log('❌ ERROR: Tipo de proyecto inválido');
-  return res.status(400).json({
-    success: false,
-    message: 'El tipo de proyecto es requerido y debe ser válido (Diseño, Proyecto, Dirección de Obra)'
-  });
-}
-    console.log('✅ ProjectType validation passed');
+    
+    if (!projectType || (Array.isArray(projectType) && projectType.length === 0)) {
+      console.log('❌ ERROR: Tipo de proyecto vacío');
+      return res.status(400).json({
+        success: false,
+        message: 'El tipo de proyecto es requerido'
+      });
+    }
+    
+    // Si es array, validar que todos los elementos sean válidos
+    const projectTypesToValidate = Array.isArray(projectType) ? projectType : [projectType];
+    const invalidTypes = projectTypesToValidate.filter(type => !validProjectTypes.includes(type));
+    
+    if (invalidTypes.length > 0) {
+      console.log('❌ ERROR: Tipos de proyecto inválidos:', invalidTypes);
+      return res.status(400).json({
+        success: false,
+        message: `Tipos de proyecto inválidos: ${invalidTypes.join(', ')}. Los tipos válidos son: ${validProjectTypes.join(', ')}`
+      });
+    }
+    
+    console.log('✅ ProjectType validation passed:', projectTypesToValidate);
     
     // Log 5: Preparar data final
     const generateSlug = (title, year) => {
@@ -961,16 +976,28 @@ export const createProject = async (req, res) => {
     console.log('4. Validación projectType:');
     console.log('   - projectType recibido:', projectType);
     console.log('   - tipos válidos:', validProjectTypes);
-    console.log('   - es válido:', validProjectTypes.includes(projectType));
-
-    if (!projectType || !validProjectTypes.includes(projectType)) {
-      console.log('❌ ERROR: Tipo de proyecto inválido');
-      
+    
+    if (!projectType || (Array.isArray(projectType) && projectType.length === 0)) {
+      console.log('❌ ERROR: Tipo de proyecto vacío');
       return res.status(400).json({
         success: false,
-        message: 'El tipo de proyecto es requerido y debe ser válido (Preproyecto, Proyecto, Dirección)'
+        message: 'El tipo de proyecto es requerido'
       });
     }
+    
+    // Si es array, validar que todos los elementos sean válidos
+    const projectTypesToValidate = Array.isArray(projectType) ? projectType : [projectType];
+    const invalidTypes = projectTypesToValidate.filter(type => !validProjectTypes.includes(type));
+    
+    if (invalidTypes.length > 0) {
+      console.log('❌ ERROR: Tipos de proyecto inválidos:', invalidTypes);
+      return res.status(400).json({
+        success: false,
+        message: `Tipos de proyecto inválidos: ${invalidTypes.join(', ')}. Los tipos válidos son: ${validProjectTypes.join(', ')}`
+      });
+    }
+    
+    console.log('✅ ProjectType validation passed:', projectTypesToValidate);
 
     // ✅ FUNCIÓN generateSlug CORREGIDA
     const generateSlug = (title, year) => {

@@ -529,8 +529,14 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
     e.preventDefault();
     e.stopPropagation();
     
+    // Validación básica
     if (!form.title.trim()) {
       alert("El título es requerido");
+      return;
+    }
+    
+    if (!form.projectType || form.projectType.length === 0) {
+      alert("Debes seleccionar al menos un tipo de proyecto");
       return;
     }
 
@@ -541,7 +547,8 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
       };
 
       if (isEdit) {
-        await updateProject({ id: projectId, ...finalFormData }).unwrap();
+        const result = await updateProject({ id: projectId, ...finalFormData }).unwrap();
+        console.log('✅ Proyecto actualizado:', result);
         
         // ✅ AGREGAR: Subir archivos nuevos si hay alguno
         if (files.length > 0) {
@@ -558,6 +565,7 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
         }
       } else {
         const projectResult = await createProject(finalFormData).unwrap();
+        console.log('✅ Proyecto creado:', projectResult);
         const newProjectId = projectResult.data.id;
 
         if (files.length > 0) {
@@ -572,7 +580,19 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
         }
       }
     } catch (error) {
-      alert("Error al guardar el proyecto");
+      console.error('❌ Error al guardar proyecto:', error);
+      
+      // Extraer mensaje de error más específico
+      let errorMessage = "Error al guardar el proyecto";
+      
+      if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      // Mostrar error más específico
+      alert(`❌ ${errorMessage}`);
     }
   };
 
