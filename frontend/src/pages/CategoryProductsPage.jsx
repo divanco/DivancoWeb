@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGetProductsByCategoryQuery } from '../features/products/productsApi';
+import { useGetCategoriesQuery } from '../features/categories/categoriesApi';
+import { useGetSubcategoriesQuery } from '../features/subcategories/subcategoriesApi';
 
 const CategoryProductsPage = () => {
   const { categorySlug } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('order');
   const [sortOrder, setSortOrder] = useState('ASC');
+  const [searchTerm, setSearchTerm] = useState('');
   const limit = 12;
 
+  // Queries para productos, categorías y subcategorías
   const {
     data,
     isLoading,
@@ -19,10 +23,27 @@ const CategoryProductsPage = () => {
     page: currentPage,
     limit,
     sortBy,
-    sortOrder
+    sortOrder,
+    search: searchTerm
+  });
+
+  const { data: categoriesData } = useGetCategoriesQuery({ limit: 50 });
+  const { data: subcategoriesData } = useGetSubcategoriesQuery({ 
+    categoryId: data?.category?.id,
+    limit: 50 
   });
 
   const { products = [], category, total = 0, totalPages = 0 } = data || {};
+  const categories = categoriesData?.data || [];
+  const subcategories = subcategoriesData?.data || [];
+
+  // Filtrar productos por búsqueda del lado cliente para respuesta más rápida
+  const filteredProducts = products.filter(product => 
+    searchTerm === '' || 
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Función para formatear precio
   const formatPrice = (price, currency = 'COP') => {
@@ -75,6 +96,18 @@ const CategoryProductsPage = () => {
     setCurrentPage(1);
   };
 
+  // Manejar cambio de búsqueda
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Limpiar búsqueda
+  const clearSearch = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -83,8 +116,12 @@ const CategoryProductsPage = () => {
             <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-96 mb-8"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow h-96"></div>
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-sm p-4">
+                  <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
               ))}
             </div>
           </div>
@@ -97,13 +134,15 @@ const CategoryProductsPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Error al cargar productos
-            </h1>
-            <p className="text-gray-600 mb-6">{error.message}</p>
+          <div className="text-center py-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Error al cargar la categoría
+            </h2>
+            <p className="text-gray-600 mb-4">
+              No se pudo cargar la información de la categoría.
+            </p>
             <button
-              onClick={() => refetch()}
+              onClick={refetch}
               className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
             >
               Reintentar
@@ -121,27 +160,31 @@ const CategoryProductsPage = () => {
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link to="/" className="text-gray-500 hover:text-gray-700">
+              <Link to="/" className="text-gray-500 hover:text-gray-700 transition-colors">
                 Inicio
               </Link>
             </li>
             <span className="text-gray-400">/</span>
             <li>
-              <Link to="/showroom" className="text-gray-500 hover:text-gray-700">
+              <Link to="/showroom" className="text-gray-500 hover:text-gray-700 transition-colors">
                 Showroom
               </Link>
             </li>
-            <span className="text-gray-400">/</span>
-            <li className="text-gray-900 font-medium">
-              {category?.name}
-            </li>
+            {category && (
+              <>
+                <span className="text-gray-400">/</span>
+                <li className="text-gray-900 font-medium">
+                  {category.name}
+                </li>
+              </>
+            )}
           </ol>
         </nav>
 
         {/* Header de categoría */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {category?.name}
+            {category?.name || 'Nuestros Productos'}
           </h1>
           {category?.description && (
             <p className="text-gray-600 text-lg">
@@ -149,11 +192,93 @@ const CategoryProductsPage = () => {
             </p>
           )}
           <p className="text-sm text-gray-500 mt-2">
-            {total} producto{total !== 1 ? 's' : ''} encontrado{total !== 1 ? 's' : ''}
+            {searchTerm ? filteredProducts.length : total} producto{(searchTerm ? filteredProducts.length : total) !== 1 ? 's' : ''} 
+            {searchTerm ? ` encontrado${filteredProducts.length !== 1 ? 's' : ''} para "${searchTerm}"` : ' en total'}
           </p>
         </div>
 
-        {/* Controles de ordenamiento */}
+        {/* Barra de búsqueda prominente */}
+        <div className="mb-8">
+          <div className="relative max-w-2xl mx-auto">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Buscar productos por nombre, marca o descripción..."
+              className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+            />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Navegación por categorías y subcategorías */}
+        <div className="mb-8">
+          {/* Categorías */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Explorar por Categorías</h3>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to="/showroom"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  !categorySlug 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Todas las categorías
+              </Link>
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  to={`/showroom/${cat.slug}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    cat.slug === categorySlug 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Subcategorías de la categoría actual */}
+          {category && subcategories.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-md font-medium text-gray-700 mb-3">
+                Subcategorías en {category.name}
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {subcategories.map((subcategory) => (
+                  <Link
+                    key={subcategory.id}
+                    to={`/subcategoria/${subcategory.slug}`}
+                    className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-md text-sm hover:bg-orange-200 transition-colors"
+                  >
+                    {subcategory.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Control de ordenamiento */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-4">
             <label htmlFor="sort" className="text-sm font-medium text-gray-700">
@@ -163,7 +288,7 @@ const CategoryProductsPage = () => {
               id="sort"
               value={`${sortBy}-${sortOrder}`}
               onChange={handleSortChange}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="order-ASC">Posición</option>
               <option value="name-ASC">Nombre A-Z</option>
@@ -180,10 +305,10 @@ const CategoryProductsPage = () => {
         </div>
 
         {/* Grid de productos */}
-        {products.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <Link
                   key={product.id}
                   to={`/productos/${product.slug}`}
@@ -227,8 +352,8 @@ const CategoryProductsPage = () => {
               ))}
             </div>
 
-            {/* Paginación */}
-            {totalPages > 1 && (
+            {/* Paginación - solo mostrar si no hay búsqueda activa */}
+            {!searchTerm && totalPages > 1 && (
               <div className="flex justify-center space-x-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -249,10 +374,10 @@ const CategoryProductsPage = () => {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 text-sm border rounded-md ${
-                          currentPage === page
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white border-gray-300 hover:bg-gray-50'
+                        className={`px-3 py-2 text-sm rounded-md ${
+                          page === currentPage
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white border border-gray-300 hover:bg-gray-50'
                         }`}
                       >
                         {page}
@@ -262,15 +387,11 @@ const CategoryProductsPage = () => {
                     page === currentPage - 3 ||
                     page === currentPage + 3
                   ) {
-                    return (
-                      <span key={page} className="px-2 py-2 text-sm text-gray-500">
-                        ...
-                      </span>
-                    );
+                    return <span key={page} className="px-2 py-2 text-sm text-gray-500">...</span>;
                   }
                   return null;
                 })}
-
+                
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -282,19 +403,36 @@ const CategoryProductsPage = () => {
             )}
           </>
         ) : (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No hay productos en esta categoría
-            </h3>
-            <p className="text-gray-600">
-              Revisa otras categorías en nuestro showroom.
-            </p>
-            <Link
-              to="/showroom"
-              className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
-            >
-              Ver todas las categorías
-            </Link>
+          <div className="text-center py-16">
+            <div className="max-w-md mx-auto">
+              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.44-1.01-5.879-2.629m15.758 0A7.966 7.966 0 0112 15c-2.34 0-4.44-1.01-5.879-2.629M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm ? `No se encontraron productos para "${searchTerm}"` : 'No hay productos en esta categoría'}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {searchTerm 
+                  ? 'Intenta con otros términos de búsqueda o explora nuestras categorías.'
+                  : 'Revisa otras categorías en nuestro showroom.'
+                }
+              </p>
+              {searchTerm ? (
+                <button
+                  onClick={clearSearch}
+                  className="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Limpiar búsqueda
+                </button>
+              ) : (
+                <Link
+                  to="/showroom"
+                  className="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Ver todas las categorías
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>
