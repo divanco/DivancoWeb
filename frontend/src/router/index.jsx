@@ -62,7 +62,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "showroom/:categorySlug",
-          element: <CategoryProductsPage />,
+          element: <ProductsPage />,
         },
         {
           path: "showroom/:categorySlug/:subcategorySlug",

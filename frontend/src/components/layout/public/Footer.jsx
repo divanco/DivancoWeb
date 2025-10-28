@@ -169,7 +169,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-gray-400 text-sm">
-              © {currentYear} Divanco Arquitectura. {t('footer.allRightsReserved')}
+              © {currentYear} Grupo Divanco® {t('footer.allRightsReserved')}
             </p>
           </div>
         </div>
