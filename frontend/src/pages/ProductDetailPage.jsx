@@ -179,7 +179,7 @@ const ProductDetailPage = () => {
                       <>
                         <li>
                           <a 
-                            href={`/showroom/${product.subcategory.category?.slug}/${product.subcategory.slug}`} 
+                            href={`/showroom/${product.subcategory.category?.slug}`} 
                             className="hover:text-gray-700"
                           >
                             {product.subcategory.name}
