@@ -20,7 +20,7 @@ const ProjectNavigation = ({ currentProject }) => {
 
   return (
     <div className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-8 md:px-16 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 py-8">
         <div className="flex items-center justify-between">
           {/* Proyecto anterior */}
           <div className="flex-1">

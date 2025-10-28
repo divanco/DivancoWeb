@@ -19,9 +19,9 @@ const RelatedProjects = ({ currentProject, limit = 3 }) => {
   if (relatedProjects.length === 0) return null;
 
   return (
-    <div className="bg-gray-50 py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-8 md:px-16">
-        <h2 className="text-3xl md:text-4xl font-light mb-12 text-center">
+    <div className="bg-gray-50 py-12 md:py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-light mb-8 md:mb-12 text-center">
           Proyectos Relacionados
         </h2>
         
@@ -69,7 +69,7 @@ const RelatedProjects = ({ currentProject, limit = 3 }) => {
                   
                   {project.description && (
                     <p className="text-gray-600 text-sm line-clamp-2">
-                      {project.description}
+                      {project.shortDescription || project.description}
                     </p>
                   )}
                   

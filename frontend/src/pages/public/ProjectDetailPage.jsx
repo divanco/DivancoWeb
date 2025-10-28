@@ -347,7 +347,7 @@ const VirtualTour = ({ kuulaUrl, t }) => {
   
   return (
     <div id="virtual-tour" className="bg-gray-900 py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-8 md:px-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-light mb-4 text-white">
             {t('projectDetail.tourVirtual')}
