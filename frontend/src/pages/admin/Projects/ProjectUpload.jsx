@@ -292,14 +292,26 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
     }
 
     if (validFiles.length > 0) {
-      const filesWithMetadata = validFiles.map((file) => ({
-        file,
-        id: Math.random().toString(36).substr(2, 9),
-        type: "render",
-        description: "",
-        isMain: files.length === 0,
-        preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
-      }));
+      const filesWithMetadata = validFiles.map((file) => {
+        // ✅ Detectar tipo de archivo automáticamente
+        let fileType = "render"; // Por defecto
+        if (file.type.startsWith("video/")) {
+          fileType = "video";
+        } else if (file.type.startsWith("image/")) {
+          fileType = "render"; // Imágenes por defecto como render
+        } else if (file.type === "application/pdf") {
+          fileType = "plano";
+        }
+
+        return {
+          file,
+          id: Math.random().toString(36).substr(2, 9),
+          type: fileType, // ✅ Usar tipo detectado
+          description: "",
+          isMain: files.length === 0,
+          preview: file.type.startsWith("image/") || file.type.startsWith("video/") ? URL.createObjectURL(file) : null,
+        };
+      });
 
       setFiles(prev => [...prev, ...filesWithMetadata]);
     }
@@ -1063,11 +1075,20 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
                             {/* Preview pequeño */}
                             <div className="flex-shrink-0 relative">
                               {fileData.preview ? (
-                                <img
-                                  src={fileData.preview}
-                                  alt=""
-                                  className="w-8 h-8 object-cover rounded"
-                                />
+                                fileData.file.type.startsWith("video/") ? (
+                                  <video
+                                    src={fileData.preview}
+                                    className="w-8 h-8 object-cover rounded"
+                                    muted
+                                    playsInline
+                                  />
+                                ) : (
+                                  <img
+                                    src={fileData.preview}
+                                    alt=""
+                                    className="w-8 h-8 object-cover rounded"
+                                  />
+                                )
                               ) : (
                                 <div className={`w-12 h-12 ${fileType.bgColor} rounded flex items-center justify-center`}>
                                   <IconComponent className={`h-6 w-6 ${fileType.color}`} />

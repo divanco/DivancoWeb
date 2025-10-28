@@ -21,7 +21,18 @@ export const getAllProjects = async (req, res) => {
     
     if (publicOnly === 'true') whereClause.isPublic = true;
     if (year) whereClause.year = year;
-    if (projectType) whereClause.projectType = projectType;
+    if (projectType) {
+      // ✅ Manejar projectType como array (después de la migración)
+      const projectTypesArray = typeof projectType === 'string' 
+        ? projectType.split(',').map(t => t.trim())
+        : Array.isArray(projectType) 
+        ? projectType 
+        : [projectType];
+      
+      whereClause.projectType = {
+        [Op.overlap]: projectTypesArray
+      };
+    }
     if (etapa) whereClause.etapa = etapa;
     if (featured === 'true') whereClause.isFeatured = true;
     if (tags) {
@@ -165,7 +176,18 @@ export const searchProjects = async (req, res) => {
 
     // ✅ Filtros específicos
     if (year) whereClause.year = year;
-    if (projectType) whereClause.projectType = projectType;
+    if (projectType) {
+      // ✅ Manejar projectType como array (después de la migración)
+      const projectTypesArray = typeof projectType === 'string' 
+        ? projectType.split(',').map(t => t.trim())
+        : Array.isArray(projectType) 
+        ? projectType 
+        : [projectType];
+      
+      whereClause.projectType = {
+        [Op.overlap]: projectTypesArray
+      };
+    }
     if (etapa) whereClause.etapa = etapa;
     if (client) {
       whereClause.client = {
