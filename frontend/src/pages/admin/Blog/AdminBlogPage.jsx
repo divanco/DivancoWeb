@@ -37,19 +37,6 @@ const AdminBlogPage = () => {
     search: searchTerm || undefined
   });
 
-  // 🐛 Console.log para debug
-  useEffect(() => {
-    console.log('🔍 AdminBlogPage Debug:', {
-      postsData,
-      isLoading,
-      error,
-      hasData: !!postsData,
-      dataKeys: postsData ? Object.keys(postsData) : null,
-      posts: postsData?.data || postsData?.posts,
-      postsLength: postsData?.data?.length || postsData?.posts?.length || 0
-    });
-  }, [postsData, isLoading, error]);
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -91,7 +78,6 @@ const AdminBlogPage = () => {
 
   // 🔍 Determinar la estructura correcta de los posts
   const posts = postsData?.data || postsData?.posts || [];
-  console.log('📋 Posts to display:', posts);
 
   return (
     <div className="min-h-screen bg-gray-50">
