@@ -47,13 +47,14 @@ const ExistingMediaManager = ({
             <div className="aspect-square">
               {isVideoFile(item) ? (
                 <video
-                  src={item.urls?.original || item.url}
+                  src={item.urls?.main || item.urls?.original || item.url}
                   className="w-full h-full object-cover"
                   controls
                   preload="metadata"
                   onError={(e) => {
                     console.error('Error cargando video:', e);
-                    console.log('URL del video:', item.urls?.original || item.url);
+                    console.log('URL del video:', item.urls?.main || item.urls?.original || item.url);
+                    console.log('URLs disponibles:', item.urls);
                   }}
                 >
                   Tu navegador no soporta la reproducción de video.

@@ -318,13 +318,14 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
                     <div className="relative aspect-square overflow-hidden">
                       {isVideo ? (
                         <video
-                          src={mediaItem.urls?.original || mediaItem.url}
+                          src={mediaItem.urls?.main || mediaItem.urls?.original || mediaItem.url}
                           className="w-full h-full object-cover"
                           controls
                           preload="metadata"
                           onError={(e) => {
                             console.error('Error cargando video:', e);
-                            console.log('URL del video:', mediaItem.urls?.original || mediaItem.url);
+                            console.log('URL del video:', mediaItem.urls?.main || mediaItem.urls?.original || mediaItem.url);
+                            console.log('URLs disponibles:', mediaItem.urls);
                           }}
                         >
                           Tu navegador no soporta la reproducción de video.
