@@ -75,7 +75,7 @@ const ProductDetailPage = () => {
   const stockStatus = getStockStatus(product.stock || 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-8 gap-y-8 lg:gap-y-0 p-6 lg:p-0">
@@ -240,35 +240,47 @@ const ProductDetailPage = () => {
                       Especificaciones
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                      <dl className="space-y-4">
+                      <div className="space-y-3">
                         {Object.entries(product.specifications).map(([key, value]) => {
-                          // Si el valor viene con el formato "Clave,Valor", lo dividimos
-                          let displayKey = key;
-                          let displayValue = value;
+                          // Si el valor contiene comas, dividir en múltiples especificaciones
+                          const values = typeof value === 'string' && value.includes(',') 
+                            ? value.split(',').map(v => v.trim()) 
+                            : [value];
                           
-                          // Si el valor contiene comas, verificamos si la clave está duplicada
-                          if (typeof value === 'string' && value.includes(',')) {
-                            const parts = value.split(',').map(p => p.trim());
-                            // Si el primer elemento coincide con la clave, lo omitimos
-                            if (parts[0].toLowerCase() === key.toLowerCase()) {
-                              displayValue = parts.slice(1).join(' • ');
-                            } else {
-                              displayValue = parts.join(' • ');
-                            }
+                          // Convertir la clave a formato legible
+                          const formattedKey = key
+                            .replace(/_/g, ' ')
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ');
+                          
+                          // Si hay múltiples valores, mostrar uno por línea
+                          if (values.length > 1) {
+                            return values.map((val, idx) => (
+                              <div key={`${key}-${idx}`} className="flex justify-between py-2 border-b border-gray-300 last:border-b-0">
+                                <span className="text-sm font-semibold text-gray-700">
+                                  {idx === 0 ? formattedKey : ''}:
+                                </span>
+                                <span className="text-base text-gray-900 font-medium text-right">
+                                  {val}
+                                </span>
+                              </div>
+                            ));
                           }
                           
+                          // Si es una sola especificación
                           return (
-                            <div key={key} className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between pb-4 border-b border-gray-200 last:border-b-0">
-                              <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 sm:mb-0">
-                                {displayKey}:
-                              </dt>
-                              <dd className="text-base text-gray-900 font-medium sm:text-right">
-                                {displayValue}
-                              </dd>
+                            <div key={key} className="flex justify-between py-2 border-b border-gray-300 last:border-b-0">
+                              <span className="text-sm font-semibold text-gray-700">
+                                {formattedKey}:
+                              </span>
+                              <span className="text-base text-gray-900 font-medium text-right">
+                                {value}
+                              </span>
                             </div>
                           );
                         })}
-                      </dl>
+                      </div>
                     </div>
                   </div>
                 )}
