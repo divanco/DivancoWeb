@@ -8,7 +8,7 @@ import LoadingBoundary, { LoadingSpinner } from '../../common/LoadingBoundary';
 
 const PublicLayout = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       <ScrollToTop />
       <Header />
       
