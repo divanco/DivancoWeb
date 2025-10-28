@@ -18,17 +18,6 @@ const ProjectHero = ({ project, mainImage, t }) => (
           alt={project.title}
           className="w-full h-full object-cover"
         />
-        
-        {/* Capa con descripción corta */}
-        {project.shortDescription && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-10 text-white p-6 md:p-8 backdrop-blur-sm">
-            <div className="max-w-5xl mx-auto">
-              <p className="text-lg md:text-xl font-light leading-relaxed">
-                {project.shortDescription}
-              </p>
-            </div>
-          </div>
-        )}
       </>
     ) : (
       <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
@@ -40,16 +29,16 @@ const ProjectHero = ({ project, mainImage, t }) => (
 
 // ✅ NUEVO: Información del proyecto en dos columnas
 const ProjectInfo = ({ project, t }) => (
-   <div className="max-w-7xl mx-auto mt-8 relative z-10 px-6 md:px-8">
+   <div className="max-w-7xl mx-auto mt-8 relative z-10 px-4 sm:px-6 md:px-8">
     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
         
         {/* ✅ COLUMNA IZQUIERDA: Descripción scrolleable (2/3 del ancho) */}
-        <div className="lg:col-span-2 p-8 lg:p-12">
+        <div className="lg:col-span-2 p-4 sm:p-6 lg:p-12">
           <div className="space-y-6">
             <div>
               {/* ✅ NUEVO ESTILO DE TÍTULO - Similar al BlogSection */}
-              <h1 className="text-4xl lg:text-5xl font-light text-gray-600 mb-4 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-light text-gray-600 mb-4 leading-tight">
                 {project.title}
                 {project.architect && (
                   <span className="block text-sm font-normal text-gray-500 mt-3 tracking-wider uppercase">
@@ -66,9 +55,9 @@ const ProjectInfo = ({ project, t }) => (
 
             {project.description && (
               <div className="relative">
-                {/* ✅ CONTENEDOR CON MENOS ALTURA Y GRADIENTE */}
+                {/* ✅ CONTENEDOR: Full en móvil, scrolleable en desktop */}
                 <div 
-                  className="text-gray-700 font-light leading-relaxed text-base md:text-lg max-h-48 overflow-y-auto pr-4 custom-scrollbar relative"
+                  className="text-gray-700 font-light leading-relaxed text-base md:text-lg md:max-h-48 md:overflow-y-auto md:pr-4 md:custom-scrollbar relative"
                   style={{ lineHeight: '1.7' }}
                 >
                   {project.description.split('\n').map((paragraph, index) => (
@@ -78,11 +67,11 @@ const ProjectInfo = ({ project, t }) => (
                   ))}
                 </div>
                 
-                {/* ✅ GRADIENTE INDICADOR DE MÁS CONTENIDO */}
-                <div className="absolute bottom-0 left-0 right-4 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+                {/* ✅ GRADIENTE INDICADOR DE MÁS CONTENIDO - Solo en desktop */}
+                <div className="hidden md:block absolute bottom-0 left-0 right-4 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                 
-                {/* ✅ INDICADOR VISUAL DE SCROLL */}
-                <div className="flex items-center justify-center mt-3 text-gray-400">
+                {/* ✅ INDICADOR VISUAL DE SCROLL - Solo en desktop */}
+                <div className="hidden md:flex items-center justify-center mt-3 text-gray-400">
                   <div className="flex items-center gap-2 text-xs font-light">
                     <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -115,7 +104,7 @@ const ProjectInfo = ({ project, t }) => (
         </div>
 
         {/* ✅ COLUMNA DERECHA: Metadatos con tipografía mejorada */}
-        <div className="bg-gray-50 p-8 lg:p-12 border-l border-gray-100">
+        <div className="bg-gray-50 p-4 sm:p-6 lg:p-12 border-t lg:border-t-0 lg:border-l border-gray-100">
           <div className="space-y-8">
             <div>
               <h3 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-6 border-b border-gray-200 pb-2">
@@ -248,7 +237,7 @@ const ProjectInfo = ({ project, t }) => (
     </div>
 
     {/* ✅ INDICADOR VISUAL DE QUE HAY MÁS CONTENIDO DEBAJO - Mejorado */}
-    <div className="flex flex-col items-center mt-16 mb-8">
+    <div className="flex flex-col items-center mt-8 md:mt-12 lg:mt-16 mb-4 md:mb-8 px-4">
       <div className="text-center space-y-4">
         <h3 className="text-xs font-medium text-gray-500 tracking-wider uppercase">
           — {t('projectDetail.galeria')}
@@ -293,8 +282,8 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
   });
 
   return (
-    <div className="bg-gray-50 py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-8 md:px-16 space-y-12">
+    <div className="bg-gray-50 py-12 md:py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 space-y-12">
         {MEDIA_TYPES.map(({ key, label, isVideo }) => {
           const mediaItems = mediaFiles.filter(file =>
             file.type === key && file.urls

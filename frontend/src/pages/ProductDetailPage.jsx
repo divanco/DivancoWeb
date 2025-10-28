@@ -240,17 +240,34 @@ const ProductDetailPage = () => {
                       Especificaciones
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                      <dl className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {Object.entries(product.specifications).map(([key, value]) => (
-                          <div key={key}>
-                            <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                              {key}
-                            </dt>
-                            <dd className="text-base text-gray-900 mt-2 font-medium">
-                              {value}
-                            </dd>
-                          </div>
-                        ))}
+                      <dl className="space-y-4">
+                        {Object.entries(product.specifications).map(([key, value]) => {
+                          // Si el valor viene con el formato "Clave,Valor", lo dividimos
+                          let displayKey = key;
+                          let displayValue = value;
+                          
+                          // Si el valor contiene comas, verificamos si la clave está duplicada
+                          if (typeof value === 'string' && value.includes(',')) {
+                            const parts = value.split(',').map(p => p.trim());
+                            // Si el primer elemento coincide con la clave, lo omitimos
+                            if (parts[0].toLowerCase() === key.toLowerCase()) {
+                              displayValue = parts.slice(1).join(' • ');
+                            } else {
+                              displayValue = parts.join(' • ');
+                            }
+                          }
+                          
+                          return (
+                            <div key={key} className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between pb-4 border-b border-gray-200 last:border-b-0">
+                              <dt className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 sm:mb-0">
+                                {displayKey}:
+                              </dt>
+                              <dd className="text-base text-gray-900 font-medium sm:text-right">
+                                {displayValue}
+                              </dd>
+                            </div>
+                          );
+                        })}
                       </dl>
                     </div>
                   </div>
