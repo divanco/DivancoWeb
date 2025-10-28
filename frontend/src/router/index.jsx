@@ -10,7 +10,7 @@ import {
 
 // 🏛️ Landing Pages (Público)
 import HomePage from "../pages/public/HomePage";
-import ProductsPage from "../pages/ProductsPage";
+import ShowroomPage from "../pages/public/ShowroomPage";
 import ProductDetailPage from "../pages/ProductDetailPage";
 import CategoryProductsPage from "../pages/CategoryProductsPage";
 import SubcategoryProductsPage from "../pages/SubcategoryProductsPage";
@@ -54,7 +54,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "showroom",
-          element: <ProductsPage />,
+          element: <ShowroomPage />,
         },
         {
           path: "/productos/:slug",
@@ -62,7 +62,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "showroom/:categorySlug",
-          element: <ProductsPage />,
+          element: <CategoryProductsPage />,
         },
         {
           path: "showroom/:categorySlug/:subcategorySlug",
