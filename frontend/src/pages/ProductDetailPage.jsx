@@ -289,7 +289,7 @@ const ProductDetailPage = () => {
                   {/* Botón de WhatsApp */}
                   <div className="mt-8">
                     <a
-                      href={`https://wa.me/573001234567?text=${encodeURIComponent(product.whatsappMessage || `Hola! Me interesa el producto "${product.name}". ¿Podrían brindarme más información?`)}`}
+                      href={`https://wa.me/573105706816?text=${encodeURIComponent(product.whatsappMessage || `Hola! Me interesa el producto "${product.name}". ¿Podrían brindarme más información?`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full bg-green-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"

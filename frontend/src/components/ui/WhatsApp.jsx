@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const WhatsApp = ({ 
-  phoneNumber = "573203033270", // Reemplaza con tu número
+  phoneNumber = "573105706816", // Reemplaza con tu número
   message = "Hola! Me interesa contactarlos",
   position = "bottom-right" 
 }) => {
@@ -9,7 +9,7 @@ const WhatsApp = ({
 
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${573203033270}?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/${573105706816}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   };
 

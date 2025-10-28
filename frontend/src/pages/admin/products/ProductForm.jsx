@@ -116,22 +116,34 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
   };
 
   const handleImageUpload = async (productId) => {
-    if (selectedImages.length === 0) return;
+    console.log('🔵 [ProductForm] handleImageUpload iniciado:', {
+      productId,
+      selectedImagesCount: selectedImages.length,
+      selectedImages: selectedImages.map(f => ({ name: f.name, size: f.size }))
+    });
+    
+    if (selectedImages.length === 0) {
+      console.log('⚠️ [ProductForm] No hay imágenes para subir');
+      return;
+    }
 
     for (let i = 0; i < selectedImages.length; i++) {
       const file = selectedImages[i];
+      console.log(`🔵 [ProductForm] Subiendo imagen ${i + 1}/${selectedImages.length}:`, file.name);
       setUploadProgress(prev => ({ ...prev, [i]: 0 }));
 
       try {
-        await uploadImage(productId, [file]);
+        const result = await uploadImage(productId, [file]);
+        console.log(`✅ [ProductForm] Imagen ${i + 1} subida exitosamente:`, result);
         setUploadProgress(prev => ({ ...prev, [i]: 100 }));
       } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error(`🔴 [ProductForm] Error subiendo imagen ${i + 1}:`, error);
         setUploadProgress(prev => ({ ...prev, [i]: -1 }));
       }
     }
 
     // Clear selected images after upload
+    console.log('🔵 [ProductForm] Limpiando imágenes seleccionadas');
     setSelectedImages([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -212,11 +224,26 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
       }
 
       console.log('✅ [ProductForm] Producto guardado exitosamente:', result.data);
+      console.log('🔍 [ProductForm] Debug - result completo:', result);
+      console.log('🔍 [ProductForm] Debug - result.data:', result.data);
+      console.log('🔍 [ProductForm] Debug - result.data.product:', result.data?.product);
+      console.log('🔍 [ProductForm] Debug - result.data.product.id:', result.data?.product?.id);
 
       // Upload images if selected
       const productId = result.data?.product?.id || product?.id;
+      console.log('🔍 [ProductForm] ProductId extraído:', productId);
+      console.log('🔍 [ProductForm] Imágenes seleccionadas:', selectedImages.length);
+      
       if (selectedImages.length > 0 && productId) {
+        console.log('🔵 [ProductForm] Iniciando subida de imágenes para producto:', productId);
         await handleImageUpload(productId);
+      } else {
+        console.log('⚠️ [ProductForm] No se subirán imágenes:', {
+          hasImages: selectedImages.length > 0,
+          hasProductId: !!productId,
+          productId,
+          selectedImagesCount: selectedImages.length
+        });
       }
 
       // Reiniciar el formulario si es un nuevo producto
