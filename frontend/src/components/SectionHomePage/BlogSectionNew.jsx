@@ -46,23 +46,29 @@ const BlogSection = () => {
     
     // Si es un objeto Cloudinary con variantes
     if (post.featuredImage && typeof post.featuredImage === 'object') {
+      // Intentar obtener la URL de las variantes disponibles
       const imageUrl = post.featuredImage.desktop?.url || 
                       post.featuredImage.mobile?.url || 
+                      post.featuredImage.tablet?.url ||
                       post.featuredImage.thumbnail?.url ||
                       post.featuredImage.url;
       
-      console.log('🖼️ [getImageUrl] URL encontrada:', imageUrl);
-      return imageUrl || '/images/blog/default-blog.jpg';
+      // Verificar que la URL sea válida y no esté vacía
+      if (imageUrl && imageUrl.trim()) {
+        console.log('🖼️ [getImageUrl] URL encontrada:', imageUrl);
+        return imageUrl;
+      }
     }
     
     // Si es una URL directa (string)
-    if (typeof post.featuredImage === 'string') {
+    if (typeof post.featuredImage === 'string' && post.featuredImage.trim()) {
       console.log('🖼️ [getImageUrl] URL directa:', post.featuredImage);
       return post.featuredImage;
     }
     
-    console.log('🖼️ [getImageUrl] Usando imagen por defecto');
-    return '/images/blog/default-blog.jpg';
+    // Si no hay imagen, retornar null para no mostrar nada o mostrar placeholder
+    console.log('🖼️ [getImageUrl] Sin imagen válida, usando placeholder');
+    return null;
   };
 
   // Debug: mostrar siempre algo para ver si el componente se renderiza
@@ -138,8 +144,17 @@ const BlogSection = () => {
 
         {/* Blog Posts */}
         <div className="space-y-12 lg:space-y-16">
-          {blogPosts.slice(0, 1).map((post, index) => (
-            <article key={post.id} className="group">
+          {blogPosts.slice(0, 1).map((post) => {
+            const imageUrl = getImageUrl(post);
+            
+            // Si no hay imagen, no mostrar el post
+            if (!imageUrl) {
+              console.log('⚠️ [BlogSection] Post sin imagen, omitiendo:', post.title);
+              return null;
+            }
+
+            return (
+              <article key={post.id} className="group">
               
               {/* ✅ MOBILE: Layout vertical (columnas) */}
               <div className="block lg:hidden">
@@ -154,14 +169,9 @@ const BlogSection = () => {
                 <div className="relative mb-6 overflow-hidden bg-gray-100">
                   <div className="aspect-[4/3] bg-gray-200">
                     <img
-                      src={getImageUrl(post)}
+                      src={imageUrl}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        if (!e.target.src.includes('data:image')) {
-                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Y2EzYWYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNHB4Ij5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+';
-                        }
-                      }}
                     />
                   </div>
                 </div>
@@ -232,14 +242,9 @@ const BlogSection = () => {
                   <div className="relative overflow-hidden bg-gray-100">
                     <div className="aspect-[4/3] bg-gray-200">
                       <img
-                        src={getImageUrl(post)}
+                        src={imageUrl}
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        onError={(e) => {
-                          if (!e.target.src.includes('data:image')) {
-                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Y2EzYWYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNHB4Ij5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+';
-                          }
-                        }}
                       />
                     </div>
                   </div>
@@ -247,7 +252,8 @@ const BlogSection = () => {
 
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom CTA */}
