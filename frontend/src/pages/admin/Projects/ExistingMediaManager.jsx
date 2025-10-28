@@ -8,10 +8,17 @@ const ExistingMediaManager = ({
   onToggleSlider,
   isDeleting = false 
 }) => {
+  // Función para detectar si un archivo es video
+  const isVideoFile = (item) => {
+    const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'ogg'];
+    const fileExtension = item.filename?.split('.').pop()?.toLowerCase();
+    return item.type === 'video' || videoExtensions.includes(fileExtension);
+  };
+
   if (!media || media.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        No hay imágenes en este proyecto aún
+        No hay archivos multimedia en este proyecto aún
       </div>
     );
   }
@@ -19,7 +26,7 @@ const ExistingMediaManager = ({
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900">
-        Imágenes Actuales ({media.length})
+        Archivos Multimedia ({media.length})
       </h3>
       
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -28,13 +35,28 @@ const ExistingMediaManager = ({
             key={item.id} 
             className="relative group border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
           >
-            {/* Imagen */}
+            {/* Contenido multimedia */}
             <div className="aspect-square">
-              <img
-                src={item.urls?.thumbnail || item.urls?.mobile || item.url}
-                alt={item.alt || item.title || 'Media'}
-                className="w-full h-full object-cover"
-              />
+              {isVideoFile(item) ? (
+                <video
+                  src={item.urls?.original || item.url}
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                  onError={(e) => {
+                    console.error('Error cargando video:', e);
+                    console.log('URL del video:', item.urls?.original || item.url);
+                  }}
+                >
+                  Tu navegador no soporta la reproducción de video.
+                </video>
+              ) : (
+                <img
+                  src={item.urls?.thumbnail || item.urls?.mobile || item.url}
+                  alt={item.alt || item.title || 'Media'}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             {/* Overlay con acciones */}
@@ -48,7 +70,7 @@ const ExistingMediaManager = ({
                     ? 'bg-yellow-500 text-white' 
                     : 'bg-white text-gray-700 hover:bg-yellow-100'
                 }`}
-                title={item.isSliderImage ? 'Imagen del slider' : 'Marcar como imagen del slider'}
+                title={item.isSliderImage ? 'Archivo del slider' : 'Marcar como archivo del slider'}
                 disabled={isDeleting}
               >
                 {item.isSliderImage ? (
@@ -62,7 +84,7 @@ const ExistingMediaManager = ({
               <button
                 onClick={() => onDelete(item.id)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
-                title="Eliminar imagen"
+                title={`Eliminar ${isVideoFile(item) ? 'video' : 'imagen'}`}
                 disabled={isDeleting}
               >
                 <XMarkIcon className="w-5 h-5" />
@@ -71,8 +93,10 @@ const ExistingMediaManager = ({
 
             {/* Badge de tipo */}
             <div className="absolute top-2 left-2">
-              <span className="px-2 py-1 text-xs font-medium rounded-md bg-black bg-opacity-60 text-white">
-                {item.type || 'render'}
+              <span className={`px-2 py-1 text-xs font-medium rounded-md bg-black bg-opacity-60 text-white ${
+                isVideoFile(item) ? 'bg-blue-600' : 'bg-black bg-opacity-60'
+              }`}>
+                {isVideoFile(item) ? 'video' : (item.type || 'imagen')}
               </span>
             </div>
 
