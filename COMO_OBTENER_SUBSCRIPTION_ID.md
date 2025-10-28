@@ -104,6 +104,100 @@ az account show --query id --output tsv
 
 ---
 
+## 🚨 PROBLEMA ACTUAL: Permisos de Contributor No Disponibles (2024-2025)
+
+### ¿Qué está pasando?
+
+Microsoft ha actualizado las políticas de seguridad de Azure y ahora es común que **NO aparezca la opción "Contributor"** en las asignaciones de roles, especialmente en:
+
+- ✅ Cuentas nuevas de Azure
+- ✅ Suscripciones Free Trial
+- ✅ Cuentas corporativas con políticas restrictivas
+- ✅ Azure for Students
+
+### 🛠️ SOLUCIONES ALTERNATIVAS
+
+#### **Opción A: Usar Roles Más Específicos**
+
+En lugar de "Contributor", busca y asigna estos roles:
+
+```
+✅ Storage Blob Data Contributor
+✅ Storage Account Contributor  
+✅ App Service Contributor
+✅ Website Contributor
+✅ Key Vault Contributor (si usas Key Vault)
+```
+
+#### **Opción B: Crear Service Principal con Azure CLI**
+
+Si tienes Azure CLI instalado:
+
+```bash
+# 1. Crear Service Principal
+az ad sp create-for-rbac --name "DivancoWebApp" \
+  --role "Website Contributor" \
+  --scopes "/subscriptions/TU_SUBSCRIPTION_ID"
+
+# 2. El comando te dará:
+# - appId (Client ID)
+# - password (Client Secret)  
+# - tenant (Tenant ID)
+```
+
+#### **Opción C: Usar Managed Identity**
+
+Para deployment directo sin service principal:
+
+1. **App Service**: Crear con Managed Identity habilitada
+2. **Static Web Apps**: Usar GitHub Actions con OIDC
+3. **Container Apps**: Deployment directo desde GitHub
+
+#### **Opción D: Solicitar Permisos al Administrador**
+
+Si es cuenta corporativa/organizacional:
+
+```
+📧 Email Template para enviar:
+
+Asunto: Solicitud de permisos Azure para desarrollo web
+
+Hola [Administrador],
+
+Necesito permisos en Azure para desplegar una aplicación web.
+¿Podrías asignarme los siguientes roles en la suscripción [ID]?
+
+- App Service Contributor
+- Storage Account Contributor  
+- Website Contributor
+
+Es para el proyecto: [Nombre del proyecto]
+Repositorio: [URL del repo]
+
+Gracias,
+[Tu nombre]
+```
+
+### 🆕 MÉTODO ALTERNATIVO: GitHub Actions + OIDC (Recomendado 2024)
+
+**Sin necesidad de Service Principal**:
+
+1. **En Azure Portal**:
+   - Ir a "Microsoft Entra ID" > "App registrations"
+   - Create new registration
+   - Configurar Federated Credentials para GitHub
+
+2. **En GitHub**:
+   - Agregar secrets para AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+   - Usar GitHub Actions para deployment
+
+3. **Beneficios**:
+   - ✅ Más seguro (no secrets permanentes)
+   - ✅ Recomendado por Microsoft
+   - ✅ Evita problemas de permisos
+
+---
+
 ## ❌ Errores Comunes
 
 ### "No encuentro mi Subscription ID"

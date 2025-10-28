@@ -15,6 +15,14 @@ const ExistingMediaManager = ({
     return item.type === 'video' || videoExtensions.includes(fileExtension);
   };
 
+  // 🔍 DEBUG: Ver qué archivos llegan y cuáles son videos
+  console.log('🎥 ExistingMediaManager Debug:', {
+    totalMedia: media.length,
+    mediaTypes: media.map(m => ({ id: m.id, type: m.type, filename: m.filename })),
+    videosDetected: media.filter(m => isVideoFile(m)),
+    videoCount: media.filter(m => isVideoFile(m)).length
+  });
+
   if (!media || media.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">

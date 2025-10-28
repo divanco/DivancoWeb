@@ -284,6 +284,14 @@ const MEDIA_TYPES = [
 const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
   if (!mediaFiles || mediaFiles.length === 0) return null;
 
+  // 🔍 DEBUG: Ver archivos media en página pública
+  console.log('🎬 ProjectGallery Debug:', {
+    totalMediaFiles: mediaFiles.length,
+    mediaTypes: mediaFiles.map(m => ({ id: m.id, type: m.type, filename: m.filename || 'no-filename' })),
+    videosFound: mediaFiles.filter(f => f.type === 'video'),
+    videoCount: mediaFiles.filter(f => f.type === 'video').length
+  });
+
   return (
     <div className="bg-gray-50 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-8 md:px-16 space-y-12">
