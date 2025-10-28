@@ -230,7 +230,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
       console.log('🔍 [ProductForm] Debug - result.data.product.id:', result.data?.product?.id);
 
       // Upload images if selected
-      const productId = result.data?.product?.id || product?.id;
+      const productId = result.data?.data?.product?.id || product?.id;
       console.log('🔍 [ProductForm] ProductId extraído:', productId);
       console.log('🔍 [ProductForm] Imágenes seleccionadas:', selectedImages.length);
       
