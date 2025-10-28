@@ -271,12 +271,13 @@ const ProjectInfo = ({ project, t }) => (
   </div>
 );
 
-const IMAGE_TYPES = [
-  { key: 'render', label: 'Renders' },
-  { key: 'obra_finalizada', label: 'Obra Finalizada' },
-  { key: 'obra_proceso', label: 'Obra en Proceso' },
-  { key: 'plano', label: 'Planos' },
-  { key: 'image', label: 'Imágenes' },
+const MEDIA_TYPES = [
+  { key: 'render', label: 'Renders', isVideo: false },
+  { key: 'obra_finalizada', label: 'Obra Finalizada', isVideo: false },
+  { key: 'obra_proceso', label: 'Obra en Proceso', isVideo: false },
+  { key: 'plano', label: 'Planos', isVideo: false },
+  { key: 'image', label: 'Imágenes', isVideo: false },
+  { key: 'video', label: 'Videos', isVideo: true },
 ];
 
 // Galería de imágenes agrupada y sincronizada con el lightbox
@@ -286,11 +287,11 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
   return (
     <div className="bg-gray-50 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-8 md:px-16 space-y-12">
-        {IMAGE_TYPES.map(({ key, label }) => {
-          const images = mediaFiles.filter(file =>
-            file.type === key && file.urls && file.type !== 'video'
+        {MEDIA_TYPES.map(({ key, label, isVideo }) => {
+          const mediaItems = mediaFiles.filter(file =>
+            file.type === key && file.urls
           );
-          if (images.length === 0) return null;
+          if (mediaItems.length === 0) return null;
           return (
             <div key={key}>
               {/* ✅ Título de sección con estilo mejorado */}
@@ -298,21 +299,38 @@ const ProjectGallery = ({ mediaFiles, galleryImages, onImageClick }) => {
                 — {label}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {images.map((image) => (
+                {mediaItems.map((mediaItem) => (
                   <div
-                    key={image.id}
-                    className="group cursor-pointer overflow-hidden bg-white rounded-none shadow-sm hover:shadow-xl transition-all duration-300"
-                    onClick={() => onImageClick(galleryImages.findIndex(f => f.id === image.id))}
+                    key={mediaItem.id}
+                    className={`group overflow-hidden bg-white rounded-none shadow-sm hover:shadow-xl transition-all duration-300 ${
+                      isVideo ? '' : 'cursor-pointer'
+                    }`}
+                    onClick={isVideo ? undefined : () => onImageClick(galleryImages.findIndex(f => f.id === mediaItem.id))}
                   >
                     <div className="relative aspect-square overflow-hidden">
-                      <img
-                        src={image.urls?.desktop || image.urls?.mobile || image.urls?.thumbnail || image.url}
-                        alt={image.description || `Imagen`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {isVideo ? (
+                        <video
+                          src={mediaItem.urls?.original || mediaItem.url}
+                          className="w-full h-full object-cover"
+                          controls
+                          preload="metadata"
+                          onError={(e) => {
+                            console.error('Error cargando video:', e);
+                            console.log('URL del video:', mediaItem.urls?.original || mediaItem.url);
+                          }}
+                        >
+                          Tu navegador no soporta la reproducción de video.
+                        </video>
+                      ) : (
+                        <img
+                          src={mediaItem.urls?.desktop || mediaItem.urls?.mobile || mediaItem.urls?.thumbnail || mediaItem.url}
+                          alt={mediaItem.description || `Media`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
                     </div>
-                    {image.description && (
-                      <div className="p-3 text-xs font-light text-gray-500 tracking-wider">{image.description}</div>
+                    {mediaItem.description && (
+                      <div className="p-3 text-xs font-light text-gray-500 tracking-wider">{mediaItem.description}</div>
                     )}
                   </div>
                 ))}
@@ -429,7 +447,7 @@ const ProjectDetailPage = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [shareSuccess, setShareSuccess] = useState(false);
 
-  // Array plano de imágenes para lightbox y galería
+  // Array plano de imágenes para lightbox (solo imágenes, no videos)
   const galleryImages = useMemo(() =>
     project?.media?.filter(file => file.urls && file.type !== 'video') || [],
     [project]
