@@ -74,7 +74,7 @@ const RelatedProjects = ({ currentProject, limit = 3 }) => {
                   )}
                   
                   {/* Tags */}
-                  {project.tags && project.tags.length > 0 && (
+                  {/* {project.tags && project.tags.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {project.tags.slice(0, 2).map((tag, index) => (
                         <span
@@ -85,7 +85,7 @@ const RelatedProjects = ({ currentProject, limit = 3 }) => {
                         </span>
                       ))}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </Link>
             );

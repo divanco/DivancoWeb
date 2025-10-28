@@ -83,7 +83,7 @@ const ProjectInfo = ({ project, t }) => (
             )}
 
             {/* Tags con estilo mejorado */}
-            {project.tags && project.tags.length > 0 && (
+            {/* {project.tags && project.tags.length > 0 && (
               <div className="pt-6 border-t border-gray-100">
                 <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-3">
                   — {t('projectDetail.etiquetas')}
@@ -99,7 +99,7 @@ const ProjectInfo = ({ project, t }) => (
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
