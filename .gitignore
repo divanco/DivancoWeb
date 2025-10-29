@@ -70,6 +70,9 @@ web_modules/
 .env.*
 !.env.example
 
+# Azure credentials (sensitive)
+AZURE_CREDENTIALS.md
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
