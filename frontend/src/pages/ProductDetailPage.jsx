@@ -242,7 +242,30 @@ const ProductDetailPage = () => {
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                       <div className="space-y-2">
                         {Object.entries(product.specifications).map(([key, value]) => {
-                          // Convertir la clave a formato legible (ej: PESO_DISEÑO -> Peso Diseño)
+                          // Dividir las claves por guión bajo (ej: PESO_DISEÑO_DE_COCINAS -> ["PESO", "DISEÑO_DE_COCINAS"])
+                          const keys = key.split('_');
+                          
+                          // Dividir los valores por coma
+                          const values = typeof value === 'string' ? value.split(',').map(v => v.trim()) : [value];
+                          
+                          // Si hay la misma cantidad de claves y valores, emparejarlos
+                          if (keys.length === values.length) {
+                            return keys.map((k, idx) => {
+                              const formattedKey = k
+                                .split('_')
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                .join(' ');
+                              
+                              return (
+                                <div key={`${key}-${idx}`} className="text-sm">
+                                  <span className="font-semibold text-gray-700">{formattedKey}:</span>{' '}
+                                  <span className="text-gray-900">{values[idx]}</span>
+                                </div>
+                              );
+                            });
+                          }
+                          
+                          // Si no coinciden, mostrar todo junto (fallback)
                           const formattedKey = key
                             .replace(/_/g, ' ')
                             .split(' ')
