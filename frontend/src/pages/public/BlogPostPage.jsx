@@ -39,10 +39,12 @@ const BlogPostPage = () => {
   };
 
   const getImageUrl = (post) => {
+    if (!post.featuredImage) return null;
+    
     return post.featuredImage?.desktop?.url ||
            post.featuredImage?.mobile?.url ||
            post.featuredImage?.thumbnail?.url ||
-           '/images/blog/default-blog.jpg';
+           null;
   };
 
   // Función para renderizar el contenido de Editor.js
@@ -254,16 +256,13 @@ const BlogPostPage = () => {
         </header>
 
         {/* Featured Image */}
-        {post.featuredImage && (
+        {post.featuredImage && getImageUrl(post) && (
           <div className="mb-12">
             <div className="aspect-[16/9] overflow-hidden bg-gray-100 rounded-lg">
               <img
                 src={getImageUrl(post)}
                 alt={post.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/images/blog/default-blog.jpg';
-                }}
               />
             </div>
           </div>
@@ -446,20 +445,19 @@ const BlogPostPage = () => {
               Artículos Relacionados
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {relatedPosts.slice(0, 3).map((relatedPost) => (
+              {relatedPosts.slice(0, 3).map((relatedPost) => {
+                const imageUrl = getImageUrl(relatedPost);
+                if (!imageUrl) return null; // No mostrar posts sin imagen
+                
+                return (
                 <article key={relatedPost.id} className="group">
                   <Link to={`/blog/${relatedPost.slug}`} className="block">
                     {/* Image */}
                     <div className="aspect-[4/3] overflow-hidden bg-gray-100 mb-4 rounded">
                       <img
-                        src={getImageUrl(relatedPost)}
+                        src={imageUrl}
                         alt={relatedPost.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        onError={(e) => {
-                          if (!e.target.src.includes('data:image')) {
-                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Y2EzYWYiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNHB4Ij5JbWFnZW4gbm8gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+';
-                          }
-                        }}
                       />
                     </div>
 
@@ -479,7 +477,8 @@ const BlogPostPage = () => {
                     </div>
                   </Link>
                 </article>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
