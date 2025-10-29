@@ -75,14 +75,14 @@ const ProductDetailPage = () => {
   const stockStatus = getStockStatus(product.stock || 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-12">
+    <div className="min-h-screen bg-gray-50 pt-24 md:pt-28 lg:pt-32 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-8 gap-y-8 lg:gap-y-0 p-6 lg:p-0">
             
             {/* SECCIÓN DE IMÁGENES - Lado izquierdo */}
             <div className="lg:bg-gray-50 lg:p-8 flex flex-col justify-center">
-              <div className="flex flex-col-reverse lg:flex-col gap-4">
+              <div className="flex flex-col gap-4">
                 
                 {/* IMAGEN PRINCIPAL */}
                 <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 flex items-center justify-center min-h-96">
@@ -107,16 +107,16 @@ const ProductDetailPage = () => {
                   )}
                 </div>
 
-                {/* MINIATURAS HORIZONTALES (móvil) / VERTICALES (desktop) */}
+                {/* MINIATURAS - Siempre horizontales */}
                 {hasImages && images.length > 1 && (
-                  <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                  <div className="flex gap-2 overflow-x-auto pb-2">
                     {images.map((image, index) => {
                       const thumbnailUrl = getImageUrl(image, 'thumbnail');
                       return (
                         <button
                           key={index}
                           onClick={() => setSelectedImageIndex(index)}
-                          className={`flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                             selectedImageIndex === index 
                               ? 'border-blue-500 ring-2 ring-blue-200' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -240,43 +240,19 @@ const ProductDetailPage = () => {
                       Especificaciones
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {Object.entries(product.specifications).map(([key, value]) => {
-                          // Si el valor contiene comas, dividir en múltiples especificaciones
-                          const values = typeof value === 'string' && value.includes(',') 
-                            ? value.split(',').map(v => v.trim()) 
-                            : [value];
-                          
-                          // Convertir la clave a formato legible
+                          // Convertir la clave a formato legible (ej: PESO_DISEÑO -> Peso Diseño)
                           const formattedKey = key
                             .replace(/_/g, ' ')
                             .split(' ')
                             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                             .join(' ');
                           
-                          // Si hay múltiples valores, mostrar uno por línea
-                          if (values.length > 1) {
-                            return values.map((val, idx) => (
-                              <div key={`${key}-${idx}`} className="flex justify-between py-2 border-b border-gray-300 last:border-b-0">
-                                <span className="text-sm font-semibold text-gray-700">
-                                  {idx === 0 ? formattedKey : ''}:
-                                </span>
-                                <span className="text-base text-gray-900 font-medium text-right">
-                                  {val}
-                                </span>
-                              </div>
-                            ));
-                          }
-                          
-                          // Si es una sola especificación
                           return (
-                            <div key={key} className="flex justify-between py-2 border-b border-gray-300 last:border-b-0">
-                              <span className="text-sm font-semibold text-gray-700">
-                                {formattedKey}:
-                              </span>
-                              <span className="text-base text-gray-900 font-medium text-right">
-                                {value}
-                              </span>
+                            <div key={key} className="text-sm">
+                              <span className="font-semibold text-gray-700">{formattedKey}:</span>{' '}
+                              <span className="text-gray-900">{value}</span>
                             </div>
                           );
                         })}
