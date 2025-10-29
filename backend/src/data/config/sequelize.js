@@ -5,8 +5,8 @@ dotenv.config();
 const env = process.env.NODE_ENV || 'development';
 
 let sequelize;
-if (env === 'production' && process.env.DB_DEPLOY) {
-  sequelize = new Sequelize(process.env.DB_DEPLOY, {
+if (env === 'production' && (process.env.DATABASE_URL || process.env.DB_DEPLOY)) {
+  sequelize = new Sequelize(process.env.DATABASE_URL || process.env.DB_DEPLOY, {
     // ✅ CAMBIO: Habilitar logging en desarrollo para debugging
     logging: env === 'development' ? (sql, timing) => {
       // Solo mostrar advertencias para queries realmente críticas
