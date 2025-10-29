@@ -150,17 +150,17 @@ const Header = () => {
             }`}
           >
           {/* Logo Completo - Siempre visible */}
-          <div className="flex items-center min-w-0">
+         <div className="flex items-center">
             <Link
               to="/"
-              className="group relative z-10 flex-shrink-0"
+              className="group relative z-10"
               onClick={handleLogoClick}
             >
               {/* Logo Completo (Logo + Texto DIVANCO) */}
               <img
                 src={logoCompleto}
                 alt="Divanco"
-                className="h-10 sm:h-12 md:h-16 lg:h-20 xl:h-24 w-auto transition-all duration-300 group-hover:opacity-80"
+                className="h-32 md:h-24 lg:h-32 xl:h-60 w-auto transition-all duration-300 group-hover:opacity-80"
               />
             </Link>
           </div>
