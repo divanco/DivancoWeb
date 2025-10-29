@@ -38,6 +38,7 @@ app.use(cors({
     const allowedOrigins = [
       'https://divanco-web.vercel.app',
       'https://divancoweb.onrender.com',
+      'https://polite-desert-0d77a5b1e.3.azurestaticapps.net',
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:3000'
