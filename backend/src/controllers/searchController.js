@@ -39,7 +39,7 @@ export const globalSearch = async (req, res) => {
       total: 0
     };
 
-    // Búsqueda en categorías
+    // Búsqueda en categorías (solo cuando tipo es 'all' o 'categories', NO cuando es 'products')
     if (type === 'all' || type === 'categories') {
       const whereClause = { isActive: true };
       
@@ -66,11 +66,11 @@ export const globalSearch = async (req, res) => {
       results.categories = categories.map(category => ({
         ...category.toJSON(),
         type: 'category',
-        url: `/showroom/${category.slug}`
+        url: `/productos/categoria/${category.slug}`
       }));
     }
 
-    // Búsqueda en subcategorías
+    // Búsqueda en subcategorías (solo cuando tipo es 'all' o 'subcategories', NO cuando es 'products')
     if (type === 'all' || type === 'subcategories') {
       const whereClause = { isActive: true };
       
@@ -109,7 +109,7 @@ export const globalSearch = async (req, res) => {
       results.subcategories = subcategories.map(subcategory => ({
         ...subcategory.toJSON(),
         type: 'subcategory',
-        url: `/showroom/${subcategory.category.slug}/${subcategory.slug}`
+        url: `/productos/categoria/${subcategory.category.slug}/${subcategory.slug}`
       }));
     }
 
