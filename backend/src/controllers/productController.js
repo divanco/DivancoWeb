@@ -135,6 +135,7 @@ export const createProduct = async (req, res) => {
       model,
       sku,
       specifications,
+      dimensions,
       whatsappMessage,
       price,
       currency,
@@ -177,9 +178,10 @@ export const createProduct = async (req, res) => {
       brand: brand?.trim(),
       model: model?.trim(),
       sku: sku?.trim(),
+      // Guardar dimensiones anidadas dentro de specifications.dimensions
       specifications: {
         ...(specifications || {}),
-        ...(dimensions || {})
+        dimensions: dimensions || (specifications && specifications.dimensions) || {}
       },
       whatsappMessage: whatsappMessage?.trim(),
       price: price ? parseFloat(price) : null,
@@ -237,6 +239,15 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    // Buscar producto primero para poder mezclar especificaciones existentes
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Producto no encontrado'
+      });
+    }
+
     const {
       name,
       description,
@@ -265,12 +276,17 @@ export const updateProduct = async (req, res) => {
     if (brand !== undefined) updateData.brand = brand?.trim();
     if (model !== undefined) updateData.model = model?.trim();
     if (sku !== undefined) updateData.sku = sku?.trim();
+
+    // Merge specifications while keeping nested dimensions under specifications.dimensions
     if (specifications !== undefined || dimensions !== undefined) {
       updateData.specifications = {
+        ...(product.specifications || {}),
         ...(specifications || {}),
-        ...(dimensions || {})
+        // if dimensions provided explicitly, set/replace the nested dimensions object
+        ...(dimensions !== undefined ? { dimensions: dimensions || {} } : {})
       };
     }
+
     if (whatsappMessage !== undefined) updateData.whatsappMessage = whatsappMessage?.trim();
     if (price !== undefined) updateData.price = price ? parseFloat(price) : null;
     if (currency !== undefined) updateData.currency = currency || 'COP';
@@ -279,14 +295,6 @@ export const updateProduct = async (req, res) => {
     if (isNew !== undefined) updateData.isNew = Boolean(isNew);
     if (metaTitle !== undefined) updateData.metaTitle = metaTitle?.trim();
     if (metaDescription !== undefined) updateData.metaDescription = metaDescription?.trim();
-
-    const product = await Product.findByPk(id);
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Producto no encontrado'
-      });
-    }
 
     // Validar subcategoría si se está actualizando
     if (updateData.subcategoryId) {
