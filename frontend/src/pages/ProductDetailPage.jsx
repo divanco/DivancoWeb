@@ -31,9 +31,10 @@ const ProductDetailPage = () => {
 
   // Estados de stock
   const getStockStatus = (stock) => {
-    if (stock === 0) return { text: 'Agotado', color: 'bg-red-100 text-red-800' };
-    if (stock <= 5) return { text: 'Últimas unidades', color: 'bg-yellow-100 text-yellow-800' };
-    return { text: 'Disponible', color: 'bg-green-100 text-green-800' };
+    const color = stock === 0 ? 'bg-red-100 text-red-800' :
+                  stock <= 5 ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800';
+    return { text: `Stock: ${stock}`, color };
   };
 
   if (isLoading) {

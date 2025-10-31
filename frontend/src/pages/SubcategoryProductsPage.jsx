@@ -228,15 +228,13 @@ const SubcategoryProductsPage = () => {
                           Nuevo
                         </span>
                       )}
-                      {product.stock > 0 ? (
-                        <span className="text-xs text-green-600 font-medium">
-                          En stock
-                        </span>
-                      ) : (
-                        <span className="text-xs text-red-600 font-medium">
-                          Agotado
-                        </span>
-                      )}
+                      <span className={`text-xs font-medium ${
+                        product.stock === 0 ? 'text-red-600' :
+                        product.stock <= 5 ? 'text-yellow-600' :
+                        'text-green-600'
+                      }`}>
+                        Stock: {product.stock}
+                      </span>
                     </div>
                   </div>
                 </Link>

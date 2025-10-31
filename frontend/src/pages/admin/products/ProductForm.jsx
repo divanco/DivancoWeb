@@ -17,9 +17,9 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     specifications: currentProduct?.specifications || {},
     dimensions: currentProduct?.specifications?.dimensions || {},
     order: currentProduct?.order || 0,
-    isFeatured: currentProduct?.isFeatured || false,
-    isNew: currentProduct?.isNew || false,
-    isOnSale: currentProduct?.isOnSale || false,
+    isFeatured: currentProduct?.isFeatured ?? false,
+    isNew: currentProduct?.isNew ?? false,
+    isOnSale: currentProduct?.isOnSale ?? false,
     slug: currentProduct?.slug || ''
   });
 
@@ -681,10 +681,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                       'bg-red-500'
                     }`}></div>
                     <span className="text-sm text-gray-700">
-                      {form.stock > 10 ? 'En stock' :
-                       form.stock > 0 ? 'Stock bajo' :
-                       'Agotado'}
-                      {form.stock > 0 && ` (${form.stock} unidades)`}
+                      Stock: {form.stock} {form.stock === 1 ? 'unidad' : 'unidades'}
                     </span>
                   </div>
                 )}

@@ -62,19 +62,13 @@ const ProductCard = ({
 
       {/* Stock Badge */}
       <div className="absolute top-3 right-3 z-10">
-        {product.stock === 0 ? (
-          <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">
-            Agotado
-          </span>
-        ) : product.stock <= 5 ? (
-          <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-            Últimas unidades
-          </span>
-        ) : (
-          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-            Disponible
-          </span>
-        )}
+        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+          product.stock === 0 ? 'bg-red-100 text-red-800' :
+          product.stock <= 5 ? 'bg-yellow-100 text-yellow-800' :
+          'bg-green-100 text-green-800'
+        }`}>
+          Stock: {product.stock}
+        </span>
       </div>
 
       {/* Image */}
