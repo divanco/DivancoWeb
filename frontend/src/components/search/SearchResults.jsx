@@ -52,13 +52,17 @@ const SearchResults = ({
   const getItemLink = (item) => {
     // Prefer backend-provided url if present
     if (item.url) return item.url;
+    
     const linkMap = {
-      project: `/projects/${item.slug}`,
-      post: `/blog/${item.slug}`,
-      category: `/category/${item.slug}`,
-      subcategory: `/subcategory/${item.slug}`,
-      product: `/product/${item.slug}`
+      project: `/proyectos/${item.slug}`,
+      post: `/noticias/${item.slug}`,
+      category: `/productos/categoria/${item.slug}`,
+      subcategory: item.category 
+        ? `/productos/categoria/${item.category.slug || item.category}/${item.slug}`
+        : `/productos/categoria/sin-categoria/${item.slug}`,
+      product: `/productos/${item.slug}`
     };
+    
     return linkMap[item.type] || '#';
   };
 
@@ -178,7 +182,7 @@ const SearchResults = ({
 
   const typeLabels = {
     project: 'Proyectos',
-    post: 'Artículos del blog',
+    post: 'Noticias',
     category: 'Categorías',
     subcategory: 'Subcategorías',
     product: 'Productos'

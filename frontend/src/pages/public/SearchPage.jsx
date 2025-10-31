@@ -18,6 +18,9 @@ const SearchPage = () => {
   const [filters, setFilters] = useState({
     type: searchParams.get('type') || '',
     category: searchParams.get('category') || '',
+    subcategory: searchParams.get('subcategory') || '',
+    projectType: searchParams.get('projectType') || '',
+    dateRange: searchParams.get('dateRange') || '',
     tags: searchParams.get('tags') || '',
   });
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
@@ -50,6 +53,9 @@ const SearchPage = () => {
     if (debouncedQuery) newSearchParams.set('q', debouncedQuery);
     if (filters.type) newSearchParams.set('type', filters.type);
     if (filters.category) newSearchParams.set('category', filters.category);
+    if (filters.subcategory) newSearchParams.set('subcategory', filters.subcategory);
+    if (filters.projectType) newSearchParams.set('projectType', filters.projectType);
+    if (filters.dateRange) newSearchParams.set('dateRange', filters.dateRange);
     if (filters.tags) newSearchParams.set('tags', filters.tags);
     if (currentPage > 1) newSearchParams.set('page', currentPage.toString());
 
@@ -140,7 +146,7 @@ const SearchPage = () => {
         allResults.push(...results.categories.map(item => ({
           ...item,
           type: 'category',
-          url: `/categorias/${item.slug}`
+          url: `/productos/categoria/${item.slug}`
         })));
       }
       
@@ -149,7 +155,9 @@ const SearchPage = () => {
         allResults.push(...results.subcategories.map(item => ({
           ...item,
           type: 'subcategory',
-          url: `/categorias/${item.category?.slug || 'categoria'}/${item.slug}`
+          url: item.category 
+            ? `/productos/categoria/${item.category.slug || item.category}/${item.slug}`
+            : `/productos/categoria/sin-categoria/${item.slug}`
         })));
       }
       
@@ -203,7 +211,7 @@ const SearchPage = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Header de búsqueda */}

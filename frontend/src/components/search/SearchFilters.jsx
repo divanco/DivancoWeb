@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useGetCategoriesQuery } from '../../features/categories/categoriesApi';
+import { useGetSubcategoriesQuery } from '../../features/subcategories/subcategoriesApi';
 
 const SearchFilters = ({
   filters,
@@ -8,28 +10,56 @@ const SearchFilters = ({
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  // Obtener categorías y subcategorías dinámicamente
+  const { data: categoriesData } = useGetCategoriesQuery({ limit: 100 });
+  const { data: subcategoriesData } = useGetSubcategoriesQuery({ limit: 100 });
+
   const filterOptions = {
     type: [
       { value: '', label: 'Todos los tipos' },
       { value: 'project', label: 'Proyectos' },
-      { value: 'post', label: 'Artículos del blog' },
-      { value: 'category', label: 'Categorías' },
-      { value: 'subcategory', label: 'Subcategorías' },
+      { value: 'post', label: 'Noticias' },
       { value: 'product', label: 'Productos' },
+    ],
+    projectType: [
+      { value: '', label: 'Todos los tipos' },
+      { value: 'Diseño', label: 'Diseño' },
+      { value: 'Proyecto', label: 'Proyecto' },
+      { value: 'Dirección de Obra', label: 'Dirección de Obra' },
+    ],
+    dateRange: [
+      { value: '', label: 'Todas las fechas' },
+      { value: '1m', label: 'Último mes' },
+      { value: '3m', label: 'Últimos 3 meses' },
+      { value: '1y', label: 'Último año' },
     ],
     category: [
       { value: '', label: 'Todas las categorías' },
-      { value: 'living', label: 'Living' },
-      { value: 'dormitorio', label: 'Dormitorio' },
-      { value: 'cocina', label: 'Cocina' },
-      { value: 'baño', label: 'Baño' },
-      { value: 'exterior', label: 'Exterior' },
-      { value: 'iluminacion', label: 'Iluminación' },
+      ...(categoriesData?.data || []).map(cat => ({
+        value: cat.slug,
+        label: cat.name
+      }))
+    ],
+    subcategory: [
+      { value: '', label: 'Todas las subcategorías' },
+      ...(subcategoriesData?.data || []).map(subcat => ({
+        value: subcat.slug,
+        label: subcat.name
+      }))
     ]
   };
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
+    
+    // Limpiar filtros secundarios cuando cambia el tipo
+    if (key === 'type') {
+      newFilters.category = '';
+      newFilters.subcategory = '';
+      newFilters.projectType = '';
+      newFilters.dateRange = '';
+    }
+    
     onFiltersChange(newFilters);
   };
 
@@ -37,11 +67,30 @@ const SearchFilters = ({
     onFiltersChange({
       type: '',
       category: '',
+      subcategory: '',
+      projectType: '',
+      dateRange: '',
       tags: '',
     });
   };
 
   const hasActiveFilters = Object.values(filters).some(value => value !== '');
+
+  // Determinar qué filtro secundario mostrar según el tipo seleccionado
+  const getSecondaryFilter = () => {
+    switch (filters.type) {
+      case 'project':
+        return 'projectType';
+      case 'post':
+        return 'dateRange';
+      case 'product':
+        return 'category';
+      default:
+        return null;
+    }
+  };
+
+  const secondaryFilter = getSecondaryFilter();
 
   return (
     <div className="mb-6">
@@ -68,24 +117,55 @@ const SearchFilters = ({
             </select>
           </div>
 
-          {/* Selector de categoría */}
-          <div className="flex-1 min-w-48">
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
-              Categoría
-            </label>
-            <select
-              id="category-filter"
-              value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {filterOptions.category.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Filtro secundario dinámico */}
+          {secondaryFilter && (
+            <div className="flex-1 min-w-48">
+              <label htmlFor="secondary-filter" className="block text-sm font-medium text-gray-700 mb-1">
+                {secondaryFilter === 'projectType' && 'Tipo de proyecto'}
+                {secondaryFilter === 'dateRange' && 'Fecha'}
+                {secondaryFilter === 'category' && 'Categoría'}
+              </label>
+              <select
+                id="secondary-filter"
+                value={filters[secondaryFilter] || ''}
+                onChange={(e) => handleFilterChange(secondaryFilter, e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {filterOptions[secondaryFilter].map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Subcategoría (solo visible cuando tipo es producto y hay categoría seleccionada) */}
+          {filters.type === 'product' && filters.category && (
+            <div className="flex-1 min-w-48">
+              <label htmlFor="subcategory-filter" className="block text-sm font-medium text-gray-700 mb-1">
+                Subcategoría
+              </label>
+              <select
+                id="subcategory-filter"
+                value={filters.subcategory || ''}
+                onChange={(e) => handleFilterChange('subcategory', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {filterOptions.subcategory
+                  .filter(opt => {
+                    if (!opt.value) return true;
+                    const subcat = subcategoriesData?.data?.find(s => s.slug === opt.value);
+                    return subcat?.category?.slug === filters.category;
+                  })
+                  .map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
 
           {/* Botones de acción */}
           <div className="flex items-end gap-2">
@@ -190,12 +270,54 @@ const SearchFilters = ({
             </span>
           )}
 
+          {filters.projectType && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              {filterOptions.projectType.find(opt => opt.value === filters.projectType)?.label}
+              <button
+                onClick={() => handleFilterChange('projectType', '')}
+                className="ml-1 hover:text-green-600"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+
+          {filters.dateRange && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              {filterOptions.dateRange.find(opt => opt.value === filters.dateRange)?.label}
+              <button
+                onClick={() => handleFilterChange('dateRange', '')}
+                className="ml-1 hover:text-yellow-600"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+
           {filters.category && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
               {filterOptions.category.find(opt => opt.value === filters.category)?.label}
               <button
                 onClick={() => handleFilterChange('category', '')}
                 className="ml-1 hover:text-green-600"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+
+          {filters.subcategory && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              {filterOptions.subcategory.find(opt => opt.value === filters.subcategory)?.label}
+              <button
+                onClick={() => handleFilterChange('subcategory', '')}
+                className="ml-1 hover:text-orange-600"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
