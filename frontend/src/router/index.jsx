@@ -24,6 +24,7 @@ import AboutPage from "../pages/public/AboutPage";
 import ContactPage from "../pages/public/ContactPage";
 import SearchPage from "../pages/public/SearchPage";
 import EdicionesPage from "../components/layout/public/EdicionesPage";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
 
 // 🔐 Auth Pages
 import LoginPage from "../pages/auth/LoginPage";
@@ -104,6 +105,14 @@ export const router = createBrowserRouter(
         {
           path: "buscar",
           element: <SearchPage />,
+        },
+        {
+          path: "no-autorizado",
+          element: <UnauthorizedPage />,
+        },
+        {
+          path: "unauthorized",
+          element: <UnauthorizedPage />,
         },
       ],
     },

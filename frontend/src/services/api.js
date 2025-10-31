@@ -34,8 +34,14 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
     
     if (result.error && result.error.status === 401) {
-      // Token expirado, limpiar estado de auth
+      // Token expirado o no autorizado
       api.dispatch({ type: 'auth/logout' });
+      
+      // Redirigir a página de no autorizado
+      // Usar setTimeout para evitar problemas de sincronización
+      setTimeout(() => {
+        window.location.href = '/no-autorizado';
+      }, 100);
     }
     
     return result;
