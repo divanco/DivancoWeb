@@ -146,7 +146,7 @@ const ShowroomSection = () => {
               return (
                 <Link
                   key={category.id}
-                  to="/showroom"
+                  to={`/showroom/${category.slug}`}
                   className={`relative flex-shrink-0 transition-all duration-1000 cursor-pointer group ${
                     isMobile 
                       ? 'opacity-100 scale-100 z-10' 
