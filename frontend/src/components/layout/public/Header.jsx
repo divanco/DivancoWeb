@@ -86,39 +86,41 @@ const Header = () => {
   }, [isHomepage]);
 
   // ✅ MEJORADO: Función para manejar el triple click en el logo
- const handleLogoClick = (e) => {
-  e.preventDefault();
-  // Limpiar timeout anterior si existe
-  if (timeoutRef.current) {
-    clearTimeout(timeoutRef.current);
-  }
-
-  const newClickCount = clickCount + 1;
-  setClickCount(newClickCount);
-
-  // Si es el tercer click, navegar inmediatamente
-  if (newClickCount >= 3) {
-    navigate("/login");
-    setClickCount(0);
-    return;
-  }
-
-  // Si es el primer click, navegar a inicio
-    // Single click: go to home (force reload if already at '/')
-    if (newClickCount === 1) {
-      if (window.location.pathname === "/") {
-        window.location.href = "/";
-      } else {
-        navigate("/");
-      }
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    
+    // Si ya estamos en la homepage, solo refrescar (no contar como click para triple-click)
+    if (window.location.pathname === "/") {
+      window.location.href = "/";
+      return;
     }
 
-  // Configurar nuevo timeout para resetear
-  timeoutRef.current = setTimeout(() => {
-    setClickCount(0);
-    timeoutRef.current = null;
-  }, 2000);
-};
+    // Limpiar timeout anterior si existe
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const newClickCount = clickCount + 1;
+    setClickCount(newClickCount);
+
+    // Si es el tercer click, navegar a login inmediatamente
+    if (newClickCount >= 3) {
+      navigate("/login");
+      setClickCount(0);
+      return;
+    }
+
+    // Si es el primer o segundo click (y no estamos en /), navegar a inicio
+    if (newClickCount === 1) {
+      navigate("/");
+    }
+
+    // Configurar nuevo timeout para resetear
+    timeoutRef.current = setTimeout(() => {
+      setClickCount(0);
+      timeoutRef.current = null;
+    }, 2000);
+  };
 
   // Lógica para el fondo del header
   const getHeaderBackground = () => {
