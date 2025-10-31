@@ -64,18 +64,36 @@ const SearchPage = () => {
 
   useEffect(() => {
     // Ejecutar búsqueda cuando cambian los parámetros
-    if (debouncedQuery.trim()) {
+    // Permitir búsqueda con solo filtros o con query
+    if (debouncedQuery.trim() || filters.type) {
       performSearch();
     }
   }, [debouncedQuery, filters, currentPage]);
 
   // Funciones
   const performSearch = () => {
+    // Mapear tipos del frontend a los que espera el backend
+    const typeMap = {
+      'project': 'projects',
+      'post': 'blog',
+      'product': 'products',
+      '': 'all'
+    };
+    
+    const backendType = typeMap[filters.type] || 'all';
+    
     const searchParams = {
-      q: debouncedQuery,
+      q: debouncedQuery || '*', // Usar * como wildcard si no hay query
       limit: 20,
       page: currentPage,
+      type: backendType,
     };
+    
+    // Agregar filtros adicionales si existen
+    if (filters.category) searchParams.category = filters.category;
+    if (filters.subcategory) searchParams.subcategory = filters.subcategory;
+    if (filters.projectType) searchParams.projectType = filters.projectType;
+    if (filters.dateRange) searchParams.dateRange = filters.dateRange;
 
     if (isAdvancedMode) {
       triggerAdvancedSearch({
@@ -83,13 +101,10 @@ const SearchPage = () => {
         filters: filters,
       });
     } else {
-      triggerGlobalSearch({
-        ...searchParams,
-        type: filters.type || undefined,
-      });
+      triggerGlobalSearch(searchParams);
     }
 
-    // Agregar a historial
+    // Agregar a historial solo si hay query real
     if (debouncedQuery.trim()) {
       addToHistory(debouncedQuery);
     }

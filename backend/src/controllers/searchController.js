@@ -9,17 +9,24 @@ export const globalSearch = async (req, res) => {
       q: query, 
       type = 'all', 
       limit = 20,
-      page = 1 
+      page = 1,
+      category,
+      subcategory,
+      projectType,
+      dateRange
     } = req.query;
 
-    if (!query || query.trim().length < 2) {
+    // Permitir búsqueda con wildcard o filtros
+    const isWildcard = query === '*';
+    
+    if (!query || (query.trim().length < 2 && !isWildcard)) {
       return res.status(400).json({
         success: false,
         message: 'La consulta debe tener al menos 2 caracteres'
       });
     }
 
-    const searchTerm = query.trim();
+    const searchTerm = isWildcard ? '' : query.trim();
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const itemLimit = parseInt(limit);
 
@@ -33,15 +40,22 @@ export const globalSearch = async (req, res) => {
 
     // Búsqueda en categorías
     if (type === 'all' || type === 'categories') {
+      const whereClause = { isActive: true };
+      
+      if (!isWildcard && searchTerm) {
+        whereClause[Op.or] = [
+          { name: { [Op.iLike]: `%${searchTerm}%` } },
+          { description: { [Op.iLike]: `%${searchTerm}%` } },
+          { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
+        ];
+      }
+      
+      if (category) {
+        whereClause.slug = category;
+      }
+
       const categories = await Category.findAll({
-        where: {
-          isActive: true,
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${searchTerm}%` } },
-            { description: { [Op.iLike]: `%${searchTerm}%` } },
-            { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
-          ]
-        },
+        where: whereClause,
         attributes: ['id', 'name', 'slug', 'description', 'featuredImage'],
         limit: type === 'categories' ? itemLimit : 5,
         offset: type === 'categories' ? offset : 0,
@@ -57,21 +71,34 @@ export const globalSearch = async (req, res) => {
 
     // Búsqueda en subcategorías
     if (type === 'all' || type === 'subcategories') {
+      const whereClause = { isActive: true };
+      
+      if (!isWildcard && searchTerm) {
+        whereClause[Op.or] = [
+          { name: { [Op.iLike]: `%${searchTerm}%` } },
+          { description: { [Op.iLike]: `%${searchTerm}%` } },
+          { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
+        ];
+      }
+      
+      if (subcategory) {
+        whereClause.slug = subcategory;
+      }
+      
+      const includeCategory = {
+        model: Category,
+        as: 'category',
+        attributes: ['name', 'slug'],
+        where: { isActive: true }
+      };
+      
+      if (category) {
+        includeCategory.where.slug = category;
+      }
+
       const subcategories = await Subcategory.findAll({
-        where: {
-          isActive: true,
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${searchTerm}%` } },
-            { description: { [Op.iLike]: `%${searchTerm}%` } },
-            { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
-          ]
-        },
-        include: [{
-          model: Category,
-          as: 'category',
-          attributes: ['name', 'slug'],
-          where: { isActive: true }
-        }],
+        where: whereClause,
+        include: [includeCategory],
         attributes: ['id', 'name', 'slug', 'description', 'featuredImage'],
         limit: type === 'subcategories' ? itemLimit : 5,
         offset: type === 'subcategories' ? offset : 0,
@@ -87,16 +114,24 @@ export const globalSearch = async (req, res) => {
 
     // Búsqueda en proyectos
     if (type === 'all' || type === 'projects') {
+      const whereClause = { isActive: true };
+      
+      if (!isWildcard && searchTerm) {
+        whereClause[Op.or] = [
+          { title: { [Op.iLike]: `%${searchTerm}%` } },
+          { description: { [Op.iLike]: `%${searchTerm}%` } },
+          { location: { [Op.iLike]: `%${searchTerm}%` } },
+          { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
+        ];
+      }
+      
+      // Filtro por tipo de proyecto
+      if (projectType) {
+        whereClause.projectType = { [Op.contains]: [projectType] };
+      }
+
       const projects = await Project.findAll({
-        where: {
-          isActive: true,
-          [Op.or]: [
-            { title: { [Op.iLike]: `%${searchTerm}%` } },
-            { description: { [Op.iLike]: `%${searchTerm}%` } },
-            { location: { [Op.iLike]: `%${searchTerm}%` } },
-            { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
-          ]
-        },
+        where: whereClause,
         attributes: ['id', 'title', 'slug', 'description', 'location', 'year', 'projectType'],
         include: [{
           model: MediaFile,
@@ -128,19 +163,44 @@ export const globalSearch = async (req, res) => {
 
     // Búsqueda en blog posts
     if (type === 'all' || type === 'blog') {
+      const whereClause = { status: 'published' };
+      
+      if (!isWildcard && searchTerm) {
+        whereClause[Op.or] = [
+          { title: { [Op.iLike]: `%${searchTerm}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('content'), 'text'),
+            { [Op.iLike]: `%${searchTerm}%` }
+          ),
+          { excerpt: { [Op.iLike]: `%${searchTerm}%` } },
+          { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
+        ];
+      }
+      
+      // Filtro por rango de fechas
+      if (dateRange) {
+        const now = new Date();
+        let startDate;
+        
+        switch(dateRange) {
+          case '1m':
+            startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+          case '3m':
+            startDate = new Date(now.setMonth(now.getMonth() - 3));
+            break;
+          case '1y':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+        }
+        
+        if (startDate) {
+          whereClause.publishedAt = { [Op.gte]: startDate };
+        }
+      }
+
       const blogPosts = await BlogPost.findAll({
-        where: {
-          status: 'published',
-          [Op.or]: [
-            { title: { [Op.iLike]: `%${searchTerm}%` } },
-            sequelize.where(
-              sequelize.cast(sequelize.col('content'), 'text'),
-              { [Op.iLike]: `%${searchTerm}%` }
-            ),
-            { excerpt: { [Op.iLike]: `%${searchTerm}%` } },
-            { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
-          ]
-        },
+        where: whereClause,
         attributes: ['id', 'title', 'slug', 'excerpt', 'publishedAt', 'featuredImage', 'author'],
         limit: type === 'blog' ? itemLimit : 5,
         offset: type === 'blog' ? offset : 0,
@@ -150,7 +210,7 @@ export const globalSearch = async (req, res) => {
       results.blogPosts = blogPosts.map(post => ({
         ...post.toJSON(),
         type: 'post',
-        url: `/blog/${post.slug}`
+        url: `/noticias/${post.slug}`
       }));
     }
 
