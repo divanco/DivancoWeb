@@ -18,12 +18,29 @@ import LanguageSwitcher from "../../LanguageSwitcher";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
 
-  // ✅ CORREGIR: Usar useRef para el timeout
+  // ✅ Usar useRef para el timeout
   const timeoutRef = useRef(null);
+  
+  // ✅ Usar localStorage para persistir el contador de clicks
+  const getClickCount = () => {
+    const stored = localStorage.getItem('logoClickCount');
+    const timestamp = localStorage.getItem('logoClickTimestamp');
+    if (stored && timestamp) {
+      // Si han pasado más de 2 segundos, resetear
+      if (Date.now() - parseInt(timestamp) > 2000) {
+        localStorage.removeItem('logoClickCount');
+        localStorage.removeItem('logoClickTimestamp');
+        return 0;
+      }
+      return parseInt(stored);
+    }
+    return 0;
+  };
+
+  const [clickCount, setClickCount] = useState(getClickCount());
 
   // Consultar últimos 5 proyectos y posts
   const { data: recentProjects } = useGetRecentProjectsQuery(5);
@@ -85,7 +102,7 @@ const Header = () => {
     }
   }, [isHomepage]);
 
-  // ✅ MEJORADO: Función para manejar el triple click en el logo
+  // ✅ MEJORADO: Función para manejar el triple click en el logo con localStorage
   const handleLogoClick = (e) => {
     e.preventDefault();
 
@@ -95,10 +112,17 @@ const Header = () => {
     }
 
     const newClickCount = clickCount + 1;
+    
+    // Guardar en localStorage
+    localStorage.setItem('logoClickCount', newClickCount.toString());
+    localStorage.setItem('logoClickTimestamp', Date.now().toString());
+    
     setClickCount(newClickCount);
 
     // Si es el tercer click, navegar a login inmediatamente
     if (newClickCount >= 3) {
+      localStorage.removeItem('logoClickCount');
+      localStorage.removeItem('logoClickTimestamp');
       navigate("/login");
       setClickCount(0);
       return;
@@ -106,17 +130,23 @@ const Header = () => {
 
     // Si es el primer click y estamos en homepage, refrescar
     if (newClickCount === 1 && window.location.pathname === "/") {
-      window.location.href = "/";
-      // NO hacer return aquí - dejar que continúe para configurar el timeout
+      // Pequeño delay para asegurar que localStorage se guardó
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 50);
+      return;
     }
+    
     // Si es el primer click y NO estamos en homepage, navegar a inicio
-    else if (newClickCount === 1) {
+    if (newClickCount === 1) {
       navigate("/");
     }
 
-    // Configurar nuevo timeout para resetear
+    // Configurar timeout para resetear
     timeoutRef.current = setTimeout(() => {
       setClickCount(0);
+      localStorage.removeItem('logoClickCount');
+      localStorage.removeItem('logoClickTimestamp');
       timeoutRef.current = null;
     }, 2000);
   };
