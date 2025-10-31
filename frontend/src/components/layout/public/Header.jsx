@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Bars3Icon,
   XMarkIcon,
-  MagnifyingGlassIcon,
+  MagnifyingGlassIcon, 
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
@@ -472,13 +472,6 @@ const MinimalMobileMenu = ({
       </Link>
       {isAuthenticated && (
         <div>
-          <Link
-            to="/profile"
-            className="block text-base font-light uppercase tracking-widest text-white/80 hover:text-naranjaDivanco py-3 px-2 rounded transition-all duration-200"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {user?.name || "Profile"}
-          </Link>
           <button
             onClick={async () => {
               await logoutWithoutNavigate();
