@@ -1,4 +1,4 @@
-import { Category, Subcategory, Project, BlogPost, User, MediaFile } from '../data/models/index.js';
+import { Category, Subcategory, Project, BlogPost, User, MediaFile, Product } from '../data/models/index.js';
 import { Op } from 'sequelize';
 import sequelize from '../data/config/sequelize.js';
 
@@ -35,6 +35,7 @@ export const globalSearch = async (req, res) => {
       subcategories: [],
       projects: [],
       blogPosts: [],
+      products: [],
       total: 0
     };
 
@@ -127,7 +128,8 @@ export const globalSearch = async (req, res) => {
       
       // Filtro por tipo de proyecto
       if (projectType) {
-        whereClause.projectType = { [Op.contains]: [projectType] };
+        // projectType es un array, usamos @> para verificar si contiene el elemento
+        whereClause.projectType = sequelize.literal(`"Project"."projectType" @> ARRAY['${projectType}']::text[]`);
       }
 
       const projects = await Project.findAll({
@@ -214,17 +216,100 @@ export const globalSearch = async (req, res) => {
       }));
     }
 
+    // Búsqueda en productos
+    if (type === 'all' || type === 'products') {
+      const whereClause = { isActive: true };
+      
+      if (!isWildcard && searchTerm) {
+        whereClause[Op.or] = [
+          { name: { [Op.iLike]: `%${searchTerm}%` } },
+          { description: { [Op.iLike]: `%${searchTerm}%` } },
+          { shortDescription: { [Op.iLike]: `%${searchTerm}%` } },
+          { searchableText: { [Op.iLike]: `%${searchTerm}%` } }
+        ];
+      }
+
+      const includeOptions = [];
+      
+      // Incluir categoría si se solicita
+      if (category || subcategory) {
+        const categoryInclude = {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug'],
+          where: { isActive: true }
+        };
+        
+        if (category) {
+          categoryInclude.where.slug = category;
+        }
+        
+        includeOptions.push(categoryInclude);
+      }
+      
+      // Incluir subcategoría si se solicita
+      if (subcategory) {
+        includeOptions.push({
+          model: Subcategory,
+          as: 'subcategory',
+          attributes: ['id', 'name', 'slug'],
+          where: { 
+            isActive: true,
+            slug: subcategory
+          }
+        });
+      }
+
+      const products = await Product.findAll({
+        where: whereClause,
+        include: includeOptions.length > 0 ? includeOptions : [
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['id', 'name', 'slug'],
+            required: false
+          },
+          {
+            model: Subcategory,
+            as: 'subcategory',
+            attributes: ['id', 'name', 'slug'],
+            required: false
+          }
+        ],
+        attributes: ['id', 'name', 'slug', 'description', 'shortDescription', 'price', 'images', 'stockStatus'],
+        limit: type === 'products' ? itemLimit : 5,
+        offset: type === 'products' ? offset : 0,
+        order: [['createdAt', 'DESC'], ['name', 'ASC']]
+      });
+
+      results.products = products.map(product => {
+        const productData = product.toJSON();
+        const featuredImage = productData.images && productData.images.length > 0 
+          ? productData.images[0] 
+          : null;
+        
+        return {
+          ...productData,
+          type: 'product',
+          url: `/productos/${product.slug}`,
+          featuredImage: featuredImage
+        };
+      });
+    }
+
     // Calcular total
     results.total = results.categories.length + 
                    results.subcategories.length + 
                    results.projects.length + 
-                   results.blogPosts.length;
+                   results.blogPosts.length +
+                   results.products.length;
 
     // Si es búsqueda específica por tipo, devolver solo ese tipo con paginación
     if (type !== 'all') {
       const specificResults = results[type === 'categories' ? 'categories' :
                                      type === 'subcategories' ? 'subcategories' :
-                                     type === 'projects' ? 'projects' : 'blogPosts'];
+                                     type === 'projects' ? 'projects' : 
+                                     type === 'products' ? 'products' : 'blogPosts'];
       
       return res.json({
         success: true,
