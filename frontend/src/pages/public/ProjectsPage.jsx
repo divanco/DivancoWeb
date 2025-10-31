@@ -216,7 +216,9 @@ const ProjectsPage = () => {
                       <p className={`font-light opacity-90 mb-2 leading-relaxed ${
                         isMobile ? 'text-xs' : 'text-sm lg:text-base'
                       }`}>
-                        {project.projectType} • {project.year}
+                        {Array.isArray(project.projectType) 
+                          ? project.projectType.join(' • ') 
+                          : project.projectType} • {project.year}
                       </p>
                       {project.location && (
                         <p className={`font-light opacity-80 mb-2 ${

@@ -134,7 +134,10 @@ const ProjectSection = ({ limit = 6 }) => {
               
               // Usar sliderImage si existe, si no buscar en media
               const sliderImage = project.sliderImage || (project.media && project.media[0]);
-              const imageUrl = sliderImage?.urls?.desktop || sliderImage?.urls?.mobile || sliderImage?.url || null;
+              const isVideo = sliderImage?.type === 'video';
+              const mediaUrl = isVideo 
+                ? (sliderImage?.urls?.main || sliderImage?.urls?.original || sliderImage?.url)
+                : (sliderImage?.urls?.desktop || sliderImage?.urls?.mobile || sliderImage?.url);
               
               return (
                 <div 
@@ -158,16 +161,32 @@ const ProjectSection = ({ limit = 6 }) => {
                     marginRight: '2rem'
                   }}
                 >
-                  {/* Imagen principal - SIN border-radius en desktop */}
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={project.title}
-                      className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'rounded-lg' : ''}`}
-                      onError={(e) => {
-                        e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23f5f5f5'/%3E%3Ctext x='400' y='280' text-anchor='middle' fill='%23999' font-size='24' font-family='Arial'%3E" + project.title + "%3C/text%3E%3Ctext x='400' y='320' text-anchor='middle' fill='%23666' font-size='16' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
+                  {/* Imagen/Video principal - SIN border-radius en desktop */}
+                  {mediaUrl ? (
+                    isVideo ? (
+                      <video
+                        src={mediaUrl}
+                        className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'rounded-lg' : ''}`}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        onError={(e) => {
+                          console.error('Error cargando video en ProjectSection:', e);
+                        }}
+                      >
+                        Tu navegador no soporta la reproducción de video.
+                      </video>
+                    ) : (
+                      <img
+                        src={mediaUrl}
+                        alt={project.title}
+                        className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'rounded-lg' : ''}`}
+                        onError={(e) => {
+                          e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23f5f5f5'/%3E%3Ctext x='400' y='280' text-anchor='middle' fill='%23999' font-size='24' font-family='Arial'%3E" + project.title + "%3C/text%3E%3Ctext x='400' y='320' text-anchor='middle' fill='%23666' font-size='16' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
+                        }}
+                      />
+                    )
                   ) : (
                     <div className={`absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center ${isMobile ? 'rounded-lg' : ''}`}>
                       <span className="text-gray-400">Sin imagen</span>

@@ -66,7 +66,9 @@ const ProjectInfo = ({ project, t }) => (
                 )}
                 {!project.architect && project.projectType && (
                   <span className="block text-sm font-normal text-gray-500 mt-3 tracking-wider uppercase">
-                    — {project.projectType}
+                    — {Array.isArray(project.projectType) 
+                        ? project.projectType.join(' • ') 
+                        : project.projectType}
                   </span>
                 )}
               </h1>
@@ -142,7 +144,9 @@ const ProjectInfo = ({ project, t }) => (
                       {t('projectDetail.etapa')}
                     </dt>
                     <dd className="text-lg font-light text-gray-900">
-                      {project.projectType}
+                      {Array.isArray(project.projectType) 
+                        ? project.projectType.join(' • ') 
+                        : project.projectType}
                     </dd>
                   </div>
                 )}
@@ -176,6 +180,25 @@ const ProjectInfo = ({ project, t }) => (
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAGS */}
+            {project.tags && project.tags.length > 0 && (
+              <div>
+                <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-4 border-b border-gray-200 pb-2">
+                  — Tags
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag, idx) => (
+                    <span 
+                      key={idx}
+                      className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full capitalize"
+                    >
+                      {tag.replace(/_/g, ' ')}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
