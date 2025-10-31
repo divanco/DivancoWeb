@@ -142,6 +142,7 @@ export const createProduct = async (req, res) => {
       order,
       isFeatured,
       isNew,
+      isOnSale,
       metaTitle,
       metaDescription
     } = req.body;
@@ -189,6 +190,7 @@ export const createProduct = async (req, res) => {
       order: parseInt(order) || 0,
       isFeatured: Boolean(isFeatured),
       isNew: Boolean(isNew),
+      isOnSale: Boolean(isOnSale),
       metaTitle: metaTitle?.trim(),
       metaDescription: metaDescription?.trim()
     };
@@ -263,6 +265,7 @@ export const updateProduct = async (req, res) => {
       order,
       isFeatured,
       isNew,
+      isOnSale,
       metaTitle,
       metaDescription
     } = req.body;
@@ -293,6 +296,7 @@ export const updateProduct = async (req, res) => {
     if (order !== undefined) updateData.order = parseInt(order) || 0;
     if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
     if (isNew !== undefined) updateData.isNew = Boolean(isNew);
+    if (isOnSale !== undefined) updateData.isOnSale = Boolean(isOnSale);
     if (metaTitle !== undefined) updateData.metaTitle = metaTitle?.trim();
     if (metaDescription !== undefined) updateData.metaDescription = metaDescription?.trim();
 
