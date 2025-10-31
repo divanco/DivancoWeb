@@ -143,6 +143,7 @@ const ShowroomSection = () => {
                              category.featuredImage?.thumbnail?.url || 
                              category.featuredImage?.mobile?.url || null;
               
+              // Solo usar Link, sin ningún handler extra que sobrescriba la navegación
               return (
                 <Link
                   key={category.id}
@@ -155,12 +156,10 @@ const ShowroomSection = () => {
                         : 'opacity-80 scale-95 z-10'
                   }`}
                   style={isMobile ? {
-                    // Móvil: Una imagen por vez, más horizontal
                     width: '90%',
                     height: '300px',
                     marginRight: '1rem'
                   } : {
-                    // Desktop: Slide central + parciales laterales, más horizontal
                     width: '70%',
                     height: '400px',
                     marginRight: '1.5rem'
@@ -181,10 +180,8 @@ const ShowroomSection = () => {
                       <span className="text-gray-500 text-lg">{category.name}</span>
                     </div>
                   )}
-                  
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent rounded-lg group-hover:from-black/60 transition-all duration-300" />
-                  
                   {/* Contenido del slide */}
                   <div className={`absolute bottom-0 left-0 right-0 text-white transition-all duration-700 ${
                     (isMobile || isActive) ? 'opacity-100 translate-y-0' : 'opacity-90 translate-y-1'
@@ -196,7 +193,6 @@ const ShowroomSection = () => {
                       }`}>
                         {category.name}
                       </h3>
-                      
                       {/* Descripción */}
                       {category.description && (
                         <p className={`font-light opacity-90 mb-4 line-clamp-2 ${
@@ -205,7 +201,6 @@ const ShowroomSection = () => {
                           {category.description}
                         </p>
                       )}
-                      
                       {/* Botón explorar */}
                       <div className={`inline-flex items-center text-white font-light uppercase tracking-wider hover:opacity-70 transition-all duration-300 group-hover:translate-x-1 ${
                         isMobile ? 'text-xs' : 'text-sm'
@@ -217,7 +212,6 @@ const ShowroomSection = () => {
                       </div>
                     </div>
                   </div>
-
                   {/* Indicador de categoría activa */}
                   {!isMobile && isActive && (
                     <div className="absolute top-4 left-4 bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">

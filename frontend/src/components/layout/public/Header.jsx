@@ -104,9 +104,14 @@ const Header = () => {
   }
 
   // Si es el primer click, navegar a inicio
-  if (newClickCount === 1) {
-    navigate("/");
-  }
+    // Single click: go to home (force reload if already at '/')
+    if (newClickCount === 1) {
+      if (window.location.pathname === "/") {
+        window.location.href = "/";
+      } else {
+        navigate("/");
+      }
+    }
 
   // Configurar nuevo timeout para resetear
   timeoutRef.current = setTimeout(() => {
