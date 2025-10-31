@@ -164,6 +164,10 @@ const ShowroomSection = () => {
                     height: '400px',
                     marginRight: '1.5rem'
                   }}
+                  onClick={e => {
+                    e.preventDefault();
+                    window.location.href = `/showroom/${category.slug}`;
+                  }}
                 >
                   {/* Imagen principal con aspect ratio horizontal */}
                   {imageUrl ? (
