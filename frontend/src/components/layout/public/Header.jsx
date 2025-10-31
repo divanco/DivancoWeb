@@ -88,12 +88,6 @@ const Header = () => {
   // ✅ MEJORADO: Función para manejar el triple click en el logo
   const handleLogoClick = (e) => {
     e.preventDefault();
-    
-    // Si ya estamos en la homepage, solo refrescar (no contar como click para triple-click)
-    if (window.location.pathname === "/") {
-      window.location.href = "/";
-      return;
-    }
 
     // Limpiar timeout anterior si existe
     if (timeoutRef.current) {
@@ -110,8 +104,13 @@ const Header = () => {
       return;
     }
 
-    // Si es el primer o segundo click (y no estamos en /), navegar a inicio
-    if (newClickCount === 1) {
+    // Si es el primer click y estamos en homepage, refrescar
+    if (newClickCount === 1 && window.location.pathname === "/") {
+      window.location.href = "/";
+      // NO hacer return aquí - dejar que continúe para configurar el timeout
+    }
+    // Si es el primer click y NO estamos en homepage, navegar a inicio
+    else if (newClickCount === 1) {
       navigate("/");
     }
 
