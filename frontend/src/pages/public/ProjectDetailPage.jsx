@@ -32,12 +32,10 @@ const ProjectInfo = ({ project, t }) => (
    <div className="max-w-7xl mx-auto mt-8 relative z-10 px-4 sm:px-6 md:px-8">
     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
-        
-        {/* ✅ COLUMNA IZQUIERDA: Descripción scrolleable (2/3 del ancho) */}
+        {/* COLUMNA IZQUIERDA: Descripción scrolleable (2/3 del ancho) */}
         <div className="lg:col-span-2 p-4 sm:p-6 lg:p-12">
           <div className="space-y-6">
             <div>
-              {/* ✅ NUEVO ESTILO DE TÍTULO - Similar al BlogSection */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-light text-gray-600 mb-4 leading-tight">
                 {project.title}
                 {project.architect && (
@@ -55,7 +53,6 @@ const ProjectInfo = ({ project, t }) => (
 
             {project.description && (
               <div className="relative">
-                {/* ✅ CONTENEDOR: Full en móvil, scrolleable en desktop */}
                 <div 
                   className="text-gray-700 font-light leading-relaxed text-base md:text-lg md:max-h-48 md:overflow-y-auto md:pr-4 md:custom-scrollbar relative"
                   style={{ lineHeight: '1.7' }}
@@ -66,11 +63,7 @@ const ProjectInfo = ({ project, t }) => (
                     </p>
                   ))}
                 </div>
-                
-                {/* ✅ GRADIENTE INDICADOR DE MÁS CONTENIDO - Solo en desktop */}
                 <div className="hidden md:block absolute bottom-0 left-0 right-4 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
-                
-                {/* ✅ INDICADOR VISUAL DE SCROLL - Solo en desktop */}
                 <div className="hidden md:flex items-center justify-center mt-3 text-gray-400">
                   <div className="flex items-center gap-2 text-xs font-light">
                     <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,29 +74,10 @@ const ProjectInfo = ({ project, t }) => (
                 </div>
               </div>
             )}
-
-            {/* Tags con estilo mejorado */}
-            {/* {project.tags && project.tags.length > 0 && (
-              <div className="pt-6 border-t border-gray-100">
-                <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-3">
-                  — {t('projectDetail.etiquetas')}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-light bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors tracking-wider"
-                    >
-                      #{tag.replace('_', ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )} */}
           </div>
         </div>
 
-        {/* ✅ COLUMNA DERECHA: Metadatos con tipografía mejorada */}
+        {/* COLUMNA DERECHA: Metadatos y especificaciones */}
         <div className="bg-gray-50 p-4 sm:p-6 lg:p-12 border-t lg:border-t-0 lg:border-l border-gray-100">
           <div className="space-y-8">
             <div>
@@ -111,7 +85,6 @@ const ProjectInfo = ({ project, t }) => (
                 — {t('projectDetail.informacion')}
               </h3>
               <div className="space-y-5">
-                
                 {project.year && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -122,7 +95,6 @@ const ProjectInfo = ({ project, t }) => (
                     </dd>
                   </div>
                 )}
-
                 {project.location && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -133,7 +105,6 @@ const ProjectInfo = ({ project, t }) => (
                     </dd>
                   </div>
                 )}
-
                 {project.client && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -144,7 +115,6 @@ const ProjectInfo = ({ project, t }) => (
                     </dd>
                   </div>
                 )}
-
                 {project.projectType && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -155,9 +125,6 @@ const ProjectInfo = ({ project, t }) => (
                     </dd>
                   </div>
                 )}
-
-                
-
                 {project.area && (
                   <div className="group">
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -168,11 +135,30 @@ const ProjectInfo = ({ project, t }) => (
                     </dd>
                   </div>
                 )}
-
               </div>
             </div>
 
-            {/* ✅ Información adicional con estilo mejorado */}
+            {/* ESPECIFICACIONES COMO TABLA CLAVE:VALOR */}
+            {project.specifications && Object.keys(project.specifications).length > 0 && (
+              <div>
+                <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-4 border-b border-gray-200 pb-2">
+                  — {t('projectDetail.especificaciones') || 'Especificaciones'}
+                </h4>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <tbody>
+                      {Object.entries(project.specifications).map(([key, value], idx) => (
+                        <tr key={idx} className="border-b border-gray-100">
+                          <td className="py-2 pr-4 font-medium text-gray-600 whitespace-nowrap capitalize">{key.replace(/_/g, ' ')}</td>
+                          <td className="py-2 text-gray-900 font-light">{value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {(project.startDate || project.endDate) && (
               <div>
                 <h4 className="text-xs font-medium text-gray-500 tracking-wider uppercase mb-4 border-b border-gray-200 pb-2">
@@ -209,7 +195,6 @@ const ProjectInfo = ({ project, t }) => (
               </div>
             )}
 
-            {/* ✅ CTA con estilo mejorado - Ahora abre Kuula directamente */}
             {project.kuulaUrl && (
               <div className="pt-6 border-t border-gray-200">
                 <a
@@ -218,7 +203,6 @@ const ProjectInfo = ({ project, t }) => (
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-light text-white bg-naranjaDivanco hover:bg-orange-600 rounded-none transition-all duration-200 shadow-sm hover:shadow-md tracking-wider uppercase"
                 >
-                  {/* Icono de VR/Oculus */}
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 4H5C3.89543 4 3 4.89543 3 6V18C3 19.1046 3.89543 20 5 20H9C10.1046 20 11 19.1046 11 18V6C11 4.89543 10.1046 4 9 4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M19 4H15C13.8954 4 13 4.89543 13 6V18C13 19.1046 13.8954 20 15 20H19C20.1046 20 21 19.1046 21 18V6C21 4.89543 20.1046 4 19 4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -235,8 +219,6 @@ const ProjectInfo = ({ project, t }) => (
         </div>
       </div>
     </div>
-
-    {/* ✅ INDICADOR VISUAL DE QUE HAY MÁS CONTENIDO DEBAJO - Mejorado */}
     <div className="flex flex-col items-center mt-8 md:mt-12 lg:mt-16 mb-4 md:mb-8 px-4">
       <div className="text-center space-y-4">
         <h3 className="text-xs font-medium text-gray-500 tracking-wider uppercase">
