@@ -84,11 +84,17 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads/')));
 
 
-// ✅ Servir archivos estáticos del frontend (ahora en backend/dist)
-app.use(express.static(path.join(process.cwd(), 'dist')));
+// NOTE: frontend now hosted separately (Azure Static Web Apps).
+// Static serving from backend/dist is disabled to avoid trying to access /app/dist inside the container.
+// app.use(express.static(path.join(process.cwd(), 'dist')));
 
 app.get('/', (req, res) => {
   res.send('Backend Divanco Running 🏗️');
+});
+
+// Health endpoint used by deployment checks
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, message: 'Backend is healthy', timestamp: new Date().toISOString() });
 });
 
 // Ejemplo de endpoint para enviar email
@@ -124,21 +130,7 @@ app.post('/upload', testUpload.single('file'), (req, res) => {
 
 app.use(routes);
 
-// SPA fallback: servir index.html para cualquier ruta que no sea archivo subido ni estático
-import fs from 'fs';
-
-const frontendDist = path.join(process.cwd(), 'dist');
-const indexHtml = path.join(frontendDist, 'index.html');
-
-app.get('*', (req, res, next) => {
-  // Si la ruta es para archivos subidos, no hacer fallback
-  if (req.path.startsWith('/uploads')) return next();
-  // Si la ruta es para un archivo estático existente, no hacer fallback
-  const filePath = path.join(frontendDist, req.path);
-  if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) return res.sendFile(filePath);
-  // Fallback: servir index.html
-  res.sendFile(indexHtml);
-});
+// SPA fallback removed: frontend is served by Azure Static Web Apps. Backend only serves API routes and uploads.
 
 // 404 handler (solo si no existe ni como archivo ni como ruta)
 app.use('*', (req, res) => {
