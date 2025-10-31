@@ -84,8 +84,8 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads/')));
 
 
-// ✅ Servir archivos estáticos del frontend (DESACTIVADO - ahora en Azure Static Web Apps)
-// app.use(express.static(path.join(process.cwd(), 'dist')));
+// ✅ Servir archivos estáticos del frontend (ahora en backend/dist)
+app.use(express.static(path.join(process.cwd(), 'dist')));
 
 app.get('/', (req, res) => {
   res.send('Backend Divanco Running 🏗️');
@@ -124,8 +124,9 @@ app.post('/upload', testUpload.single('file'), (req, res) => {
 
 app.use(routes);
 
-// SPA fallback: DESACTIVADO - ahora el frontend está en Azure Static Web Apps
-/*
+// SPA fallback: servir index.html para cualquier ruta que no sea archivo subido ni estático
+import fs from 'fs';
+
 const frontendDist = path.join(process.cwd(), 'dist');
 const indexHtml = path.join(frontendDist, 'index.html');
 
@@ -138,7 +139,6 @@ app.get('*', (req, res, next) => {
   // Fallback: servir index.html
   res.sendFile(indexHtml);
 });
-*/
 
 // 404 handler (solo si no existe ni como archivo ni como ruta)
 app.use('*', (req, res) => {
