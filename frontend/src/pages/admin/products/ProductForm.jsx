@@ -20,6 +20,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     featured: currentProduct?.featured || false,
     isNew: currentProduct?.isNew || false,
     isOnSale: currentProduct?.isOnSale || false,
+    showStockStatus: currentProduct?.showStockStatus !== false, // Por defecto true
     slug: currentProduct?.slug || ''
   });
 
@@ -172,6 +173,19 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     }
   };
 
+  const handleMoveImage = (fromIndex, toIndex) => {
+    if (!currentProduct || !currentProduct.images) return;
+    
+    const newImages = [...currentProduct.images];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    
+    setCurrentProduct(prevProduct => ({
+      ...prevProduct,
+      images: newImages
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -189,15 +203,19 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     try {
       // Convert specifications and dimensions arrays to objects
       const specificationsObj = specifications.reduce((acc, spec) => {
-        if (spec.key.trim() && spec.value.trim()) {
-          acc[spec.key.trim()] = spec.value.trim();
+        const key = typeof spec.key === 'string' ? spec.key.trim() : '';
+        const value = typeof spec.value === 'string' ? spec.value.trim() : '';
+        if (key && value) {
+          acc[key] = value;
         }
         return acc;
       }, {});
 
       const dimensionsObj = dimensions.reduce((acc, dim) => {
-        if (dim.key.trim() && dim.value.trim()) {
-          acc[dim.key.trim()] = dim.value.trim();
+        const key = typeof dim.key === 'string' ? dim.key.trim() : '';
+        const value = typeof dim.value === 'string' ? dim.value.trim() : '';
+        if (key && value) {
+          acc[key] = value;
         }
         return acc;
       }, {});
@@ -641,20 +659,36 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                   </label>
                 </div>
 
-                {/* Stock Status Indicator */}
                 <div className="flex items-center">
-                  <div className={`w-3 h-3 rounded-full mr-2 ${
-                    form.stock > 10 ? 'bg-green-500' : 
-                    form.stock > 0 ? 'bg-yellow-500' : 
-                    'bg-red-500'
-                  }`}></div>
-                  <span className="text-sm text-gray-700">
-                    {form.stock > 10 ? 'En stock' :
-                     form.stock > 0 ? 'Stock bajo' :
-                     'Agotado'}
-                    {form.stock > 0 && ` (${form.stock} unidades)`}
-                  </span>
+                  <input
+                    type="checkbox"
+                    name="showStockStatus"
+                    checked={form.showStockStatus}
+                    onChange={handleChange}
+                    id="showStockStatus"
+                    className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  />
+                  <label htmlFor="showStockStatus" className="ml-2 text-sm text-gray-700">
+                    Mostrar estado de stock
+                  </label>
                 </div>
+
+                {/* Stock Status Indicator */}
+                {form.showStockStatus && (
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      form.stock > 10 ? 'bg-green-500' : 
+                      form.stock > 0 ? 'bg-yellow-500' : 
+                      'bg-red-500'
+                    }`}></div>
+                    <span className="text-sm text-gray-700">
+                      {form.stock > 10 ? 'En stock' :
+                       form.stock > 0 ? 'Stock bajo' :
+                       'Agotado'}
+                      {form.stock > 0 && ` (${form.stock} unidades)`}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -673,11 +707,42 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                     const imageUrl = image?.thumbnail?.url || image?.desktop?.url || image?.mobile?.url || image?.url;
                     return (
                       <div key={index} className="relative group">
+                        <div className="absolute top-1 left-1 bg-gray-800 text-white px-2 py-0.5 rounded text-xs font-medium">
+                          #{index + 1}
+                        </div>
                         <img
                           src={imageUrl}
                           alt={`${currentProduct.name} ${index + 1}`}
                           className="w-full h-24 object-cover rounded-lg border"
                         />
+                        {/* Reorder buttons */}
+                        <div className="absolute bottom-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleMoveImage(index, index - 1)}
+                              className="bg-blue-600 text-white rounded p-1 hover:bg-blue-700"
+                              title="Mover a la izquierda"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              </svg>
+                            </button>
+                          )}
+                          {index < currentProduct.images.length - 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleMoveImage(index, index + 1)}
+                              className="bg-blue-600 text-white rounded p-1 hover:bg-blue-700"
+                              title="Mover a la derecha"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                        {/* Delete button */}
                         <button
                           type="button"
                           onClick={() => handleDeleteImage(index)}
@@ -691,6 +756,9 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                     );
                   })}
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Usa las flechas para cambiar el orden de las imágenes
+                </p>
               </div>
             )}
 
