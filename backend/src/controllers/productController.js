@@ -177,7 +177,10 @@ export const createProduct = async (req, res) => {
       brand: brand?.trim(),
       model: model?.trim(),
       sku: sku?.trim(),
-      specifications: specifications || {},
+      specifications: {
+        ...(specifications || {}),
+        ...(dimensions || {})
+      },
       whatsappMessage: whatsappMessage?.trim(),
       price: price ? parseFloat(price) : null,
       currency: currency || 'COP', // Cambiar default de USD a COP
@@ -234,7 +237,48 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = { ...req.body };
+    const {
+      name,
+      description,
+      subcategoryId,
+      brand,
+      model,
+      sku,
+      specifications,
+      dimensions,
+      whatsappMessage,
+      price,
+      currency,
+      order,
+      isFeatured,
+      isNew,
+      metaTitle,
+      metaDescription
+    } = req.body;
+
+    const updateData = {};
+
+    // Solo agregar campos que se están actualizando
+    if (name !== undefined) updateData.name = name.trim();
+    if (description !== undefined) updateData.description = description?.trim();
+    if (subcategoryId !== undefined) updateData.subcategoryId = subcategoryId;
+    if (brand !== undefined) updateData.brand = brand?.trim();
+    if (model !== undefined) updateData.model = model?.trim();
+    if (sku !== undefined) updateData.sku = sku?.trim();
+    if (specifications !== undefined || dimensions !== undefined) {
+      updateData.specifications = {
+        ...(specifications || {}),
+        ...(dimensions || {})
+      };
+    }
+    if (whatsappMessage !== undefined) updateData.whatsappMessage = whatsappMessage?.trim();
+    if (price !== undefined) updateData.price = price ? parseFloat(price) : null;
+    if (currency !== undefined) updateData.currency = currency || 'COP';
+    if (order !== undefined) updateData.order = parseInt(order) || 0;
+    if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
+    if (isNew !== undefined) updateData.isNew = Boolean(isNew);
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle?.trim();
+    if (metaDescription !== undefined) updateData.metaDescription = metaDescription?.trim();
 
     const product = await Product.findByPk(id);
     if (!product) {

@@ -2,29 +2,32 @@ import { useState, useRef } from 'react';
 import { useProductManager } from '../../../features/products/useProducts';
 
 const ProductForm = ({ subcategory, product, onClose, onSave }) => {
+  // Estado local para el producto actual (para manejar actualizaciones en tiempo real)
+  const [currentProduct, setCurrentProduct] = useState(product);
+
   const [form, setForm] = useState({
-    name: product?.name || '',
-    description: product?.description || '',
-    shortDescription: product?.shortDescription || '',
-    brand: product?.brand || '',
-    model: product?.model || '',
-    price: product?.price || '',
-    salePrice: product?.salePrice || '',
-    stock: product?.stock || 0,
-    specifications: product?.specifications || {},
-    dimensions: product?.dimensions || {},
-    order: product?.order || 0,
-    featured: product?.featured || false,
-    isNew: product?.isNew || false,
-    isOnSale: product?.isOnSale || false,
-    slug: product?.slug || ''
+    name: currentProduct?.name || '',
+    description: currentProduct?.description || '',
+    shortDescription: currentProduct?.shortDescription || '',
+    brand: currentProduct?.brand || '',
+    model: currentProduct?.model || '',
+    price: currentProduct?.price || '',
+    salePrice: currentProduct?.salePrice || '',
+    stock: currentProduct?.stock || 0,
+    specifications: currentProduct?.specifications || {},
+    dimensions: currentProduct?.specifications?.dimensions || {},
+    order: currentProduct?.order || 0,
+    featured: currentProduct?.featured || false,
+    isNew: currentProduct?.isNew || false,
+    isOnSale: currentProduct?.isOnSale || false,
+    slug: currentProduct?.slug || ''
   });
 
   const [specifications, setSpecifications] = useState(
-    Object.entries(product?.specifications || {}).map(([key, value]) => ({ key, value }))
+    Object.entries(currentProduct?.specifications || {}).map(([key, value]) => ({ key, value }))
   );
   const [dimensions, setDimensions] = useState(
-    Object.entries(product?.dimensions || {}).map(([key, value]) => ({ key, value }))
+    Object.entries(currentProduct?.specifications?.dimensions || {}).map(([key, value]) => ({ key, value }))
   );
 
   const [error, setError] = useState(null);
@@ -151,16 +154,19 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
   };
 
   const handleDeleteImage = async (imageIndex) => {
-    if (!product || !window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+    if (!currentProduct || !window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
       return;
     }
 
     try {
-      await deleteImage(product.id, imageIndex);
-      // Llamar a onSave para refrescar los datos del producto
-      if (onSave) {
-        onSave();
-      }
+      await deleteImage(currentProduct.id, imageIndex);
+
+      // Actualizar el estado local removiendo la imagen eliminada
+      setCurrentProduct(prevProduct => ({
+        ...prevProduct,
+        images: prevProduct.images.filter((_, index) => index !== imageIndex)
+      }));
+
     } catch (error) {
       alert('Error al eliminar la imagen: ' + error.message);
     }
@@ -658,18 +664,18 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
             <h3 className="text-lg font-medium text-gray-900">Imágenes</h3>
             
             {/* Current images */}
-            {product && product.images && product.images.length > 0 && (
+            {currentProduct && currentProduct.images && currentProduct.images.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Imágenes actuales</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {product.images.map((image, index) => {
+                  {currentProduct.images.map((image, index) => {
                     // Extract URL from the complex image structure
                     const imageUrl = image?.thumbnail?.url || image?.desktop?.url || image?.mobile?.url || image?.url;
                     return (
                       <div key={index} className="relative group">
                         <img
                           src={imageUrl}
-                          alt={`${product.name} ${index + 1}`}
+                          alt={`${currentProduct.name} ${index + 1}`}
                           className="w-full h-24 object-cover rounded-lg border"
                         />
                         <button
@@ -691,7 +697,7 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
             {/* Upload new images */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {product ? 'Añadir nuevas imágenes' : 'Subir imágenes'}
+                {currentProduct ? 'Añadir nuevas imágenes' : 'Subir imágenes'}
               </label>
               <input
                 type="file"
