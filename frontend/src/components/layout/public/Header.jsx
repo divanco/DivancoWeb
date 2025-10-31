@@ -128,17 +128,8 @@ const Header = () => {
       return;
     }
 
-    // Si es el primer click y estamos en homepage, refrescar
-    if (newClickCount === 1 && window.location.pathname === "/") {
-      // Pequeño delay para asegurar que localStorage se guardó
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 50);
-      return;
-    }
-    
     // Si es el primer click y NO estamos en homepage, navegar a inicio
-    if (newClickCount === 1) {
+    if (newClickCount === 1 && window.location.pathname !== "/") {
       navigate("/");
     }
 
