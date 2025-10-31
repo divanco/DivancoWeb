@@ -17,10 +17,9 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
     specifications: currentProduct?.specifications || {},
     dimensions: currentProduct?.specifications?.dimensions || {},
     order: currentProduct?.order || 0,
-    featured: currentProduct?.featured || false,
+    isFeatured: currentProduct?.isFeatured || false,
     isNew: currentProduct?.isNew || false,
     isOnSale: currentProduct?.isOnSale || false,
-    showStockStatus: currentProduct?.showStockStatus !== false, // Por defecto true
     slug: currentProduct?.slug || ''
   });
 
@@ -221,13 +220,25 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
       }, {});
 
       const payload = {
-        ...form,
-        subcategoryId: subcategory.id,
-        specifications: specificationsObj,
-        dimensions: dimensionsObj,
+        name: form.name,
+        description: form.description,
+        shortDescription: form.shortDescription,
+        brand: form.brand,
+        model: form.model,
+        slug: form.slug,
         price: form.price ? parseFloat(form.price) : null,
         salePrice: form.salePrice ? parseFloat(form.salePrice) : null,
-        currency: 'COP' // Asegurar que siempre sea COP
+        stock: form.stock ? parseInt(form.stock) : 0,
+        order: form.order ? parseInt(form.order) : 0,
+        isFeatured: Boolean(form.isFeatured),
+        isNew: Boolean(form.isNew),
+        isOnSale: Boolean(form.isOnSale),
+        subcategoryId: subcategory.id,
+        currency: 'COP',
+        specifications: {
+          ...specificationsObj,
+          dimensions: dimensionsObj
+        }
       };
 
       console.log('🔵 [ProductForm] Enviando datos:', payload);
@@ -620,13 +631,13 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    name="featured"
-                    checked={form.featured}
+                    name="isFeatured"
+                    checked={form.isFeatured}
                     onChange={handleChange}
-                    id="featured"
+                    id="isFeatured"
                     className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                   />
-                  <label htmlFor="featured" className="ml-2 text-sm text-gray-700">
+                  <label htmlFor="isFeatured" className="ml-2 text-sm text-gray-700">
                     Producto destacado
                   </label>
                 </div>
@@ -658,23 +669,11 @@ const ProductForm = ({ subcategory, product, onClose, onSave }) => {
                     En oferta
                   </label>
                 </div>
+              </div>
 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="showStockStatus"
-                    checked={form.showStockStatus}
-                    onChange={handleChange}
-                    id="showStockStatus"
-                    className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                  />
-                  <label htmlFor="showStockStatus" className="ml-2 text-sm text-gray-700">
-                    Mostrar estado de stock
-                  </label>
-                </div>
-
-                {/* Stock Status Indicator */}
-                {form.showStockStatus && (
+              {/* Mostrar siempre el estado de stock */}
+              <div>
+                {(
                   <div className="flex items-center">
                     <div className={`w-3 h-3 rounded-full mr-2 ${
                       form.stock > 10 ? 'bg-green-500' : 

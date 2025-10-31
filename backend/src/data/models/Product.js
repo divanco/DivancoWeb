@@ -108,6 +108,10 @@ Product.init({
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  isOnSale: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   viewCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
