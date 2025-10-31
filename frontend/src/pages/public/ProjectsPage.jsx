@@ -145,17 +145,36 @@ const ProjectsPage = () => {
                   }}
                   onClick={() => navigate(`/proyectos/${project.slug}`)}
                 >
-                  {/* ✅ USAR IMAGEN DEL SLIDER */}
+                  {/* ✅ USAR IMAGEN/VIDEO DEL SLIDER */}
                   {project.sliderImage ? (
                     (() => {
-                      const imageUrl = project.sliderImage.urls?.desktop || project.sliderImage.urls?.mobile;
+                      const isVideo = project.sliderImage.type === 'video';
+                      const mediaUrl = isVideo 
+                        ? (project.sliderImage.urls?.main || project.sliderImage.urls?.original || project.sliderImage.url)
+                        : (project.sliderImage.urls?.desktop || project.sliderImage.urls?.mobile);
                       
-                      return imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={project.title}
-                          className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                        />
+                      return mediaUrl ? (
+                        isVideo ? (
+                          <video
+                            src={mediaUrl}
+                            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            onError={(e) => {
+                              console.error('Error cargando video en slider:', e);
+                            }}
+                          >
+                            Tu navegador no soporta la reproducción de video.
+                          </video>
+                        ) : (
+                          <img
+                            src={mediaUrl}
+                            alt={project.title}
+                            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                          />
+                        )
                       ) : (
                         <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center rounded-lg">
                           <span className="text-gray-500">Sin imagen</span>

@@ -1072,26 +1072,33 @@ const ProjectUpload = ({ projectId = null, onProjectCreated = () => console.log(
                                 : "bg-white border border-gray-100"
                             }`}
                           >
-                            {/* Preview pequeño */}
+                            {/* Preview mejorado */}
                             <div className="flex-shrink-0 relative">
                               {fileData.preview ? (
                                 fileData.file.type.startsWith("video/") ? (
-                                  <video
-                                    src={fileData.preview}
-                                    className="w-8 h-8 object-cover rounded"
-                                    muted
-                                    playsInline
-                                  />
+                                  <div className="relative w-16 h-16 rounded overflow-hidden bg-black">
+                                    <video
+                                      src={fileData.preview}
+                                      className="w-full h-full object-cover"
+                                      muted
+                                      playsInline
+                                      preload="metadata"
+                                    />
+                                    {/* Ícono de play overlay */}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <VideoCameraIcon className="h-6 w-6 text-white" />
+                                    </div>
+                                  </div>
                                 ) : (
                                   <img
                                     src={fileData.preview}
                                     alt=""
-                                    className="w-8 h-8 object-cover rounded"
+                                    className="w-16 h-16 object-cover rounded"
                                   />
                                 )
                               ) : (
-                                <div className={`w-12 h-12 ${fileType.bgColor} rounded flex items-center justify-center`}>
-                                  <IconComponent className={`h-6 w-6 ${fileType.color}`} />
+                                <div className={`w-16 h-16 ${fileType.bgColor} rounded flex items-center justify-center`}>
+                                  <IconComponent className={`h-8 w-8 ${fileType.color}`} />
                                 </div>
                               )}
                             </div>

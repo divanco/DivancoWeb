@@ -8,24 +8,45 @@ import { ScrollProgress, ProjectBreadcrumbs, FloatingActions } from '../../compo
 import ProjectSEO from '../../components/ui/ProjectSEO';
 import { useTranslation } from '../../hooks';
 
-// Imagen principal con descripción corta
-const ProjectHero = ({ project, mainImage, t }) => (
-  <div className="relative h-[60vh] w-full overflow-hidden">
-    {mainImage ? (
-      <>
-        <img
-          src={mainImage.urls?.desktop || mainImage.urls?.mobile || mainImage.url}
-          alt={project.title}
-          className="w-full h-full object-cover"
-        />
-      </>
-    ) : (
-      <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
-        <span className="text-gray-400 text-xl font-alt">{t('projectDetail.sinImagen')}</span>
-      </div>
-    )}
-  </div>
-);
+// Imagen/Video principal con descripción corta
+const ProjectHero = ({ project, mainImage, t }) => {
+  const isVideo = mainImage?.type === 'video';
+  
+  return (
+    <div className="relative h-[60vh] w-full overflow-hidden bg-black">
+      {mainImage ? (
+        <>
+          {isVideo ? (
+            <video
+              src={mainImage.urls?.main || mainImage.urls?.original || mainImage.url}
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              onError={(e) => {
+                console.error('Error cargando video en hero:', e);
+                console.log('URL del video:', mainImage.urls?.main || mainImage.urls?.original || mainImage.url);
+              }}
+            >
+              Tu navegador no soporta la reproducción de video.
+            </video>
+          ) : (
+            <img
+              src={mainImage.urls?.desktop || mainImage.urls?.mobile || mainImage.url}
+              alt={project.title}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </>
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
+          <span className="text-gray-400 text-xl font-alt">{t('projectDetail.sinImagen')}</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ✅ NUEVO: Información del proyecto en dos columnas
 const ProjectInfo = ({ project, t }) => (
@@ -433,13 +454,16 @@ const ProjectDetailPage = () => {
     [project]
   );
 
-  // Seleccionar imagen principal
+  // Seleccionar imagen/video principal
   useEffect(() => {
     if (project?.media) {
-      const images = project.media.filter(file => file.type === 'image' || file.type === 'render');
-      const featured = images.find(img => img.isMain);
-      const selectedImage = featured || images[0] || null;
-      setMainImage(selectedImage);
+      // ✅ Incluir videos además de imágenes y renders
+      const mediaItems = project.media.filter(file => 
+        file.type === 'image' || file.type === 'render' || file.type === 'video'
+      );
+      const featured = mediaItems.find(item => item.isMain);
+      const selectedMedia = featured || mediaItems[0] || null;
+      setMainImage(selectedMedia);
     }
   }, [project]);
 
