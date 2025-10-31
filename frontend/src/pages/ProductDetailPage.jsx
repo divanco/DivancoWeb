@@ -241,22 +241,31 @@ const ProductDetailPage = () => {
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-6">
-                        {Object.entries(product.specifications).map(([key, value]) => {
-                          // Formatear la clave
-                          const formattedKey = key
-                            .replace(/_/g, ' ')
-                            .split(' ')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                            .join(' ');
-                          // Si el valor es array, unirlo por coma
-                          const formattedValue = Array.isArray(value) ? value.join(', ') : value;
-                          return (
-                            <React.Fragment key={key}>
-                              <div className="text-sm font-semibold text-gray-700 col-span-1">{formattedKey}</div>
-                              <div className="text-sm text-gray-900 col-span-1">{formattedValue}</div>
+                        {/* Renderizar dimensiones si existen */}
+                        {product.specifications.dimensions &&
+                          Object.entries(product.specifications.dimensions).map(([key, value]) => (
+                            <React.Fragment key={"dim-" + key}>
+                              <div className="text-sm font-semibold text-gray-700 col-span-1">{key}</div>
+                              <div className="text-sm text-gray-900 col-span-1">{value}</div>
                             </React.Fragment>
-                          );
-                        })}
+                          ))}
+                        {/* Renderizar otras especificaciones (excluyendo dimensiones) */}
+                        {Object.entries(product.specifications)
+                          .filter(([key]) => key !== "dimensions")
+                          .map(([key, value]) => {
+                            const formattedKey = key
+                              .replace(/_/g, ' ')
+                              .split(' ')
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                              .join(' ');
+                            const formattedValue = Array.isArray(value) ? value.join(', ') : value;
+                            return (
+                              <React.Fragment key={key}>
+                                <div className="text-sm font-semibold text-gray-700 col-span-1">{formattedKey}</div>
+                                <div className="text-sm text-gray-900 col-span-1">{formattedValue}</div>
+                              </React.Fragment>
+                            );
+                          })}
                       </div>
                     </div>
                   </div>
