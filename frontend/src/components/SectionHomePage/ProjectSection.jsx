@@ -6,38 +6,38 @@ import { scrollToSection } from '../../utils/simpleScroll';
 import { useTranslation } from '../../hooks';
 import { useHomeLoading } from '../../contexts/HomeLoadingContext';
 
+import { useOutletContext } from 'react-router-dom';
+
 const ProjectSection = ({ limit = 6 }) => {
   const { t } = useTranslation();
   const { data, isLoading, error } = useGetSliderProjectsQuery(limit);
   const projects = data?.data || [];
-  
-  // Acceder al contexto de carga
-  const { setSectionLoaded } = useHomeLoading();
-  
-  // Usar ref para rastrear si ya marcamos como cargado
-  const hasMarkedLoaded = useRef(false);
 
-  // Actualizar el estado de carga en el contexto
-  useEffect(() => {
-    // Importante: Solo establecer a cargado (loaded=true) cuando tenemos datos Y no lo hayamos hecho antes
-    if (!isLoading && projects.length > 0 && !hasMarkedLoaded.current) {
-      console.log('ProjectSection - Marcando como cargado');
-      setSectionLoaded('projects', true); // true = cargado (ya no está cargando)
-      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
-    }
-  }, [isLoading, projects.length, setSectionLoaded]);
+  // Acceder a función para avisar visibilidad del layout
+  const { handleProjectSectionVisible } = useOutletContext() || {};
 
-  // Ajustar slide inicial basado en la cantidad de proyectos disponibles
-  useEffect(() => {
-    if (projects.length > 0) {
-      // Si solo hay un proyecto o menos de 3, comenzar desde el índice 0
-      // Si hay 2 o más, comenzar desde el índice 1 (segunda imagen)
-      setCurrentSlide(projects.length >= 3 ? 1 : 0);
-    }
-  }, [projects.length]);
+  // Ref para el contenedor de la sección
+  const sectionRef = useRef(null);
 
-  const [currentSlide, setCurrentSlide] = useState(1); // Comenzar desde la segunda imagen (índice 1)
+  // Estado para detectar móvil
   const [isMobile, setIsMobile] = useState(false);
+  // Estado para slide actual
+  const [currentSlide, setCurrentSlide] = useState(1); // Comenzar desde la segunda imagen (índice 1)
+
+  // Intersection Observer para avisar si la sección está visible
+  useEffect(() => {
+    if (!handleProjectSectionVisible || !sectionRef.current) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        handleProjectSectionVisible(entry.isIntersecting);
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [handleProjectSectionVisible]);
+
+  // ...existing code...
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // Detectar tamaño de pantalla
@@ -102,12 +102,13 @@ const ProjectSection = ({ limit = 6 }) => {
   }
 
   return (
-    <div id="projects-section" className="min-h-screen bg-white relative">
+    <div id="projects-section" className="min-h-screen bg-white relative" ref={sectionRef}>
       {/* Slider estilo Minotti con slides parcialmente visibles */}
-      <section className="relative overflow-hidden bg-gray-50" style={{ 
-        height: isMobile ? 'calc(100vh - 80px)' : '100vh',
-        paddingTop: isMobile ? '80px' : '0'
-      }}>
+    <section className="relative overflow-hidden bg-gray-50" style={{ 
+  height: isMobile ? 'calc(85vh - 80px)' : '85vh', // Achicar el slider aún más
+  marginTop: isMobile ? '0px' : '100px', // En desktop, bajar el slider con margin
+  paddingTop: isMobile ? '20px' : '0px' // En mobile, poco padding arriba
+    }}>
         {/* Container principal */}
         <div className="relative h-full flex items-center">
 

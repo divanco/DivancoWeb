@@ -7,60 +7,47 @@ function SloganPage() {
  const { t } = useTranslation();
 
  return (
-  <section id="slogan-section" className="relative min-h-[50vh] bg-white flex items-center justify-center overflow-hidden py-8 pb-24">
+  <section id="slogan-section" className="relative min-h-screen bg-white flex items-center justify-center overflow-hidden py-8 pb-30">
     {/* Container principal */}
     <div className="max-w-4xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 text-center">
 
       {/* Slogan principal */}
       <div className="space-y-6 md:space-y-8">
         
-        {/* Logo + DIVANCO - Todo en una línea horizontal centrado */}
-        <div className="flex items-center justify-center flex-wrap gap-2 md:gap-4 lg:gap-6">
-          {/* ✅ CORREGIR: Logo con tamaños válidos de Tailwind */}
+
+        {/* Logo grande y centrado más abajo */}
+        <div className="flex flex-col items-center justify-center mt-20 mb-16">
           <img
             src="/images/prueba/logo.svg"
             alt="DIVANCO Logo"
-            className="w-16 h-16 md:w-20 md:h-20 lg:w-28 lg:h-28 opacity-90 hover:opacity-100 transition-opacity duration-500"
+            className="w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 opacity-90 hover:opacity-100 transition-opacity duration-500 mb-8"
             onError={(e) => {
               e.target.style.display = 'none';
             }}
           />
-          
-          {/* Separador después del logo */}
-          <div className="hidden sm:flex items-center">
-            <div className="w-6 md:w-8 h-px bg-gray-300"></div>
-          </div>
-          
-          {/* ✅ APLICAR el estilo tipográfico elegante que definimos */}
-          {/* Diseño */}
-          <div className="flex items-center">
-            <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              {t('sloganPage.design')}
-            </p>
-          </div>
-          
-          {/* Separador */}
-          <div className="hidden sm:flex items-center">
-            <div className="w-6 md:w-8 h-px bg-gray-300"></div>
-          </div>
-      
-          {/* Vanguardia */}
-          <div className="flex items-center">
-            <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              {t('sloganPage.vanguard')}
-            </p>
-          </div>
-          
-          {/* Separador */}
-          <div className="hidden sm:flex items-center">
-            <div className="w-6 md:w-8 h-px bg-gray-300"></div>
-          </div>
-
-          {/* Construcción */}
-          <div className="flex items-center">
-            <p className="text-lg md:text-xl lg:text-2xl font-light text-gray-700 tracking-widest uppercase">
-              {t('sloganPage.construction')}
-            </p>
+          {/* Textos debajo del logo, separados por líneas */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
+            <div className="flex items-center">
+              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+                {t('sloganPage.design')}
+              </p>
+            </div>
+            <div className="hidden md:flex items-center">
+              <div className="w-8 md:w-12 h-px bg-gray-300"></div>
+            </div>
+            <div className="flex items-center">
+              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+                {t('sloganPage.vanguard')}
+              </p>
+            </div>
+            <div className="hidden md:flex items-center">
+              <div className="w-8 md:w-12 h-px bg-gray-300"></div>
+            </div>
+            <div className="flex items-center">
+              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+                {t('sloganPage.construction')}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -79,15 +66,15 @@ function SloganPage() {
       <div className="hidden lg:block absolute bottom-40 left-20 w-1 h-1 bg-gray-300 rounded-full opacity-60"></div>
     </div>
 
-    {/* Scroll indicator sutil - Clickeable */}
+    {/* Scroll indicator sutil - Solo en pantallas md+, bien abajo y centrada */}
     <button 
       onClick={() => scrollToSection('#projects-section')}
-      className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform duration-300"
+      className="absolute left-1/2 bottom-6 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform duration-300 hidden md:block"
       aria-label={t('sloganPage.seeProjects')}
     >
-      <div className="w-px h-6 md:h-8 bg-gray-300 mx-auto mb-2"></div>
-      <svg className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors duration-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      <div className="w-px h-8 bg-gray-300 mx-auto mb-2"></div>
+      <svg className="w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors duration-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
       </svg>
     </button>
   </section>

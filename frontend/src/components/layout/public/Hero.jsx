@@ -98,10 +98,10 @@ const Hero = ({
         />
       )}
 
-      {/* ✅ Scroll Indicator - Clickeable y más visible */}
+      {/* ✅ Scroll Indicator - Solo en pantallas medianas y grandes */}
       <button 
         onClick={() => scrollToSection('#slogan-section')}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 cursor-pointer hover:scale-110 transition-all duration-300 group"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 cursor-pointer hover:scale-110 transition-all duration-300 group hidden md:block"
         aria-label="Desplazarse hacia abajo"
       >
         {/* Contenedor con fondo para mejor visibilidad */}

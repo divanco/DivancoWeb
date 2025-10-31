@@ -240,43 +240,21 @@ const ProductDetailPage = () => {
                       Especificaciones
                     </h3>
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                      <div className="space-y-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-6">
                         {Object.entries(product.specifications).map(([key, value]) => {
-                          // Dividir las claves por guión bajo (ej: PESO_DISEÑO_DE_COCINAS -> ["PESO", "DISEÑO_DE_COCINAS"])
-                          const keys = key.split('_');
-                          
-                          // Dividir los valores por coma
-                          const values = typeof value === 'string' ? value.split(',').map(v => v.trim()) : [value];
-                          
-                          // Si hay la misma cantidad de claves y valores, emparejarlos
-                          if (keys.length === values.length) {
-                            return keys.map((k, idx) => {
-                              const formattedKey = k
-                                .split('_')
-                                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                .join(' ');
-                              
-                              return (
-                                <div key={`${key}-${idx}`} className="text-sm">
-                                  <span className="font-semibold text-gray-700">{formattedKey}:</span>{' '}
-                                  <span className="text-gray-900">{values[idx]}</span>
-                                </div>
-                              );
-                            });
-                          }
-                          
-                          // Si no coinciden, mostrar todo junto (fallback)
+                          // Formatear la clave
                           const formattedKey = key
                             .replace(/_/g, ' ')
                             .split(' ')
                             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                             .join(' ');
-                          
+                          // Si el valor es array, unirlo por coma
+                          const formattedValue = Array.isArray(value) ? value.join(', ') : value;
                           return (
-                            <div key={key} className="text-sm">
-                              <span className="font-semibold text-gray-700">{formattedKey}:</span>{' '}
-                              <span className="text-gray-900">{value}</span>
-                            </div>
+                            <React.Fragment key={key}>
+                              <div className="text-sm font-semibold text-gray-700 col-span-1">{formattedKey}</div>
+                              <div className="text-sm text-gray-900 col-span-1">{formattedValue}</div>
+                            </React.Fragment>
                           );
                         })}
                       </div>
