@@ -145,9 +145,8 @@ const ShowroomSection = () => {
               
               // Solo usar Link, sin ningún handler extra que sobrescriba la navegación
               return (
-                <Link
+                <div
                   key={category.id}
-                  to={`/showroom/${category.slug}`}
                   className={`relative flex-shrink-0 transition-all duration-1000 cursor-pointer group ${
                     isMobile 
                       ? 'opacity-100 scale-100 z-10' 
@@ -164,8 +163,7 @@ const ShowroomSection = () => {
                     height: '400px',
                     marginRight: '1.5rem'
                   }}
-                  onClick={e => {
-                    e.preventDefault();
+                  onClick={() => {
                     window.location.href = `/showroom/${category.slug}`;
                   }}
                 >
@@ -222,7 +220,7 @@ const ShowroomSection = () => {
                       {t('showroom.destacados')}
                     </div>
                   )}
-                </Link>
+                </div>
               );
             })}
           </div>
