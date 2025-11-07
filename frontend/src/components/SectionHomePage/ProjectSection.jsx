@@ -140,9 +140,10 @@ const ProjectSection = ({ limit = 6 }) => {
                 : (sliderImage?.urls?.desktop || sliderImage?.urls?.mobile || sliderImage?.url);
               
               return (
-                <div 
+                <Link 
+                  to={`/proyectos/${project.slug}`}
                   key={project.id}
-                  className={`relative flex-shrink-0 transition-all duration-1000 ${
+                  className={`relative flex-shrink-0 transition-all duration-1000 block ${
                     isMobile 
                       ? 'opacity-100 scale-100 z-10' 
                       : isActive 
@@ -161,12 +162,36 @@ const ProjectSection = ({ limit = 6 }) => {
                     marginRight: '2rem'
                   }}
                 >
-                  {/* Imagen/Video principal - SIN border-radius en desktop */}
+                  {/* Fondo blur solo en desktop */}
+                  {!isMobile && mediaUrl && (
+                    isVideo ? (
+                      <video
+                        src={mediaUrl}
+                        className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-60"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
+                    ) : (
+                      <img
+                        src={mediaUrl}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-60"
+                      />
+                    )
+                  )}
+
+                  {/* Imagen/Video principal - object-contain en desktop para no deformar */}
                   {mediaUrl ? (
                     isVideo ? (
                       <video
                         src={mediaUrl}
-                        className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'rounded-lg' : ''}`}
+                        className={`absolute inset-0 w-full h-full pointer-events-none ${
+                          isMobile 
+                            ? 'object-cover rounded-lg' 
+                            : 'object-contain'
+                        }`}
                         autoPlay
                         loop
                         muted
@@ -181,7 +206,11 @@ const ProjectSection = ({ limit = 6 }) => {
                       <img
                         src={mediaUrl}
                         alt={project.title}
-                        className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'rounded-lg' : ''}`}
+                        className={`absolute inset-0 w-full h-full pointer-events-none ${
+                          isMobile 
+                            ? 'object-cover rounded-lg' 
+                            : 'object-contain'
+                        }`}
                         onError={(e) => {
                           e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23f5f5f5'/%3E%3Ctext x='400' y='280' text-anchor='middle' fill='%23999' font-size='24' font-family='Arial'%3E" + project.title + "%3C/text%3E%3Ctext x='400' y='320' text-anchor='middle' fill='%23666' font-size='16' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
                         }}
@@ -194,11 +223,15 @@ const ProjectSection = ({ limit = 6 }) => {
                   )}
                   
                   {/* Overlay gradient más sutil */}
-                  <div className={`absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent ${isMobile ? 'rounded-lg' : ''}`} />
+                  <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none ${isMobile ? 'rounded-lg' : ''}`} />
                   
-                  {/* Contenido del slide - Solo visible en slide activo */}
+                  {/* Contenido del slide - Siempre visible en móvil */}
                   <div className={`absolute bottom-0 left-0 right-0 text-white transition-all duration-700 ${
-                    (isMobile || isActive) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    isMobile 
+                      ? 'opacity-100 translate-y-0' 
+                      : isActive 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 translate-y-4'
                   } ${isMobile ? 'p-6' : 'p-12 lg:p-16'}`}>
                     <div className="max-w-md">
                       {/* Título del proyecto */}
@@ -217,9 +250,8 @@ const ProjectSection = ({ limit = 6 }) => {
                         </p>
                       )}
                       
-                      {/* Botón Ver más - SIN borde */}
-                      <Link 
-                        to={`/proyectos/${project.slug}`}
+                      {/* Botón Ver más - Ahora solo visual */}
+                      <span 
                         className={`inline-flex items-center text-white font-light uppercase tracking-widest hover:opacity-70 transition-all duration-300 group ${
                           isMobile ? 'text-xs' : 'text-sm'
                         }`}
@@ -228,7 +260,7 @@ const ProjectSection = ({ limit = 6 }) => {
                         <svg className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
-                      </Link>
+                      </span>
                     </div>
                   </div>
 
@@ -238,14 +270,18 @@ const ProjectSection = ({ limit = 6 }) => {
                       {(index + 1).toString().padStart(2, '0')}
                     </div>
                   )}
-                </div>
+                </Link>
               );
             })}
           </div>
 
           {/* Controles de navegación */}
           <button
-            onClick={prevSlide}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              prevSlide();
+            }}
             className={`absolute top-1/2 transform -translate-y-1/2 z-30 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 transition-all duration-300 ${
               isMobile ? 'left-4 p-3 rounded-full' : 'left-8 p-4 rounded-full'
             }`}
@@ -254,7 +290,11 @@ const ProjectSection = ({ limit = 6 }) => {
           </button>
 
           <button
-            onClick={nextSlide}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              nextSlide();
+            }}
             className={`absolute top-1/2 transform -translate-y-1/2 z-30 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 transition-all duration-300 ${
               isMobile ? 'right-4 p-3 rounded-full' : 'right-8 p-4 rounded-full'
             }`}
@@ -270,7 +310,11 @@ const ProjectSection = ({ limit = 6 }) => {
           {projects.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToSlide(index);
+              }}
               className={`h-1 rounded-full transition-all duration-500 ${
                 index === currentSlide 
                   ? isMobile 
@@ -295,7 +339,11 @@ const ProjectSection = ({ limit = 6 }) => {
 
         {/* Control de auto-play */}
         <button
-          onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsAutoPlaying(!isAutoPlaying);
+          }}
           className={`absolute z-30 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 transition-all duration-300 rounded-full ${
             isMobile ? 'bottom-8 right-4 p-2' : 'bottom-12 right-8 p-3'
           }`}

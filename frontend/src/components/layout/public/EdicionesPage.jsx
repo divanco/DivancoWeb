@@ -1,53 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGetProjectsByYearQuery } from '../../../features/projects/projectsApi';
 import { scrollToSection } from '../../../utils/simpleScroll';
 import { useTranslation } from '../../../hooks/useTranslation';
-import { useHomeLoading } from '../../../contexts/HomeLoadingContext';
 
 function EdicionesPage() {
   const { t } = useTranslation();
   const [currentImage, setCurrentImage] = useState(0);
-  const currentYear = 2025; // Cambiar esto para mostrar diferentes años
+  const currentYear = 2025;
   const navigate = useNavigate();
 
-  // ✅ Obtener proyectos del año actual desde la API
   const { data: projectsData, isLoading, error } = useGetProjectsByYearQuery(currentYear);
   
-  // Acceder al contexto de carga
-  const { setSectionLoaded } = useHomeLoading();
-  
-  // Usar ref para rastrear si ya marcamos como cargado
-  const hasMarkedLoaded = useRef(false);
-  
-  // Actualizar el estado de carga en el contexto
-  useEffect(() => {
-    // Importante: EdicionesPage siempre se marca como cargado cuando los datos están listos
-    // porque incluso sin proyectos tiene imágenes por defecto
-    if (!isLoading && !hasMarkedLoaded.current) {
-      setSectionLoaded('ediciones', true); // true = cargado (ya no está cargando)
-      hasMarkedLoaded.current = true; // Marcar que ya lo hicimos
-    }
-  }, [isLoading, setSectionLoaded]);
-  
-  // ✅ Procesar proyectos para crear el slideshow
   const projects = projectsData?.data?.projects || [];
   
-  // ✅ Crear array de imágenes desde los proyectos reales
   const images = projects.length > 0 
     ? projects.map((project, index) => {
-        // Buscar imagen principal o primera imagen disponible
         const mainImage = project.media?.find(img => img.isMain) || project.media?.[0];
         
         return {
           id: project.id,
           src: mainImage?.urls?.desktop || mainImage?.urls?.main || "/images/prueba/hero.png",
           alt: `${project.title} - Edición ${currentYear}`,
-          project: project // ✅ Incluir datos del proyecto
+          project: project
         };
       })
     : [
-        // ✅ Fallback si no hay proyectos
         {
           id: 1,
           src: "/images/prueba/edicion1.png",
@@ -74,7 +52,6 @@ function EdicionesPage() {
         }
       ];
 
-  // Auto-cambio de imágenes cada 4 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
@@ -85,7 +62,6 @@ function EdicionesPage() {
 
   return (
     <section id="ediciones-section" className="relative h-screen bg-gray-50 overflow-hidden">
-      {/* Container de imágenes */}
       <div className="absolute inset-0">
         {images.map((image, index) => (
           <div
@@ -94,7 +70,6 @@ function EdicionesPage() {
               index === currentImage ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            {/* Hacer la imagen clickeable si tiene proyecto */}
             {image.project ? (
               <div 
                 className="absolute inset-0 cursor-pointer group z-20"
@@ -114,7 +89,6 @@ function EdicionesPage() {
                     e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%23f5f5f5'/%3E%3Ctext x='600' y='400' text-anchor='middle' fill='%23999' font-size='32' font-family='Arial'%3EEdiciones 2025%3C/text%3E%3C/svg%3E";
                   }}
                 />
-                {/* Indicador visual de que es clickeable */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
                     <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,31 +111,25 @@ function EdicionesPage() {
           </div>
         ))}
         
-        {/* Overlay sutil */}
         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
       </div>
 
-      {/* Contenido principal */}
       <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          {/* Loading state */}
           {isLoading && (
             <div className="text-white/80 text-lg">
               Cargando proyectos de la edición {currentYear}...
             </div>
           )}
 
-          {/* Error state */}
           {error && !isLoading && (
             <div className="text-red-400 text-lg">
               Error cargando proyectos de la edición {currentYear}
             </div>
           )}
 
-          {/* Content when loaded */}
           {!isLoading && !error && (
             <>
-              {/* Título principal clickeable */}
               <Link 
                 to="/ediciones"
                 className="group inline-block"
@@ -171,7 +139,6 @@ function EdicionesPage() {
                 </h2>
               </Link>
 
-              {/* ✅ Información mínima y elegante del proyecto actual */}
               {images[currentImage]?.project && (
                 <div className="mt-6 space-y-2">
                   <h3 className="text-xl sm:text-2xl text-white font-light">
@@ -188,14 +155,12 @@ function EdicionesPage() {
                 </div>
               )}
 
-              {/* Subtítulo general o información de proyecto */}
               {!images[currentImage]?.project && (
                 <p className="mt-8 text-base sm:text-lg text-white/70 font-light max-w-md mx-auto leading-relaxed">
                   Descubre nuestra nueva colección de espacios únicos
                 </p>
               )}
 
-              {/* Contador de proyectos */}
               {projects.length > 0 && (
                 <p className="mt-4 text-white/60 text-sm">
                   {projects.length} proyecto{projects.length !== 1 ? 's' : ''} en la edición {currentYear}
@@ -206,10 +171,8 @@ function EdicionesPage() {
         </div>
       </div>
 
-      {/* ✅ Controles de navegación y call-to-action (solo si no está cargando) */}
       {!isLoading && (
         <>
-          {/* Indicador de navegación */}
           <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex justify-center space-x-2">
             {images.map((_, index) => (
               <button
@@ -224,7 +187,6 @@ function EdicionesPage() {
             ))}
           </div>
 
-          {/* Call to action sutil */}
           <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30">
             {images[currentImage]?.project ? (
               <button 
@@ -257,13 +219,11 @@ function EdicionesPage() {
         </>
       )}
 
-      {/* Elementos decorativos */}
       <div className="absolute top-8 left-8 w-px h-16 bg-white/20"></div>
       <div className="absolute bottom-8 right-8 w-px h-16 bg-white/20"></div>
       <div className="absolute top-16 right-16 w-1 h-1 bg-white/30 rounded-full"></div>
       <div className="absolute bottom-16 left-16 w-1 h-1 bg-white/30 rounded-full"></div>
 
-      {/* Contador elegante */}
       <div className="absolute top-8 right-8 text-white/60 font-light text-lg">
         {!isLoading && (
           <>
@@ -279,7 +239,6 @@ function EdicionesPage() {
         )}
       </div>
 
-      {/* Flecha de navegación - Volver al inicio */}
       <button 
         onClick={() => {
           window.scrollTo({
