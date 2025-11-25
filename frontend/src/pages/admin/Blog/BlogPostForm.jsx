@@ -468,14 +468,20 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       const result = await uploadFeaturedImage(formData).unwrap();
       console.log("✅ Imagen destacada subida:", result);
 
-      // Extraer la URL correcta del resultado de Cloudinary
-      const imageUrl = result.desktop?.url || result.url || "";
-      console.log("🖼️ URL de imagen extraída:", imageUrl);
+      // Guardar el objeto completo de Cloudinary (no solo la URL)
+      // El backend espera un objeto JSON con desktop, mobile, thumbnail, etc.
+      const imageData = {
+        desktop: result.desktop || { url: result.url },
+        mobile: result.mobile || { url: result.url },
+        thumbnail: result.thumbnail || { url: result.url },
+        url: result.url || result.desktop?.url
+      };
+      console.log("🖼️ Objeto de imagen completo:", imageData);
 
-      // Actualizar el campo de imagen destacada con la URL de Cloudinary
+      // Actualizar el campo de imagen destacada con el objeto completo
       setFormData((prev) => ({
         ...prev,
-        featuredImage: imageUrl,
+        featuredImage: imageData,
       }));
 
       // ✅ Limpiar error de imagen si existe
@@ -997,7 +1003,11 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
                       type="url"
                       id="featuredImage"
                       name="featuredImage"
-                      value={formData.featuredImage}
+                      value={
+                        typeof formData.featuredImage === 'object' 
+                          ? (formData.featuredImage?.desktop?.url || formData.featuredImage?.url || '')
+                          : (formData.featuredImage || '')
+                      }
                       onChange={handleInputChange}
                       onBlur={() => handleFieldBlur("featuredImage")}
                       className={getInputClasses("featuredImage")}
@@ -1028,7 +1038,11 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
                     {formData.featuredImage && (
                       <div className="mt-3">
                         <img
-                          src={formData.featuredImage}
+                          src={
+                            typeof formData.featuredImage === 'object'
+                              ? (formData.featuredImage?.desktop?.url || formData.featuredImage?.url || '')
+                              : formData.featuredImage
+                          }
                           alt="Preview imagen destacada"
                           className="w-full max-w-xs h-auto border rounded-lg"
                         />
