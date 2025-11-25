@@ -15,8 +15,6 @@ jobs:
     name: Build and Deploy Frontend
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Build And Deploy
         id: builddeploy
