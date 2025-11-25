@@ -3,12 +3,48 @@ import bcrypt from 'bcryptjs';
 
 export const createUser = async (req, res, next) => {
   try {
-    const { username, password, role } = req.body;
+    const { email, name, username, password, role } = req.body;
+    
+    // Validar que el email esté presente
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'El email es requerido'
+      });
+    }
+    
+    // Validar que la contraseña esté presente
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña es requerida'
+      });
+    }
+    
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, password: hashedPassword, role });
-    res.status(201).json(user);
+    
+    const user = await User.create({ 
+      email, 
+      name,
+      username, 
+      password: hashedPassword, 
+      role: role || 'user'
+    });
+    
+    // Remover la contraseña de la respuesta
+    const userResponse = user.toJSON();
+    delete userResponse.password;
+    
+    res.status(201).json({
+      success: true,
+      data: userResponse
+    });
   } catch (error) {
-    next(error);
+    console.error('Error creando usuario:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al crear usuario'
+    });
   }
 };
 
@@ -65,34 +101,65 @@ export const getUserById = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const { username, password, role } = req.body;
+    const { email, name, username, password, role } = req.body;
+    
     const user = await User.findByPk(req.params.id);
+    
     if (!user) {
-      const err = new Error('User not found');
-      err.status = 404;
-      throw err;
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
     }
+    
+    // Actualizar campos si están presentes
+    if (email) user.email = email;
+    if (name !== undefined) user.name = name; // Permite valores null
+    if (username !== undefined) user.username = username;
     if (password) user.password = await bcrypt.hash(password, 10);
-    if (username) user.username = username;
     if (role) user.role = role;
+    
     await user.save();
-    res.json(user);
+    
+    // Remover la contraseña de la respuesta
+    const userResponse = user.toJSON();
+    delete userResponse.password;
+    
+    res.json({
+      success: true,
+      data: userResponse
+    });
   } catch (error) {
-    next(error);
+    console.error('Error actualizando usuario:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al actualizar usuario'
+    });
   }
 };
 
 export const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id);
+    
     if (!user) {
-      const err = new Error('User not found');
-      err.status = 404;
-      throw err;
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
     }
+    
     await user.destroy();
-    res.json({ message: 'User deleted' });
+    
+    res.json({
+      success: true,
+      message: 'Usuario eliminado correctamente'
+    });
   } catch (error) {
-    next(error);
+    console.error('Error eliminando usuario:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al eliminar usuario'
+    });
   }
 };
