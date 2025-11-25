@@ -224,7 +224,7 @@ const BlogPostPage = () => {
               {post.author && (
                 <>
                   <span>•</span>
-                  <span>Por {post.author.name}</span>
+                  <span>Por {post.author}</span>
                 </>
               )}
               {post.tags && post.tags.length > 0 && (
@@ -258,11 +258,11 @@ const BlogPostPage = () => {
         {/* Featured Image */}
         {post.featuredImage && getImageUrl(post) && (
           <div className="mb-12">
-            <div className="aspect-[16/9] overflow-hidden bg-gray-100 rounded-lg">
+            <div className="overflow-hidden bg-gray-100 rounded-lg">
               <img
                 src={getImageUrl(post)}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-contain"
               />
             </div>
           </div>

@@ -185,7 +185,9 @@ export const createBlogPost = async (req, res) => {
       tags = [],
       status = 'draft',
       isFeatured = false,
-      publishedAt
+      publishedAt,
+      metaTitle,
+      metaDescription
     } = req.body;
 
     console.log('🔍 [BACKEND] createBlogPost - datos recibidos:', {
@@ -197,7 +199,9 @@ export const createBlogPost = async (req, res) => {
       projectId,
       tags,
       status,
-      isFeatured
+      isFeatured,
+      metaTitle: metaTitle?.substring(0, 30),
+      metaDescription: metaDescription?.substring(0, 50)
     });
 
     // Validaciones básicas
@@ -270,7 +274,9 @@ export const createBlogPost = async (req, res) => {
       tags: Array.isArray(tags) ? tags : [],
       status,
       isFeatured: Boolean(isFeatured),
-      publishedAt: status === 'published' ? (publishedAt ? new Date(publishedAt) : new Date()) : null
+      publishedAt: status === 'published' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
+      metaTitle: metaTitle?.trim() || null,
+      metaDescription: metaDescription?.trim() || null
     };
 
     console.log('🔍 [BACKEND] Creando post con datos:', postData);
@@ -407,6 +413,14 @@ export const updateBlogPost = async (req, res) => {
 
     if (typeof updateData.excerpt !== 'undefined' && updateData.excerpt !== null) {
       updateData.excerpt = updateData.excerpt.trim();
+    }
+
+    if (typeof updateData.metaTitle !== 'undefined' && updateData.metaTitle !== null) {
+      updateData.metaTitle = updateData.metaTitle.trim();
+    }
+
+    if (typeof updateData.metaDescription !== 'undefined' && updateData.metaDescription !== null) {
+      updateData.metaDescription = updateData.metaDescription.trim();
     }
 
     // Si se está publicando por primera vez
