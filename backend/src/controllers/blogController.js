@@ -187,7 +187,10 @@ export const createBlogPost = async (req, res) => {
       isFeatured = false,
       publishedAt,
       metaTitle,
-      metaDescription
+      metaDescription,
+      featuredImage,
+      images,
+      videos
     } = req.body;
 
     console.log('🔍 [BACKEND] createBlogPost - datos recibidos:', {
@@ -201,7 +204,10 @@ export const createBlogPost = async (req, res) => {
       status,
       isFeatured,
       metaTitle: metaTitle?.substring(0, 30),
-      metaDescription: metaDescription?.substring(0, 50)
+      metaDescription: metaDescription?.substring(0, 50),
+      hasFeaturedImage: !!featuredImage,
+      imagesCount: Array.isArray(images) ? images.length : 0,
+      videosCount: Array.isArray(videos) ? videos.length : 0
     });
 
     // Validaciones básicas
@@ -276,7 +282,10 @@ export const createBlogPost = async (req, res) => {
       isFeatured: Boolean(isFeatured),
       publishedAt: status === 'published' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
       metaTitle: metaTitle?.trim() || null,
-      metaDescription: metaDescription?.trim() || null
+      metaDescription: metaDescription?.trim() || null,
+      featuredImage: featuredImage || null,
+      images: Array.isArray(images) ? images : [],
+      videos: Array.isArray(videos) ? videos : []
     };
 
     console.log('🔍 [BACKEND] Creando post con datos:', postData);

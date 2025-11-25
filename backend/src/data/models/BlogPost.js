@@ -46,6 +46,15 @@ BlogPost.init({
   videos: {
     type: DataTypes.JSON,
   },
+  // SEO Meta Tags
+  metaTitle: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+  },
+  metaDescription: {
+    type: DataTypes.TEXT(500),
+    allowNull: true,
+  },
   
  
   // Relación opcional con proyecto

@@ -117,9 +117,15 @@ const BlogPage = () => {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="order-2 lg:order-1 space-y-6">
                       <div className="space-y-4">
-                        <span className="text-xs font-medium text-gray-500 tracking-wider uppercase">
-                          {formatDate(featuredPosts.data[0].publishedAt)}
-                        </span>
+                        <div className="flex items-center gap-3 text-xs font-medium text-gray-500 tracking-wider uppercase">
+                          <span>{formatDate(featuredPosts.data[0].publishedAt)}</span>
+                          {featuredPosts.data[0].author && (
+                            <>
+                              <span>•</span>
+                              <span>Por {featuredPosts.data[0].author}</span>
+                            </>
+                          )}
+                        </div>
                         <h2 className="text-3xl lg:text-4xl font-light text-gray-900 leading-tight group-hover:text-gray-600 transition-colors duration-200">
                           {featuredPosts.data[0].title}
                         </h2>
@@ -137,11 +143,11 @@ const BlogPage = () => {
                       </div>
                     </div>
                     <div className="order-1 lg:order-2">
-                      <div className="aspect-[4/3] lg:aspect-[3/4] overflow-hidden bg-gray-100">
+                      <div className="overflow-hidden bg-gray-100">
                         <img
                           src={getImageUrl(featuredPosts.data[0])}
                           alt={featuredPosts.data[0].title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
                               e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
@@ -200,11 +206,11 @@ const BlogPage = () => {
                   <article key={post.id} className="group">
                     <Link to={`/blog/${post.slug}`} className="block">
                       {/* Imagen */}
-                      <div className="aspect-[4/3] overflow-hidden bg-gray-100 mb-6">
+                      <div className="overflow-hidden bg-gray-100 mb-6">
                         <img
                           src={getImageUrl(post)}
                           alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
                               e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
@@ -219,9 +225,15 @@ const BlogPage = () => {
                       {/* Contenido */}
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <span className="text-xs font-medium text-gray-500 tracking-wider uppercase">
-                            {formatDate(post.publishedAt)}
-                          </span>
+                          <div className="flex items-center gap-2 text-xs font-medium text-gray-500 tracking-wider uppercase">
+                            <span>{formatDate(post.publishedAt)}</span>
+                            {post.author && (
+                              <>
+                                <span>•</span>
+                                <span>Por {post.author}</span>
+                              </>
+                            )}
+                          </div>
                           <h3 className="text-xl font-light text-gray-900 leading-tight group-hover:text-gray-600 transition-colors duration-200">
                             {post.title}
                           </h3>
