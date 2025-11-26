@@ -169,10 +169,10 @@ export const uploadResponsiveImage = async (filePath, folder = 'divanco') => {
         { 
           width: 400, 
           height: 300, 
-          crop: 'fill',  // SÍ corta para thumbnail consistente
+          crop: 'limit',  // CAMBIADO: 'limit' para no cortar, antes 'fill'
           quality: 'auto:good', 
           format: 'webp',
-          gravity: 'center' // Centra el recorte
+          // gravity: 'center' // Ya no es necesario con limit
         }
       ],
       public_id_suffix: '_thumb'
