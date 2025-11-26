@@ -1,4 +1,6 @@
-# Guía de Despliegue en Azure - DivancoWeb
+# 🚀 Guía de Despliegue en Azure - DivancoWeb (Actualizada 2025)
+
+Esta guía documenta el proceso REAL de deployment basado en la arquitectura actual de producción.
 
 ## 📋 Prerrequisitos
 
@@ -69,22 +71,28 @@ az account show --query id --output tsv  # Ver solo el ID de la suscripción act
    - Node.js 18+
    - Git
 
-## 🎯 Arquitectura Azure
+## 🎯 Arquitectura Azure (Actual en Producción)
 
-### Servicios a Utilizar
-1. **Frontend**: Azure Static Web Apps (React)
-2. **Backend**: Azure App Service (Node.js/Express)
+### Servicios Utilizados
+1. **Frontend**: Azure Static Web Apps (React + Vite)
+2. **Backend**: Azure Container Apps (Node.js/Express en Docker)
 3. **Base de Datos**: Azure Database for PostgreSQL - Flexible Server
-4. **Storage**: Cloudinary (mantener) o Azure Blob Storage
-5. **Networking**: Azure Application Gateway (opcional para SSL/CDN)
+4. **Container Registry**: Azure Container Registry (ACR)
+5. **Storage**: Cloudinary (para imágenes)
+6. **CI/CD**: GitHub Actions
+
+### Arquitectura de Red
+- **Frontend URL**: `https://polite-desert-0d77a5b1e.3.azurestaticapps.net`
+- **Backend URL**: `https://divanco-backend.blackcoast-f34b960d.westus.azurecontainerapps.io`
+- **Database**: `divanco-db-server.postgres.database.azure.com`
 
 ## 📦 Costos Estimados (USD/mes)
 
-- **Static Web Apps (Standard)**: ~$10/mes
-- **App Service (B1 - Basic)**: ~$13/mes
+- **Static Web Apps (Free tier)**: $0/mes (incluye 100GB bandwidth)
+- **Container Apps (Consumption)**: ~$15-25/mes
+- **Container Registry (Basic)**: ~$5/mes
 - **PostgreSQL Flexible Server (Burstable B1ms)**: ~$12/mes
-- **Blob Storage (si se usa)**: ~$5-20/mes
-- **Total estimado**: ~$40-60/mes
+- **Total estimado**: ~$32-42/mes
 
 ## 🔧 Paso 1: Preparación
 
@@ -164,123 +172,370 @@ az postgres flexible-server show-connection-string \
   --admin-user $DB_ADMIN_USER
 ```
 
-## 🖥️ Paso 3: Desplegar Backend (App Service)
+## 🖥️ Paso 3: Desplegar Backend (Azure Container Apps)
 
-### 3.1 Crear App Service Plan
-
-```bash
-APP_SERVICE_PLAN="divanco-backend-plan"
-APP_SERVICE_NAME="divanco-backend-api"
-
-# Crear App Service Plan (Linux)
-az appservice plan create \
-  --name $APP_SERVICE_PLAN \
-  --resource-group $RESOURCE_GROUP \
-  --location $LOCATION \
-  --is-linux \
-  --sku B1
-```
-
-### 3.2 Crear Web App
+### 3.1 Crear Azure Container Registry (ACR)
 
 ```bash
-az webapp create \
+ACR_NAME="divancoregistry"
+
+# Crear Container Registry
+az acr create \
   --resource-group $RESOURCE_GROUP \
-  --plan $APP_SERVICE_PLAN \
-  --name $APP_SERVICE_NAME \
-  --runtime "NODE:18-lts"
+  --name $ACR_NAME \
+  --sku Basic \
+  --admin-enabled true
+
+# Obtener credenciales
+ACR_USERNAME=$(az acr credential show --name $ACR_NAME --query username -o tsv)
+ACR_PASSWORD=$(az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv)
 ```
 
-### 3.3 Configurar variables de entorno
+### 3.2 Crear Container Apps Environment
 
 ```bash
-# Connection string de PostgreSQL
-DB_CONNECTION_STRING="postgresql://$DB_ADMIN_USER:$DB_ADMIN_PASSWORD@$DB_SERVER_NAME.postgres.database.azure.com/$DB_NAME?sslmode=require"
+CA_ENV_NAME="divanco-env"
 
-az webapp config appsettings set \
+# Crear ambiente para Container Apps
+az containerapp env create \
+  --name $CA_ENV_NAME \
   --resource-group $RESOURCE_GROUP \
-  --name $APP_SERVICE_NAME \
-  --settings \
-    NODE_ENV="production" \
-    DB_DEPLOY="$DB_CONNECTION_STRING" \
-    JWT_SECRET="tu-jwt-secret-muy-seguro-cambiar" \
-    CLOUDINARY_CLOUD_NAME="tu-cloud-name" \
-    CLOUDINARY_API_KEY="tu-api-key" \
-    CLOUDINARY_API_SECRET="tu-api-secret" \
-    EMAIL_USER="tu-email@gmail.com" \
-    EMAIL_PASS="tu-app-password"
+  --location westus
 ```
 
-### 3.4 Configurar despliegue desde GitHub
-
-```bash
-# Configurar GitHub Actions deployment
-az webapp deployment github-actions add \
-  --resource-group $RESOURCE_GROUP \
-  --name $APP_SERVICE_NAME \
-  --repo "divanco/DivancoWeb" \
-  --branch "main" \
-  --token "GITHUB_PAT_TOKEN" \
-  --runtime-stack node \
-  --runtime-version 18
-```
-
-**O desplegar manualmente:**
+### 3.3 Build y Push de la imagen Docker
 
 ```bash
 cd backend
-zip -r backend.zip .
-az webapp deployment source config-zip \
-  --resource-group $RESOURCE_GROUP \
-  --name $APP_SERVICE_NAME \
-  --src backend.zip
+
+# Login al ACR
+az acr login --name $ACR_NAME
+
+# Build la imagen localmente
+docker build -t $ACR_NAME.azurecr.io/divanco-backend:latest .
+
+# Push al ACR
+docker push $ACR_NAME.azurecr.io/divanco-backend:latest
 ```
 
-### 3.5 Habilitar CORS
+**O usar ACR Build (recomendado):**
 
 ```bash
-FRONTEND_URL="https://divanco-frontend.azurestaticapps.net"
+az acr build \
+  --registry $ACR_NAME \
+  --image divanco-backend:latest \
+  --file Dockerfile \
+  ./backend
+```
 
-az webapp cors add \
+### 3.4 Crear Container App
+
+```bash
+CONTAINER_APP_NAME="divanco-backend"
+
+az containerapp create \
+  --name $CONTAINER_APP_NAME \
   --resource-group $RESOURCE_GROUP \
-  --name $APP_SERVICE_NAME \
-  --allowed-origins $FRONTEND_URL "http://localhost:5173"
+  --environment $CA_ENV_NAME \
+  --image $ACR_NAME.azurecr.io/divanco-backend:latest \
+  --registry-server $ACR_NAME.azurecr.io \
+  --registry-username $ACR_USERNAME \
+  --registry-password $ACR_PASSWORD \
+  --target-port 3001 \
+  --ingress external \
+  --env-vars \
+    NODE_ENV="production" \
+    PORT="3001" \
+    DATABASE_URL="postgresql://divancoadmin:Dv1nc0_2024\$Azur3@divanco-db-server.postgres.database.azure.com:5432/divancodb?sslmode=require" \
+    JWT_SECRET="beb76599ef7b4c6556ef803b5ecc9c6114d5d74d2690365c9214768e4375d01a" \
+    CLOUDINARY_CLOUD_NAME="dqkm2lqpb" \
+    CLOUDINARY_API_KEY="898884648337931" \
+    CLOUDINARY_API_SECRET="LL3-4uS5qX7_A84hzf_BwysACiE" \
+  --cpu 0.5 \
+  --memory 1.0Gi \
+  --min-replicas 1 \
+  --max-replicas 5
+```
+
+### 3.5 Configurar GitHub Actions para Backend
+
+Crea `.github/workflows/deploy-backend.yml`:
+
+```yaml
+name: Deploy Backend to Azure Container Apps
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Build and push to ACR
+      run: |
+        az acr build \
+          --registry divancoregistry \
+          --image divanco-backend:latest \
+          --file Dockerfile \
+          ./backend
+    
+    - name: Deploy to Container Apps
+      run: |
+        az containerapp update \
+          --name divanco-backend \
+          --resource-group divanco-rg \
+          --image divancoregistry.azurecr.io/divanco-backend:latest
+```
+
+### 3.6 Actualizar Container App (deployments futuros)
+
+```bash
+# Después de hacer cambios en el código
+az containerapp update \
+  --name divanco-backend \
+  --resource-group divanco-rg \
+  --image $ACR_NAME.azurecr.io/divanco-backend:latest
+
+# O crear nueva revisión
+az containerapp revision copy \
+  --name divanco-backend \
+  --resource-group divanco-rg \
+  --image $ACR_NAME.azurecr.io/divanco-backend:latest
 ```
 
 ## 🎨 Paso 4: Desplegar Frontend (Static Web Apps)
 
-### 4.1 Crear Static Web App desde Azure Portal
+### 4.1 Deployment Manual con SWA CLI (RECOMENDADO)
 
-1. Ve a Azure Portal → Create Resource → Static Web Apps
-2. Configuración:
-   - **Subscription**: Tu suscripción
-   - **Resource Group**: divanco-rg
-   - **Name**: divanco-frontend
-   - **Region**: East US
-   - **Deployment details**: GitHub
-   - **Organization**: divanco
-   - **Repository**: DivancoWeb
-   - **Branch**: main
-   - **Build presets**: React
-   - **App location**: `/frontend`
-   - **Output location**: `dist`
+El deployment manual te da control total sobre cuándo y qué se despliega. Es ideal para desarrollo y producción.
 
-### 4.2 Configurar variables de entorno en Static Web App
+**Ventajas:**
+- ✅ Control total del proceso
+- ✅ No requiere configurar GitHub Actions
+- ✅ Puedes probar antes de desplegar
+- ✅ Más rápido para cambios frecuentes
+
+**Pasos para deployment manual:**
+
+**Pasos para deployment manual:**
 
 ```bash
-STATIC_APP_NAME="divanco-frontend"
+# 1. Ir al directorio del frontend
+cd frontend
 
+# 2. Build del proyecto
+npm run build
+
+# 3. Deploy a Azure Static Web App
+npx @azure/static-web-apps-cli deploy ./dist \
+  --deployment-token "1ae33b1ed710711d29b06727645e2e970957f9307e10212e335dca74e4ccf4ad03-ccaae90c-1880-49b4-b8d7-59b208d1843b01e25080d77a5b1e" \
+  --env production
+```
+
+**⚠️ IMPORTANTE:** Guarda el deployment token en un lugar seguro (como `AZURE_CREDENTIALS.md`). Lo necesitarás para cada deployment.
+
+**Para futuros deployments:**
+```bash
+# Solo necesitas estos 2 comandos
+cd frontend
+npm run build
+npx @azure/static-web-apps-cli deploy ./dist --deployment-token "TU_TOKEN" --env production
+```
+
+Si necesitas obtener el token nuevamente:
+
+1. Ve a [Azure Portal](https://portal.azure.com)
+2. Busca tu Static Web App (`divanco-frontend`)
+3. En el menú izquierdo, ve a **Settings > Configuration**
+4. Busca **Deployment token** y haz clic en **Copy**
+
+### 4.3 Verificación del Deployment
+
+Después del deployment, verifica que todo funcione:
+
+```bash
+# El comando mostrará la URL al terminar:
+✔ Project deployed to https://polite-desert-0d77a5b1e.3.azurestaticapps.net 🚀
+```
+
+**Checklist de verificación:**
+- [ ] Abre la URL en el navegador
+- [ ] Presiona `Ctrl+Shift+R` para forzar recarga sin cache
+- [ ] Verifica que el frontend cargue correctamente
+- [ ] Prueba login y navegación
+- [ ] Verifica que las imágenes del blog se vean correctamente
+
+Si trabajas en equipo y prefieres deployments automáticos con cada push:
+
+1. Ve a tu repositorio en GitHub
+2. Settings > Secrets and variables > Actions
+3. Crea un nuevo secret:
+   - **Name:** `AZURE_STATIC_WEB_APPS_API_TOKEN`
+   - **Value:** Tu deployment token
+
+El workflow `.github/workflows/deploy-frontend.yml` ya está configurado y se ejecutará automáticamente en cada push a `main`.
+
+---
+
+## 🔧 Paso 5: Troubleshooting Común
+
+### Problema: Frontend muestra versión antigua después del deployment
+
+**Síntoma:** Acabas de hacer deployment pero ves la versión anterior.
+
+**Solución:**
+```bash
+# En el navegador, presiona:
+Ctrl + Shift + R  # Windows/Linux
+Cmd + Shift + R   # Mac
+```
+Esto fuerza una recarga sin cache del navegador.
+
+### Problema: Error "deployment token is invalid"
+
+**Solución:**
+1. Ve al Azure Portal
+2. Navega a tu Static Web App
+3. Settings > Configuration > Deployment token
+4. Copia el token nuevamente
+5. Actualiza el token en tu comando o en `AZURE_CREDENTIALS.md`
+
+### Problema: Build falla con error de memoria
+
+**Síntoma:** `JavaScript heap out of memory`
+
+**Solución:**
+```bash
+# Aumenta la memoria de Node.js
+export NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+```
+
+### Problema: Backend no responde después del deployment
+
+**Checklist:**
+1. Verifica que el Container App esté corriendo:
+   ```bash
+   az containerapp show --name divanco-backend --resource-group divanco-resources
+   ```
+
+2. Verifica los logs:
+   ```bash
+   az containerapp logs show --name divanco-backend --resource-group divanco-resources --follow
+   ```
+
+3. Verifica las variables de entorno en Azure Portal:
+   - Container Apps > divanco-backend > Settings > Containers > Environment variables
+
+### Problema: Error de CORS al conectar frontend con backend
+
+**Solución:** Verifica que las URLs estén correctas en:
+- `frontend/src/services/api.js`: baseURL debe apuntar a tu backend en Azure
+- `backend/src/app.js`: CORS debe incluir tu frontend URL
+
+---
+
+## 📝 Comandos Quick Reference
+
+### Frontend Deployment
+```bash
+cd frontend
+npm run build
+npx @azure/static-web-apps-cli deploy ./dist --deployment-token "TU_TOKEN" --env production
+```
+
+### Backend Deployment
+```bash
+cd backend
+az acr build --registry divancoregistry --image divanco-backend:latest .
+az containerapp update --name divanco-backend --resource-group divanco-resources --image divancoregistry.azurecr.io/divanco-backend:latest
+```
+
+### Ver logs del backend
+```bash
+az containerapp logs show --name divanco-backend --resource-group divanco-resources --follow
+```
+
+### Conectarse a PostgreSQL
+```bash
+psql -h divanco-db-server.postgres.database.azure.com -U divancoadmin -d divancodb
+```
+
+---
+
+## ✅ Checklist Post-Deployment
+
+Después de cada deployment, verifica:
+
+**Frontend:**
+- [ ] La aplicación carga sin errores
+- [ ] El login funciona correctamente
+- [ ] Las imágenes se muestran correctamente
+- [ ] Los formularios guardan datos
+- [ ] No hay errores en la consola del navegador
+
+**Backend:**
+- [ ] El Container App está en estado "Running"
+- [ ] Los endpoints responden correctamente
+- [ ] No hay errores en los logs
+- [ ] La conexión a base de datos funciona
+
+**Base de Datos:**
+- [ ] Las migraciones se aplicaron correctamente
+- [ ] Los datos se guardan y recuperan sin problemas
+- [ ] Las consultas tienen buen rendimiento
+
+---
+
+## 📚 Recursos Adicionales
+
+- [Azure Static Web Apps Documentation](https://learn.microsoft.com/azure/static-web-apps/)
+- [Azure Container Apps Documentation](https://learn.microsoft.com/azure/container-apps/)
+- [Azure Database for PostgreSQL Documentation](https://learn.microsoft.com/azure/postgresql/)
+- [SWA CLI Documentation](https://azure.github.io/static-web-apps-cli/)
+
+---
+
+**Última actualización:** 25 de Noviembre, 2025
+**Mantenedor:** Documentado durante deployment real del proyecto Divanco
+
+**Para obtener el deployment token:**
+```bash
+az staticwebapp secrets list \
+  --name $STATIC_APP_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --query "properties.apiKey" -o tsv
+```
+
+O desde Azure Portal:
+- Ir a Static Web App → Overview → "Manage deployment token"
+
+### 4.4 Configurar variables de entorno
+
+```bash
 az staticwebapp appsettings set \
   --name $STATIC_APP_NAME \
   --resource-group $RESOURCE_GROUP \
   --setting-names \
-    VITE_API_URL="https://$APP_SERVICE_NAME.azurewebsites.net" \
-    VITE_CLOUDINARY_CLOUD_NAME="tu-cloud-name"
+    VITE_API_BASE_URL="https://divanco-backend.blackcoast-f34b960d.westus.azurecontainerapps.io"
 ```
 
-### 4.3 Archivo de configuración (ya existe en tu proyecto)
-
-Asegúrate de tener `frontend/staticwebapp.config.json`:
+**⚠️ Importante sobre variables de entorno en Vite:**
+Las variables que comiencen con `VITE_` estarán disponibles en el frontend. Deben configurarse ANTES del build.
 
 ```json
 {

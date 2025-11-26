@@ -59,6 +59,7 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
   // ✅ NUEVO: Estado para manejar errores de validación
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Función para manejar el cierre/navegación según el contexto
   const handleClose = () => {
@@ -82,6 +83,46 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [editorInstance, setEditorInstance] = useState(null);
   const [editorData, setEditorData] = useState({ blocks: [] });
+
+  // ✅ NUEVO: Persistencia temporal para evitar pérdida de datos
+  useEffect(() => {
+    // Solo guardar si estamos creando un nuevo post y hay datos
+    if (!isEditing && (formData.title || formData.content.length > 0)) {
+      const tempState = {
+        formData,
+        editorData
+      };
+      sessionStorage.setItem('blog_post_draft', JSON.stringify(tempState));
+    }
+  }, [formData, editorData, isEditing]);
+
+  // Recuperar borrador al montar si es nuevo post
+  useEffect(() => {
+    if (!isEditing && !isInitialized) {
+      const savedDraft = sessionStorage.getItem('blog_post_draft');
+      if (savedDraft) {
+        try {
+          const { formData: savedFormData, editorData: savedEditorData } = JSON.parse(savedDraft);
+          console.log("📦 Recuperando borrador guardado:", savedFormData);
+          
+          if (window.confirm("Hay un borrador guardado no publicado. ¿Deseas recuperarlo?")) {
+            setFormData(savedFormData);
+            setEditorData(savedEditorData);
+          } else {
+            sessionStorage.removeItem('blog_post_draft');
+          }
+        } catch (e) {
+          console.error("Error recuperando borrador:", e);
+        }
+      }
+      setIsInitialized(true);
+    }
+  }, [isEditing, isInitialized]);
+
+  // Limpiar borrador al guardar exitosamente
+  const clearDraft = () => {
+    sessionStorage.removeItem('blog_post_draft');
+  };
 
   // ✅ Combinar todos los estados de loading
   const loading = isCreating || isUpdating || isUploadingImage || isLoadingPost;
@@ -139,8 +180,17 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
         return "";
 
       case "featuredImage":
-        if (value && !/^https?:\/\/.+/.test(value)) {
-          return "La URL de la imagen debe ser válida (http/https)";
+        if (value) {
+          if (typeof value === 'string') {
+            if (!/^https?:\/\/.+/.test(value)) {
+              return "La URL de la imagen debe ser válida (http/https)";
+            }
+          } else if (typeof value === 'object') {
+            const url = value.url || value.desktop?.url;
+            if (!url || !/^https?:\/\/.+/.test(url)) {
+              return "El objeto de imagen no contiene una URL válida";
+            }
+          }
         }
         return "";
 
@@ -235,17 +285,20 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       "postData:",
       postData,
       "post prop:",
-      post
+      post,
+      "isInitialized:",
+      isInitialized
     );
 
-    if (isEditing) {
+    if (isEditing && !isInitialized) {
       const sourcePost = postData?.data || post;
       if (sourcePost) {
         console.log("📝 Cargando datos del post para editar:", sourcePost);
         loadPostFromProp(sourcePost);
+        setIsInitialized(true);
       }
     }
-  }, [isEditing, postData, post]);
+  }, [isEditing, postData, post, isInitialized]);
 
   // Nueva función para cargar post desde prop
   const loadPostFromProp = (postData) => {
@@ -461,11 +514,17 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
     try {
       console.log("📸 Subiendo imagen destacada a Cloudinary:", file.name);
 
-      const formData = new FormData();
-      formData.append("image", file);
+      // Guardar estado actual antes de subir por si acaso
+      if (!isEditing) {
+        const tempState = { formData, editorData };
+        sessionStorage.setItem('blog_post_draft', JSON.stringify(tempState));
+      }
+
+      const formDataUpload = new FormData();
+      formDataUpload.append("image", file);
 
       // ✅ Usar la mutación de RTK Query para imagen destacada
-      const result = await uploadFeaturedImage(formData).unwrap();
+      const result = await uploadFeaturedImage(formDataUpload).unwrap();
       console.log("✅ Imagen destacada subida:", result);
 
       // Guardar el objeto completo de Cloudinary (no solo la URL)
@@ -479,10 +538,18 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       console.log("🖼️ Objeto de imagen completo:", imageData);
 
       // Actualizar el campo de imagen destacada con el objeto completo
-      setFormData((prev) => ({
-        ...prev,
-        featuredImage: imageData,
-      }));
+      setFormData((prev) => {
+        const newState = {
+          ...prev,
+          featuredImage: imageData,
+        };
+        // Actualizar también el storage inmediatamente
+        if (!isEditing) {
+          const tempState = { formData: newState, editorData };
+          sessionStorage.setItem('blog_post_draft', JSON.stringify(tempState));
+        }
+        return newState;
+      });
 
       // ✅ Limpiar error de imagen si existe
       setErrors((prev) => {
@@ -491,13 +558,14 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
         return newErrors;
       });
 
-      alert("Imagen destacada subida exitosamente");
+      // No mostrar alert para no interrumpir flujo
+      // alert("Imagen destacada subida exitosamente");
       return result;
     } catch (error) {
       console.error("❌ Error uploading featured image:", error);
       alert("Error al subir la imagen destacada: " + (error.message || JSON.stringify(error)));
     }
-  }, [uploadFeaturedImage]);
+  }, [uploadFeaturedImage, isEditing, formData, editorData]);
 
   // ✅ REFACTORIZADO: Función para subir imágenes del contenido del editor
   const handleImageUpload = useCallback(async (file) => {
@@ -627,12 +695,37 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       // Convertir contenido del editor al formato del backend
       const backendContent = convertToBackendFormat(currentEditorData);
 
+      // ✅ CORRECCIÓN CRÍTICA: Asegurar que featuredImage tenga el formato correcto
+      let finalFeaturedImage = formData.featuredImage;
+      
+      console.log("🔍 [BlogPostForm] featuredImage antes de procesar:", finalFeaturedImage);
+
+      // Si es un string (URL) y no está vacío, convertirlo a objeto
+      if (typeof finalFeaturedImage === 'string' && finalFeaturedImage.trim() !== '') {
+        console.log("⚠️ featuredImage es string, convirtiendo a objeto:", finalFeaturedImage);
+        finalFeaturedImage = {
+          desktop: { url: finalFeaturedImage },
+          mobile: { url: finalFeaturedImage },
+          thumbnail: { url: finalFeaturedImage },
+          url: finalFeaturedImage
+        };
+      } else if (finalFeaturedImage && typeof finalFeaturedImage === 'object') {
+        // Asegurar que tenga la estructura mínima requerida
+        console.log("✅ featuredImage es objeto, verificando estructura:", finalFeaturedImage);
+        if (!finalFeaturedImage.url && finalFeaturedImage.desktop?.url) {
+            finalFeaturedImage.url = finalFeaturedImage.desktop.url;
+        }
+      } else {
+        console.log("⚠️ featuredImage es null o inválido:", finalFeaturedImage);
+      }
+
       const submitData = {
         ...formData,
+        featuredImage: finalFeaturedImage,
         content: backendContent,
       };
 
-      console.log("📤 Enviando datos:", submitData);
+      console.log("📤 Enviando datos finales al backend:", JSON.stringify(submitData, null, 2));
 
       // ✅ REFACTORIZADO: Usar mutaciones de RTK Query
       let result;
@@ -645,6 +738,7 @@ const BlogPostForm = React.memo(({ post, onClose, onSuccess }) => {
       }
 
       console.log("✅ Post guardado:", result);
+      clearDraft(); // Limpiar borrador
       handleSuccess();
     } catch (error) {
       console.error("❌ Error saving blog post:", error);

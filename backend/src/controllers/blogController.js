@@ -206,6 +206,8 @@ export const createBlogPost = async (req, res) => {
       metaTitle: metaTitle?.substring(0, 30),
       metaDescription: metaDescription?.substring(0, 50),
       hasFeaturedImage: !!featuredImage,
+      featuredImageType: typeof featuredImage,
+      featuredImageValue: featuredImage ? JSON.stringify(featuredImage).substring(0, 200) : 'null',
       imagesCount: Array.isArray(images) ? images.length : 0,
       videosCount: Array.isArray(videos) ? videos.length : 0
     });
@@ -292,6 +294,14 @@ export const createBlogPost = async (req, res) => {
 
     const post = await BlogPost.create(postData);
 
+    // ✅ FIX: Forzar actualización de featuredImage si se proporcionó
+    // El usuario reporta que "update" funciona pero "create" a veces falla con el JSON
+    if (featuredImage) {
+      console.log('🔄 [BACKEND] Forzando persistencia de featuredImage post-creación...');
+      await post.update({ featuredImage });
+      console.log('✅ [BACKEND] featuredImage actualizada correctamente.');
+    }
+
     // Recargar con relaciones
     await post.reload({
       include: [
@@ -358,6 +368,13 @@ export const updateBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
+
+    console.log(`🔍 [BACKEND] updateBlogPost ID: ${id} - Datos recibidos:`, {
+      title: updateData.title?.substring(0, 30),
+      hasFeaturedImage: !!updateData.featuredImage,
+      featuredImageType: typeof updateData.featuredImage,
+      featuredImageValue: updateData.featuredImage ? JSON.stringify(updateData.featuredImage).substring(0, 200) : 'null'
+    });
 
     // Si projectId viene como string vacío, convertir a null
     if (updateData.projectId === '') {
