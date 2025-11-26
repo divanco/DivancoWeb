@@ -94,7 +94,12 @@ app.get('/', (req, res) => {
 
 // Health endpoint used by deployment checks
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Backend is healthy', timestamp: new Date().toISOString() });
+  res.json({ 
+    success: true, 
+    message: 'Backend is healthy', 
+    version: '1.2.0-fix-images-persistence', // 👈 Esta es la marca que buscaremos
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Ejemplo de endpoint para enviar email

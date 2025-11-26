@@ -41,10 +41,19 @@ const BlogPostPage = () => {
   const getImageUrl = (post) => {
     if (!post.featuredImage) return null;
     
-    return post.featuredImage?.desktop?.url ||
-           post.featuredImage?.mobile?.url ||
-           post.featuredImage?.thumbnail?.url ||
-           null;
+    if (typeof post.featuredImage === 'object') {
+      return post.featuredImage.desktop?.url ||
+             post.featuredImage.mobile?.url ||
+             post.featuredImage.thumbnail?.url ||
+             post.featuredImage.url ||
+             null;
+    }
+
+    if (typeof post.featuredImage === 'string') {
+      return post.featuredImage;
+    }
+
+    return null;
   };
 
   // Función para renderizar el contenido de Editor.js

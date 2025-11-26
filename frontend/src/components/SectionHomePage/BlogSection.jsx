@@ -30,10 +30,20 @@ const BlogSection = () => {
   const getImageUrl = (post) => {
     // Debug: ver la estructura real de featuredImage
     console.log('🖼️ post.featuredImage:', post.featuredImage);
-    return post.featuredImage?.desktop?.url ||
-           post.featuredImage?.mobile?.url ||
-           post.featuredImage?.thumbnail?.url ||
-           '/images/blog/default-blog.jpg';
+    
+    if (post.featuredImage && typeof post.featuredImage === 'object') {
+      return post.featuredImage.desktop?.url ||
+             post.featuredImage.mobile?.url ||
+             post.featuredImage.thumbnail?.url ||
+             post.featuredImage.url ||
+             '/images/blog/default-blog.jpg';
+    }
+    
+    if (typeof post.featuredImage === 'string' && post.featuredImage.trim() !== '') {
+      return post.featuredImage;
+    }
+
+    return '/images/blog/default-blog.jpg';
   };
 
   // Si no hay posts o está cargando, no mostrar la sección
