@@ -1,34 +1,9 @@
-  {
+{
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif,svg,webp}", "/assets/*", "/*.{css,js,json,txt,xml,ico}"]
-  },
-  "routes": [
-    {
-      "route": "/api/*",
-      "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/admin/*",
-      "allowedRoles": ["authenticated"]
-    }
-  ],
-  "responseOverrides": {
-    "401": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    },
-    "403": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    },
-    "404": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    }
+    "exclude": ["/assets/*", "/images/*", "*.css", "*.js", "*.png", "*.jpg", "*.svg", "*.webp", "*.ico", "*.json"]
   },
   "globalHeaders": {
-    "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.azurewebsites.net https://*.azurecontainerapps.io https://*.cloudinary.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; connect-src 'self' https://*.azurecontainerapps.io https://*.cloudinary.com; img-src 'self' https://*.cloudinary.com https://*.tile.openstreetmap.org https://cdnjs.cloudflare.com data: blob:",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer-when-downgrade"
@@ -36,14 +11,10 @@
   "mimeTypes": {
     ".json": "application/json",
     ".js": "text/javascript",
-    ".jsx": "text/javascript",
     ".css": "text/css",
     ".svg": "image/svg+xml",
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".webp": "image/webp"
-  },
-  "platform": {
-    "apiRuntime": "node:18"
   }
 }
