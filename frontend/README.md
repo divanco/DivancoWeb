@@ -186,3 +186,4 @@ Este frontend está diseñado para trabajar con el backend del boilerplate que i
 Este boilerplate te proporciona una base sólida y moderna para desarrollar aplicaciones React escalables y mantenibles.
 
 # Update
+ 
