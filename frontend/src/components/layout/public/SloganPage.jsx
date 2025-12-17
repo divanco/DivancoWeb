@@ -25,29 +25,17 @@ function SloganPage() {
               e.target.style.display = 'none';
             }}
           />
-          {/* Textos debajo del logo, separados por líneas */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
-            <div className="flex items-center">
-              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
-                {t('sloganPage.design')}
-              </p>
-            </div>
-            <div className="hidden md:flex items-center">
-              <div className="w-8 md:w-12 h-px bg-gray-300"></div>
-            </div>
-            <div className="flex items-center">
-              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
-                {t('sloganPage.vanguard')}
-              </p>
-            </div>
-            <div className="hidden md:flex items-center">
-              <div className="w-8 md:w-12 h-px bg-gray-300"></div>
-            </div>
-            <div className="flex items-center">
-              <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
-                {t('sloganPage.construction')}
-              </p>
-            </div>
+          {/* Textos debajo del logo, uno debajo del otro */}
+          <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+            <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+              {t('sloganPage.design')}
+            </p>
+            <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+              {t('sloganPage.vanguard')}
+            </p>
+            <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 tracking-widest uppercase">
+              {t('sloganPage.construction')}
+            </p>
           </div>
         </div>
 

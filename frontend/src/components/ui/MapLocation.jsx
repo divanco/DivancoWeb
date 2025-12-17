@@ -21,7 +21,7 @@ const MapLocation = ({ address = "Cl. 9 #5 60, Restrepo, Meta, Colombia", classN
     <div className={`rounded-lg overflow-hidden shadow-lg ${className}`}>
       <MapContainer
         center={position}
-        zoom={15}
+        zoom={17}
         style={{ height: '300px', width: '100%' }}
         className="rounded-lg"
       >
