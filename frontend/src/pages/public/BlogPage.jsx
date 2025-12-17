@@ -143,11 +143,11 @@ const BlogPage = () => {
                       </div>
                     </div>
                     <div className="order-1 lg:order-2">
-                      <div className="overflow-hidden bg-gray-100">
+                      <div className="bg-gray-100">
                         <img
                           src={getImageUrl(featuredPosts.data[0])}
                           alt={featuredPosts.data[0].title}
-                          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto object-contain transition-transform duration-500"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
                               e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
@@ -206,11 +206,11 @@ const BlogPage = () => {
                   <article key={post.id} className="group">
                     <Link to={`/blog/${post.slug}`} className="block">
                       {/* Imagen */}
-                      <div className="overflow-hidden bg-gray-100 mb-6">
+                      <div className="bg-gray-100 mb-6">
                         <img
                           src={getImageUrl(post)}
                           alt={post.title}
-                          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto object-contain transition-transform duration-500"
                           onError={(e) => {
                             if (!e.target.src.includes('data:image')) {
                               e.target.src = `data:image/svg+xml;base64,${btoa(`<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
