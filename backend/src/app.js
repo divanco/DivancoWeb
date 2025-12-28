@@ -10,6 +10,7 @@ import routes from './routes/index.js';
 // Configurar zona horaria
 process.env.TZ = 'America/Bogota';
 console.log('🇨🇴 [SERVER] Zona horaria configurada:', process.env.TZ);
+console.log('✅ [SERVER] CORS configurado para grupodivanco.co y grupodivanco.com');
 console.log('🕐 [SERVER] Hora actual Colombia:', new Date().toLocaleString('es-CO', {
   timeZone: 'America/Bogota',
   year: 'numeric',
