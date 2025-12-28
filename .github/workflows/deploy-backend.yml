@@ -40,17 +40,5 @@ jobs:
     - name: Image built successfully
       run: |
         echo "✅ Image pushed to ACR: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-    
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Update Container App
-      run: |
-        echo "🔄 Updating Container App with latest image..."
-        az containerapp update \
-          --name divanco-backend \
-          --resource-group divanco-rg \
-          --image ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-        echo "✅ Container App updated successfully!"
+        echo "⚠️ Next step: Update Container App manually with:"
+        echo "az containerapp update --name divanco-backend --resource-group divanco-rg --image ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest"
