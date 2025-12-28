@@ -41,6 +41,8 @@ app.use(cors({
       'https://yellow-sea-0d0acfc0f.3.azurestaticapps.net',
       'https://grupodivanco.com',
       'https://www.grupodivanco.com',
+      'https://grupodivanco.co',
+      'https://www.grupodivanco.co',
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:3000'
