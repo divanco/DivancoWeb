@@ -140,3 +140,19 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Azure deployment files (contain secrets)
+payload-temp.json
+update-container-app.sh
+deploy-azure.sh
+prepare-azure.sh
+migration-complete.sh
+AZURE_CREDENTIALS.md
+AZURE_DEPLOYMENT.md
+CLIENTE_INFO_AZURE.md
+COMO_OBTENER_SUBSCRIPTION_ID.md
+DEPLOY_FRONTEND_AZURE.md
+DEPLOYMENT_WORKFLOW.md
+GITHUB_ACTIONS_SETUP.md
+GUIA_DESPLIEGUE_PASO_A_PASO.md
+MIGRATION.md
