@@ -4,26 +4,28 @@ export const up = async (queryInterface) => {
   console.log('🔄 Ejecutando migración: Agregar campos kuulaUrl y showInSlider a Projects');
   
   try {
-    // Agregar campo kuulaUrl
-    await queryInterface.addColumn('Projects', 'kuulaUrl', {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      validate: {
-        isUrl: {
-          msg: 'Debe ser una URL válida'
-        },
-        len: [0, 500]
-      }
-    });
-    console.log('✅ Campo kuulaUrl agregado correctamente');
+    const table = await queryInterface.describeTable('Projects');
 
-    // Agregar campo showInSlider
-    await queryInterface.addColumn('Projects', 'showInSlider', {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
-    });
-    console.log('✅ Campo showInSlider agregado correctamente');
+    if (!table.kuulaUrl) {
+      await queryInterface.addColumn('Projects', 'kuulaUrl', {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+      });
+      console.log('✅ Campo kuulaUrl agregado correctamente');
+    } else {
+      console.log('ℹ️ Campo kuulaUrl ya existe, omitiendo');
+    }
+
+    if (!table.showInSlider) {
+      await queryInterface.addColumn('Projects', 'showInSlider', {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      });
+      console.log('✅ Campo showInSlider agregado correctamente');
+    } else {
+      console.log('ℹ️ Campo showInSlider ya existe, omitiendo');
+    }
 
     console.log('🎉 Migración completada exitosamente');
 

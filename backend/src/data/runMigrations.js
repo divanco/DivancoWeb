@@ -1,6 +1,7 @@
 import sequelize from './config/sequelize.js';
 import { up as addKuulaSliderFields } from './migrations/20250817_add_kuula_and_slider_fields.js';
 import { up as createSiteSettings } from './migrations/20260429000000-create-site-settings.js';
+import { up as addMissingBlogPostColumns } from './migrations/20260429000001-add-missing-blogpost-columns.js';
 
 const runMigrations = async () => {
   try {
@@ -13,6 +14,7 @@ const runMigrations = async () => {
     // Ejecutar migraciones
     await addKuulaSliderFields(sequelize.getQueryInterface());
     await createSiteSettings(sequelize.getQueryInterface(), sequelize.constructor);
+    await addMissingBlogPostColumns(sequelize.getQueryInterface());
     
     console.log('🎉 Todas las migraciones completadas');
     
@@ -20,7 +22,10 @@ const runMigrations = async () => {
     console.error('❌ Error ejecutando migraciones:', error);
     process.exit(1);
   } finally {
-    await sequelize.close();
+    // Solo cerrar conexión si se llama directamente (no desde el servidor)
+    if (import.meta.url === `file://${process.argv[1]}`) {
+      await sequelize.close();
+    }
   }
 };
 

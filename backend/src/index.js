@@ -1,6 +1,7 @@
 
 import sequelize from './data/config/sequelize.js';  // ✅ Agregada extensión .js
 import { syncAllModels } from './data/models/index.js';
+import runMigrations from './data/runMigrations.js';
 import app from './app.js';
 
 const PORT = process.env.PORT || 3001;
@@ -18,7 +19,10 @@ async function initializeApp() {
     
     // Sincronizar modelos en orden correcto
     console.log(`⚠️ Entorno detectado: ${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'}`);
-    
+
+    // Ejecutar migraciones (idempotentes, seguras de correr siempre)
+    await runMigrations();
+
     if (FORCE_RESET) {
       console.log('⚠️ MODO RESET: Borrando todas las tablas (FORCE: true)');
       await syncAllModels(true); // force: true - borra todo
