@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useGetHeroImageQuery, useUpdateHeroImageMutation } from '../../../features/siteSettings/siteSettingsApi';
+import { useGetHeroImageQuery, useUpdateHeroImageMutation } from '../../features/siteSettings/siteSettingsApi';
 import toast from 'react-hot-toast';
 
 const CambiarPortadaPage = () => {
