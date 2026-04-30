@@ -1,5 +1,6 @@
 import sequelize from './config/sequelize.js';
 import { up as addKuulaSliderFields } from './migrations/20250817_add_kuula_and_slider_fields.js';
+import { up as createSiteSettings } from './migrations/20260429000000-create-site-settings.js';
 
 const runMigrations = async () => {
   try {
@@ -9,8 +10,9 @@ const runMigrations = async () => {
     await sequelize.authenticate();
     console.log('✅ Conexión a base de datos establecida');
     
-    // Ejecutar migración
+    // Ejecutar migraciones
     await addKuulaSliderFields(sequelize.getQueryInterface());
+    await createSiteSettings(sequelize.getQueryInterface(), sequelize.constructor);
     
     console.log('🎉 Todas las migraciones completadas');
     

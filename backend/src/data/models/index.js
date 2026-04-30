@@ -124,7 +124,8 @@ export async function syncAllModels(force = false) {
     await MediaFile.sync(syncOptions);
     console.log('✅ Tabla MediaFiles sincronizada');
 
-    console.log('✅ Todos los modelos sincronizados exitosamente');
+    await SiteSetting.sync(syncOptions);
+    console.log('✅ Tabla SiteSettings sincronizada');
     return true;
   } catch (error) {
     console.error('❌ Error al sincronizar modelos:', error.message);
