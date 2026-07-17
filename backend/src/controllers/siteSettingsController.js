@@ -2,7 +2,7 @@ import { SiteSetting } from '../data/models/index.js';
 import {
   uploadHeroMediaMiddleware,
   uploadResponsiveImage,
-  uploadOptimizedVideo,
+  uploadHeroVideo,
 } from '../config/cloudinary.js';
 import { promises as fs } from 'fs';
 
@@ -31,6 +31,23 @@ const parseHeroMedia = (rawValue) => {
   return { url: rawValue, type: 'image' };
 };
 
+const parseHeroUpload = (req, res, next) => {
+  uploadHeroMediaMiddleware.single('media')(req, res, (err) => {
+    if (err) {
+      console.error('❌ [HeroMedia] Multer error:', err.message);
+      const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+      return res.status(status).json({
+        success: false,
+        message:
+          err.code === 'LIMIT_FILE_SIZE'
+            ? 'El archivo supera el tamaño máximo permitido (100MB)'
+            : err.message || 'Archivo no válido',
+      });
+    }
+    next();
+  });
+};
+
 // GET /settings/hero-image — público
 export const getHeroImage = async (req, res) => {
   try {
@@ -48,7 +65,7 @@ export const getHeroImage = async (req, res) => {
 
 // PUT /settings/hero-image — solo admin (imagen o video)
 export const updateHeroImage = [
-  uploadHeroMediaMiddleware.single('media'),
+  parseHeroUpload,
   async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
@@ -58,18 +75,23 @@ export const updateHeroImage = [
     }
 
     const isVideo = req.file.mimetype.startsWith('video/');
+    console.log(
+      `📤 [HeroMedia] Recibido ${isVideo ? 'video' : 'imagen'}:`,
+      req.file.originalname,
+      `${(req.file.size / (1024 * 1024)).toFixed(2)}MB`,
+      req.file.mimetype
+    );
 
     try {
       let url;
       let type;
 
       if (isVideo) {
-        const result = await uploadOptimizedVideo(req.file.path, 'site-settings/hero');
+        const result = await uploadHeroVideo(req.file.path, 'site-settings/hero');
         url = result.url;
         type = 'video';
       } else {
         const result = await uploadResponsiveImage(req.file.path, 'site-settings/hero');
-        // uploadResponsiveImage ya elimina el temp
         url = result.desktop.url;
         type = 'image';
       }
@@ -79,13 +101,16 @@ export const updateHeroImage = [
       const payload = JSON.stringify({ url, type });
       await SiteSetting.upsert({ key: HERO_MEDIA_KEY, value: payload });
 
+      console.log('✅ [HeroMedia] Guardado:', { type, url });
       res.json({ success: true, data: { url, type } });
     } catch (error) {
       await fs.unlink(req.file?.path).catch(() => {});
       console.error('Error subiendo hero media:', error);
       res.status(500).json({
         success: false,
-        message: isVideo ? 'Error al subir el video' : 'Error al subir la imagen',
+        message: isVideo
+          ? `Error al subir el video: ${error.message}`
+          : `Error al subir la imagen: ${error.message}`,
       });
     }
   },

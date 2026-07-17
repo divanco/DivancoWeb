@@ -65,24 +65,23 @@ app.use(cors({
   credentials: true
 }));
 
+const isMultipartUploadPath = (path) =>
+  path.includes('/media') ||
+  path.includes('/upload') ||
+  path.includes('/hero-image');
+
 // ✅ MIDDLEWARE CONDICIONAL - NO parsear JSON en rutas de upload
 app.use((req, res, next) => {
-  // Excluir rutas que manejan archivos del parsing JSON
-  if (req.path.includes('/media') || req.path.includes('/upload')) {
-    console.log('🚫 Saltando JSON parsing para:', req.path);
+  if (isMultipartUploadPath(req.path)) {
     return next();
   }
-  
-  // Para todas las demás rutas, aplicar JSON parsing
   express.json({ limit: '10mb' })(req, res, next);
 });
 
 app.use((req, res, next) => {
-  // Excluir rutas que manejan archivos del parsing URL-encoded
-  if (req.path.includes('/media') || req.path.includes('/upload')) {
+  if (isMultipartUploadPath(req.path)) {
     return next();
   }
-  
   express.urlencoded({ limit: '10mb', extended: true })(req, res, next);
 });
 

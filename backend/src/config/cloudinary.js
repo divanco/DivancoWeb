@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { promises as fs } from 'fs';
+import { mkdirSync } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
@@ -14,10 +15,17 @@ cloudinary.config({
   secure: true,
 });
 
+const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'temp');
+
 // Configuración de multer para almacenamiento temporal
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/temp/');
+    try {
+      mkdirSync(TEMP_UPLOAD_DIR, { recursive: true });
+      cb(null, TEMP_UPLOAD_DIR);
+    } catch (error) {
+      cb(error);
+    }
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -281,6 +289,37 @@ export const uploadOptimizedVideo = async (filePath, folder = 'divanco') => {
       console.error('Error eliminando archivo temporal:', unlinkError);
     }
     throw new Error(`Error uploading video: ${error.message}`);
+  }
+};
+
+// Hero: subida rápida sin transformaciones síncronas (evita timeout en Render)
+export const uploadHeroVideo = async (filePath, folder = 'site-settings/hero') => {
+  try {
+    console.log('🎬 [HeroVideo] Subiendo a Cloudinary...', filePath);
+    const videoUpload = await cloudinary.uploader.upload(filePath, {
+      resource_type: 'video',
+      folder: `${folder}/videos`,
+      // Sin transformation/eager: el upload responde al terminar de recibir el archivo
+      chunk_size: 6_000_000,
+      timeout: 120_000,
+    });
+
+    await fs.unlink(filePath).catch(() => {});
+
+    console.log('✅ [HeroVideo] Subido:', videoUpload.secure_url);
+    return {
+      url: videoUpload.secure_url,
+      public_id: videoUpload.public_id,
+      duration: videoUpload.duration,
+      width: videoUpload.width,
+      height: videoUpload.height,
+      format: videoUpload.format,
+      bytes: videoUpload.bytes,
+    };
+  } catch (error) {
+    await fs.unlink(filePath).catch(() => {});
+    console.error('❌ [HeroVideo] Error Cloudinary:', error);
+    throw new Error(`Error uploading hero video: ${error.message}`);
   }
 };
 

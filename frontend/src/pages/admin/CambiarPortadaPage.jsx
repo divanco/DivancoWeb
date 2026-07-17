@@ -97,8 +97,14 @@ const CambiarPortadaPage = () => {
           : 'Imagen de portada actualizada correctamente'
       );
       clearSelection();
-    } catch {
-      toast.error('Error al subir el archivo. Intenta de nuevo.');
+    } catch (err) {
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        (err?.status === 'FETCH_ERROR'
+          ? 'No hubo respuesta del servidor (timeout o red). Probá un video más liviano (<15MB) o reintentá.'
+          : 'Error al subir el archivo. Intenta de nuevo.');
+      toast.error(message, { duration: 6000 });
     }
   };
 
