@@ -9,7 +9,7 @@ export const siteSettingsApi = baseApi.injectEndpoints({
     updateHeroImage: builder.mutation({
       query: (file) => {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('media', file);
         return {
           url: '/settings/hero-image',
           method: 'PUT',

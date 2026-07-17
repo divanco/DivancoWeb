@@ -10,7 +10,7 @@ import routes from './routes/index.js';
 // Configurar zona horaria
 process.env.TZ = 'America/Bogota';
 console.log('🇨🇴 [SERVER] Zona horaria configurada:', process.env.TZ);
-console.log('✅ [SERVER] CORS configurado para grupodivanco.co y grupodivanco.com');
+console.log('✅ [SERVER] CORS: grupodivanco.com / .co → API Render');
 console.log('🕐 [SERVER] Hora actual Colombia:', new Date().toLocaleString('es-CO', {
   timeZone: 'America/Bogota',
   year: 'numeric',
@@ -35,28 +35,30 @@ app.use(cors({
   origin: function (origin, callback) {
     // Permitir requests sin origin (como mobile apps o curl)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
-      'https://divanco-web.vercel.app',
-      'https://divancoweb.onrender.com',
-      'https://grupodivanco.com',
+      process.env.FRONTEND_URL,
       'https://www.grupodivanco.com',
-      'https://grupodivanco.co',
+      'https://grupodivanco.com',
       'https://www.grupodivanco.co',
+      'https://grupodivanco.co',
+      'https://divanco-web.vercel.app',
       'http://localhost:5173',
       'http://localhost:5174',
-      'http://localhost:3000'
-    ];
-    
-    // Permitir cualquier URL de preview de Vercel para el proyecto divanco
-    const isVercelPreview = origin.match(/https:\/\/divanco-.*\.vercel\.app$/);
-    
-    if (allowedOrigins.indexOf(origin) !== -1 || isVercelPreview) {
-      callback(null, true);
-    } else {
-      console.warn('🚫 CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      'http://localhost:3000',
+    ].filter(Boolean);
+
+    // Previews de Vercel del proyecto (divanco-*)
+    const isVercelPreview = /^https:\/\/divanco[a-z0-9-]*\.vercel\.app$/.test(origin);
+
+    if (allowedOrigins.includes(origin) || isVercelPreview) {
+      return callback(null, true);
     }
+
+    // Importante: NO lanzar Error (eso se convierte en HTTP 500).
+    // callback(null, false) deniega CORS sin tumbar el request como error de servidor.
+    console.warn('🚫 CORS blocked origin:', origin);
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with'],

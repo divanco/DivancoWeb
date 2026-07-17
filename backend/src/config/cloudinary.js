@@ -67,6 +67,31 @@ export const uploadVideoMiddleware = multer({
   }
 });
 
+const heroMediaFilter = (req, file, cb) => {
+  const allowed = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'video/mp4',
+    'video/webm',
+    'video/quicktime',
+  ];
+  if (allowed.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Solo se permiten imágenes (JPG, PNG, WebP) o videos (MP4, WebM)'), false);
+  }
+};
+
+export const uploadHeroMediaMiddleware = multer({
+  storage: storage,
+  fileFilter: heroMediaFilter,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB — cubre video de portada
+  },
+});
+
 export const uploadPDFMiddleware = multer({ 
   storage: storage,
   fileFilter: pdfFilter,

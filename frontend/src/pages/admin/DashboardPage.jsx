@@ -94,8 +94,8 @@ const DashboardPage = () => {
     },
     {
       id: 'portada',
-      title: 'Imagen de portada',
-      description: 'Imagen hero de la página principal',
+      title: 'Portada del inicio',
+      description: 'Imagen o video hero de la página principal',
       icon: PhotoIcon,
       count: null,
       color: 'bg-orange-50 text-orange-600',

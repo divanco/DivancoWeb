@@ -29,7 +29,7 @@ services:
       - key: SMTP_PASS
         sync: false
       - key: FRONTEND_URL
-        value: https://divanco-web.vercel.app
+        value: https://www.grupodivanco.com
 
 databases:
   - name: divanco-db
