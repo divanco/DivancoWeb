@@ -10,6 +10,7 @@ import subscriberRoutes from './subscriberRoutes.js';
 import searchRoutes from './searchRoutes.js';
 import syncRoutes from './syncRoutes.js';
 import siteSettingsRoutes from './siteSettingsRoutes.js';
+import brandingRoutes from './brandingRoutes.js';
 
 const router = express.Router();
 
@@ -42,6 +43,9 @@ router.use('/sync', syncRoutes);
 // Rutas de configuración del sitio
 router.use('/settings', siteSettingsRoutes);
 
+// Rutas de branding (multi-tenant / multi-plataforma)
+router.use('/branding', brandingRoutes);
+
 // Ruta de información del API
 router.get('/', (req, res) => {
   res.json({
@@ -58,7 +62,8 @@ router.get('/', (req, res) => {
       blog: '/blog',
       subscribers: '/subscribers',
       search: '/search',
-      sync: '/sync (temporal)'
+      sync: '/sync (temporal)',
+      branding: '/branding'
     }
   });
 });

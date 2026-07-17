@@ -73,7 +73,8 @@ export const baseApi = createApi({
     'Subscriber',
     'ProjectMedia',
     'FilterOptions',
-    'HeroImage'
+    'HeroImage',
+    'Branding'
   ],
   endpoints: () => ({}),
 });
